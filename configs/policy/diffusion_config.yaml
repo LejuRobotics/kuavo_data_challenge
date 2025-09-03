@@ -1,0 +1,175 @@
+hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
+  run:
+    dir: ./outputs/train_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # 单次运行目录
+  sweep:
+    dir: ./outputs/train_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep并行时的根目录
+    subdir: ${hydra:job.override_dirname}
+
+
+task: "your_task_name"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
+method: "your_method_name"  # 自定义方法名称
+timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
+# 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
+repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
+root: "/your/path/to/your/lerobotdata/lerobot"  # 你的本地转换好的lerobot数据的目录
+# root: null  # 如果不使用本地数据想使用huggingface官方数据，请在task中指定，例如pusht，aloha_sim_insertion_human，此处就设置为null空
+# 将去云端调用下载数据集
+
+# 训练相关配置
+training:
+    output_directory: "outputs/train/${task}/${method}"  # 模型参数保存路径，默认这个结构，不要改动
+    seed: 42  # 数据增广、训练模型的随机种子，便于复现
+    max_epoch: 500  # 最大训练轮次，用于控制学习率调整器，与下述max_training_step相关
+    
+    save_freq_epoch: 10  # 模型参数保存频率，每10个epoch保存一次
+    log_freq: 1  # 进度条刷新频率，每1个迭代step
+    device: "cuda" # 训练设备，目前只支持单卡，多卡请使用CUDA_VISIBLE_DEVICES=6指定环境变量后使用，cuda:6这种类似的可能会出错
+    accumulation_steps: 1  # 梯度累积步数，自定义
+    ema_power: 0.75  # 如果使用ema移动指数平均方法可使用这个参数，目前测试使用ema会掉性能，所以代码中不再支持
+
+    batch_size: 64  # 批次大小
+    num_workers: 8  # dataloader的num_workers
+    drop_last: False  # 是否丢弃最后一个不完整的batch
+
+    # 最大训练步数，用于控制学习率调整器，如果指定了 `max_training_step`，则它将优先生效，否则，该值将根据上述的 `max_epoch` 自动确定。
+    # `max_epoch` 和 `max_training_step` 不会同时生效。
+    max_training_step: null  
+
+    # resume training，断点续训
+    resume: False
+    resume_timestamp: "run_20250902_150345"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+
+    # 数据增广相关的配置
+    RGB_Augmenter:
+      enable: True
+      max_num_transforms: 1
+      random_order: True
+      tfs:
+        notransform:
+          weight: 2.0  # 占比权重
+          type: "Identity"
+          kwargs: {}
+        brightness:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"brightness": [0.5, 1.5]}
+        contrast:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"contrast": [0.5, 1.5]}
+        saturation:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"saturation": [0.5, 1.5]}
+        hue:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"hue": [-0.05, 0.05]}
+        sharpness:
+          weight: 1.0
+          type: "SharpnessJitter"
+          kwargs: {"sharpness": [0.5, 1.5]}
+        random_mask:
+          weight: 1.0
+          type: RandomMask
+          kwargs:
+            mask_size: [0.1, 0.1]   # h_ratio, w_ratio
+        random_border_cutout:
+          weight: 1.0
+          type: RandomBorderCutout
+          kwargs:
+            cut_ratio: 0.15
+        gaussian_noise:
+          weight: 1.0
+          type: GaussianNoise
+          kwargs:
+            mean: 0.0
+            std: 0.05
+        gamma_correction:
+          weight: 1.0
+          type: GammaCorrection
+          kwargs:
+            gamma: [0.5, 2.0]
+        
+
+policy_name: diffusion   # 策略类型，支持diffusion和act
+
+policy:
+    _target_: kuavo_train.wrapper.policy.diffusion.DiffusionConfigWrapper.CustomDiffusionConfigWrapper  # 实例化diffusion config
+    horizon: 16  # 预测步数
+    n_action_steps: 8  # 1,2,4,12 执行动作步数
+    drop_n_last_frames: 7  # 丢弃最后n帧
+
+    normalization_mapping: # RGB等同于VISUAL类型, diffusion策略另外支持了深度数据，这两个参数用于设置normalize方式
+      RGB: 
+        _target_: lerobot.configs.types.NormalizationMode
+        value: MEAN_STD
+      DEPTH: 
+        _target_: lerobot.configs.types.NormalizationMode
+        value: MIN_MAX
+
+    # 图像裁剪，（lerobot内有的策略不支持）
+    crop_is_random: True
+    crop_shape: [420, 560]  #  [84, 84]
+
+    use_amp: True  # 是否使用混合精度训练
+
+    # 模型相关超参数设置
+    vision_backbone: resnet18
+    spatial_softmax_num_keypoints: 64
+    use_separate_rgb_encoder_per_camera: False
+
+    down_dims:
+    - 512
+    - 1024
+    - 2048
+    kernel_size: 5
+    n_groups: 8
+
+    # If using UNet, the following two lines can be adjusted. See the `use_unet` setting in `custom` for details.
+    diffusion_step_embed_dim: 128
+    use_film_scale_modulation: true
+
+    # diffusion settings:
+    noise_scheduler_type: DDPM
+    num_train_timesteps: 100
+    beta_schedule: squaredcos_cap_v2
+    beta_start: 0.0001
+    beta_end: 0.02
+    prediction_type: epsilon
+    clip_sample: true
+    clip_sample_range: 1.0
+    num_inference_steps: null
+    do_mask_loss_for_padding: false
+
+    # optimizer and scheduler
+    optimizer_lr: 0.0001
+    optimizer_betas:
+    - 0.95
+    - 0.999
+    optimizer_eps: 1.0e-08
+    optimizer_weight_decay: 1.0e-03
+    scheduler_name: cosine
+    scheduler_warmup_steps: 500
+
+    custom:  # 一些自定义设置，是本代码仓库针对lerobot diffusion policy的特色更改，包含深度数据支持以及transformer模型等，可参考相关代码
+      # support depth image
+      use_depth: True
+      depth_backbone: resnet18
+      use_separate_depth_encoder_per_camera: False
+
+      # resize and augmentation
+      resize_shape: [210, 280] 
+
+      # state encoder.
+      use_state_encoder: True
+      state_feature_dim: 128
+
+      # Unet
+      use_unet: False
+      # transformer
+      use_transformer: True
+      transformer_n_emb: 512
+      transformer_n_head: 8
+      transformer_n_layer: 4
+      transformer_dropout: 0.1
