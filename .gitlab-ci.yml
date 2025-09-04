@@ -1,11 +1,3 @@
-variables:
-  # GitHub opensource project repository URL
-  opensource_project_origin_github: "https://github.com/your-org/your-repo.git"  # Replace with actual GitHub repository
-  # Temporary directory path
-  temp_target_repo_path_github: "/tmp/ci_github_sync_${CI_PIPELINE_ID}"
-  # WeChat Bot notification token
-  WECHAT_BOT_TOKEN: "${WECHAT_BOT_TOKEN}"
-
 stages:
   - sync_to_github
 
@@ -15,8 +7,6 @@ sync_to_github:
     - osc2
   before_script:
     - echo "Preparing environment for GitHub sync..."
-    # Set proxy if needed (uncomment if required)
-    # - export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7891
   script:
     - echo "Starting GitHub sync..."
     - chmod +x $CI_PROJECT_DIR/ci_scripts/sync_to_github.sh
@@ -30,7 +20,3 @@ sync_to_github:
       fi
   only:
     - master
-    - main
-    - dev
-    - /^opensource.*/
-  when: manual  # Set to manual trigger, change to automatic if needed
