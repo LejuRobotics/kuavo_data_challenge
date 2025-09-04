@@ -92,6 +92,6 @@ git submodule update --init --recursive
 
 参考 [机器人连接配置](readme/setup_robot_connection.md)
 
-### 4. 真机推理
+### 4. 仿真和真机推理
 
 参考 [推理指南](readme/inference.md)
