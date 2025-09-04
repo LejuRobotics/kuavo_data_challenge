@@ -4,7 +4,7 @@ stages:
 sync_to_github:
   stage: sync_to_github
   tags:
-    - osc2
+    - ocs2
   before_script:
     - echo "Preparing environment for GitHub sync..."
   script:
