@@ -1,0 +1,22 @@
+stages:
+  - sync_to_github
+
+sync_to_github:
+  stage: sync_to_github
+  tags:
+    - osc2
+  before_script:
+    - echo "Preparing environment for GitHub sync..."
+  script:
+    - echo "Starting GitHub sync..."
+    - chmod +x $CI_PROJECT_DIR/ci_scripts/sync_to_github.sh
+    - bash $CI_PROJECT_DIR/ci_scripts/sync_to_github.sh
+  after_script:
+    - |
+      # Clean up temporary directory
+      if [ -d "$temp_target_repo_path_github" ]; then
+        echo "Cleaning up temporary directory..."
+        rm -rf $temp_target_repo_path_github
+      fi
+  only:
+    - master
