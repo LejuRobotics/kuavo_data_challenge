@@ -12,110 +12,15 @@ stages:
 sync_to_github:
   stage: sync_to_github
   tags:
-    - docker  # Adjust according to your runner configuration
+    - osc2
   before_script:
-    - echo "Preparing sync to GitHub..."
-    - export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7891
+    - echo "Preparing environment for GitHub sync..."
+    # Set proxy if needed (uncomment if required)
+    # - export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7891
   script:
-    - echo "Sync to GitHub..."
-    - |
-      # Retry function with exponential backoff
-      retry_git_command() {
-        local cmd="$1"
-        local max_attempts=10
-        local attempt=1
-        while [ $attempt -le $max_attempts ]; do
-          echo "Attempt $attempt/$max_attempts: $cmd"
-          if eval "$cmd"; then
-            echo "Command succeeded on attempt $attempt"
-            return 0
-          else
-            if [ $attempt -eq $max_attempts ]; then
-              echo "Command failed after $max_attempts attempts"
-              return 1
-            fi
-            local delay=$((2**attempt))
-            echo "Command failed, retrying in $delay seconds..."
-            sleep $delay
-            attempt=$((attempt + 1))
-          fi
-        done
-      }
-    - mkdir -p $temp_target_repo_path_github
-    - cd $temp_target_repo_path_github
-    - git clone $opensource_project_origin_github git_repo || echo "After clone github"
-    - cd $temp_target_repo_path_github/git_repo
-    - retry_git_command "git fetch origin"
-    - |
-      if git show-ref --verify --quiet refs/remotes/origin/$CI_COMMIT_BRANCH; then
-        echo "Branch $CI_COMMIT_BRANCH exists on remote. Checking out.";
-        git checkout -B $CI_COMMIT_BRANCH origin/$CI_COMMIT_BRANCH;
-      else
-        echo "Branch $CI_COMMIT_BRANCH does not exist on remote. Creating new branch.";
-        if git show-ref --verify --quiet refs/heads/$CI_COMMIT_BRANCH; then
-          echo "Local branch $CI_COMMIT_BRANCH exists. Checking out and resetting.";
-          git checkout $CI_COMMIT_BRANCH;
-          git reset --hard HEAD;
-        else
-          echo "Creating new local branch $CI_COMMIT_BRANCH.";
-          if git show-ref --verify --quiet refs/remotes/origin/main; then
-            echo "Using origin/main as base branch";
-            git checkout -b $CI_COMMIT_BRANCH origin/main;
-          elif git show-ref --verify --quiet refs/remotes/origin/master; then
-            echo "Using origin/master as base branch";
-            git checkout -b $CI_COMMIT_BRANCH origin/master;
-          else
-            echo "No priority base branch found, creating from HEAD";
-            git checkout -b $CI_COMMIT_BRANCH;
-          fi;
-        fi;
-      fi
-    - git reset --hard origin/$CI_COMMIT_BRANCH 2>/dev/null || echo "Branch doesn't exist on remote yet"
-    - git clean -df
-    - cd $CI_PROJECT_DIR
-    - |
-      # Sync files to target repository, excluding .gitlab-ci.yml and ci_scripts
-      rsync -av --delete --exclude='.git' --exclude='.gitlab-ci.yml' --exclude='ci_scripts' . $temp_target_repo_path_github/git_repo
-    - cd $temp_target_repo_path_github/git_repo
-    - |
-      # Check for files larger than 80MB (GitHub limit)
-      echo "Checking for files larger than 80MB..."
-      large_files=$(find . -type f -size +80M ! -path "./.git/*" 2>/dev/null)
-      if [ -n "$large_files" ]; then
-        echo "Found files larger than 80MB that will be removed:"
-        echo "$large_files"
-        echo "$large_files" | while read -r file; do
-          if [ -f "$file" ]; then
-            file_size=$(du -h "$file" | cut -f1)
-            echo "Removing large file: $file (${file_size})"
-            rm -f "$file"
-          fi
-        done
-        echo "Completed removal of large files."
-      else
-        echo "No files larger than 80MB found."
-      fi
-    - git add . && git add -u
-    - |
-      # Check if there are changes to commit
-      if [ -n "$(git status --porcelain)" ]; then
-        git commit -am "sync $CI_PROJECT_URL/commit/$CI_COMMIT_SHA"
-        retry_git_command "git push -f origin $CI_COMMIT_BRANCH"
-        
-        # If master branch, also push to main branch
-        if [ "$CI_COMMIT_BRANCH" = "master" ]; then
-          echo "Master branch detected, also pushing to main branch";
-          retry_git_command "git push -f origin HEAD:main";
-        fi
-        
-        # Send success notification
-        bash $CI_PROJECT_DIR/ci_scripts/wechat_bot_notify.sh "kuavo_data_challenge GitHub sync for branch $CI_COMMIT_BRANCH succeeded" "$WECHAT_BOT_TOKEN"
-      else
-        echo "No changes to commit"
-      fi
-    - cd $CI_PROJECT_DIR
-    - git clean -dfx
-    - git checkout .
+    - echo "Starting GitHub sync..."
+    - chmod +x $CI_PROJECT_DIR/ci_scripts/sync_to_github.sh
+    - bash $CI_PROJECT_DIR/ci_scripts/sync_to_github.sh
   after_script:
     - |
       # Clean up temporary directory
