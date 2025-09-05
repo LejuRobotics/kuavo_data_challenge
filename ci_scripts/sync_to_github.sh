@@ -37,6 +37,7 @@ retry_git_command() {
 
 # Function to setup target repository
 setup_target_repository() {
+    # 在 mkdir 和 ci 之后打印调试信息，提示用户正在执行的状态 TODO
   echo "Setting up target repository..."
   mkdir -p "$TEMP_REPO_PATH"
   cd "$TEMP_REPO_PATH"
