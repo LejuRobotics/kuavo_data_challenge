@@ -39,6 +39,7 @@ import torch
 from tqdm import tqdm
 
 from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
+from lerobot.policies.act.modeling_act import ACTPolicy
 from lerobot.utils.random_utils import set_seed
 import datetime
 import time
@@ -117,7 +118,7 @@ def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     if policy_type == 'diffusion':
         policy = CustomDiffusionPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     elif policy_type == 'act':
-        raise ValueError(f"Unsupported policy type: {policy_type}")
+        policy = ACTPolicy.from_pretrained(Path(pretrained_path),strict=True)
     else:
         raise ValueError(f"Unsupported policy type: {policy_type}")
     
