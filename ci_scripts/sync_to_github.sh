@@ -42,6 +42,7 @@ setup_target_repository() {
   mkdir -p "$TEMP_REPO_PATH"
   echo "Created/verified directory: $TEMP_REPO_PATH"
   cd "$TEMP_REPO_PATH"
+  echo "Changed to directory: $(pwd)"
   
   # Clone repository if not exists
   if [ ! -d "git_repo/.git" ]; then
