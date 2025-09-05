@@ -270,7 +270,7 @@ b. 调用部署代码
 
 - 启动自动化推理部署：
   ```bash
-  sh kuavo_deploy/eval_kuavo.sh
+  bash kuavo_deploy/eval_kuavo.sh
   ```
 - 按照指引操作，一般最后请选择`"8. 仿真中自动测试模型，执行eval_episodes次:`，这步操作详见[kuavo deploy](kuavo_deploy/readme/inference.md)
 ---

@@ -28,11 +28,11 @@ Kuavo机器人控制系统包含以下核心组件：
 
 ## 🚀 快速开始
 
-### 方法一：使用交互式脚本 run_example.sh
+### 方法一：使用交互式脚本 eval_kuavo.sh
 
 启动交互式控制界面
 ```bash
-sh ./run_example.sh
+bash kuavo_deploy/eval_kuavo.sh
 ```
 命令行弹出提示：
 ```bash
