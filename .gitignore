@@ -210,3 +210,4 @@ outputs/
 
 log/
 .vscode/
+.claude/

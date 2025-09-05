@@ -39,15 +39,18 @@ retry_git_command() {
 setup_target_repository() {
   echo "Setting up target repository..."
   mkdir -p "$TEMP_REPO_PATH"
+  echo "Created/verified directory: $TEMP_REPO_PATH"
   cd "$TEMP_REPO_PATH"
+  echo "Changed to directory: $(pwd)"
   
   # Clone repository if not exists
   if [ ! -d "git_repo/.git" ]; then
-    git clone "$GITHUB_REPO_URL" git_repo || echo "After clone github"
+    git -c core.sshCommand="ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+      clone "$GITHUB_REPO_URL" git_repo || echo "After clone github"
   fi
   
   cd git_repo
-  retry_git_command "git fetch origin"
+  retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" fetch origin"
   
   # Handle branch creation/checkout
   if git show-ref --verify --quiet refs/remotes/origin/"$CURRENT_BRANCH"; then
@@ -84,11 +87,12 @@ sync_files() {
   echo "Syncing files from source to target repository..."
   cd "$PROJECT_DIR"
   
-  # Sync files to target repository, excluding .gitlab-ci.yml and ci_scripts
+  # Sync files to target repository, excluding .gitlab-ci.yml, ci_scripts, and .claude
   rsync -av --delete \
     --exclude='.git' \
     --exclude='.gitlab-ci.yml' \
     --exclude='ci_scripts' \
+    --exclude='.claude' \
     . "$TEMP_REPO_PATH/git_repo"
 }
 
@@ -126,12 +130,12 @@ commit_and_push() {
   # Check if there are changes to commit
   if [ -n "$(git status --porcelain)" ]; then
     git commit -am "sync ${PROJECT_URL}/commit/${COMMIT_SHA}"
-    retry_git_command "git push -f origin $CURRENT_BRANCH"
+    retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" push -f origin $CURRENT_BRANCH"
     
     # If master branch, also push to main branch
     if [ "$CURRENT_BRANCH" = "master" ]; then
       echo "Master branch detected, also pushing to main branch"
-      retry_git_command "git push -f origin HEAD:main"
+      retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" push -f origin HEAD:main"
     fi
     
     # Send success notification
