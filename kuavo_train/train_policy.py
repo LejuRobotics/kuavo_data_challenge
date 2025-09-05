@@ -97,12 +97,37 @@ def build_optimizer_and_scheduler(policy, cfg, total_frames):
     return optimizer, lr_scheduler
 
 
+def build_policy_config(cfg, input_features, output_features):
+    def _normalize_feature_dict(d: Any) -> dict[str, PolicyFeature]:
+        if isinstance(d, DictConfig):
+            d = OmegaConf.to_container(d, resolve=True)
+        if not isinstance(d, dict):
+            raise TypeError(f"Expected dict or DictConfig, got {type(d)}")
+
+        return {
+            k: PolicyFeature(**v) if isinstance(v, dict) and not isinstance(v, PolicyFeature) else v
+            for k, v in d.items()
+        }
+
+    policy_cfg = instantiate(
+        cfg.policy,
+        input_features=input_features,
+        output_features=output_features,
+        device=cfg.training.device,
+    )
+                
+    policy_cfg.input_features = _normalize_feature_dict(policy_cfg.input_features)
+    policy_cfg.output_features = _normalize_feature_dict(policy_cfg.output_features)
+    return policy_cfg
+
 def build_policy(name, policy_cfg, dataset_stats):
     policy = {
         "diffusion": CustomDiffusionPolicyWrapper,
         "act": ACTPolicy,
     }[name](policy_cfg, dataset_stats)
     return policy
+
+
 
 
 @hydra.main(config_path="../configs/policy/", config_name="diffusion_config", version_base=None)
@@ -128,12 +153,7 @@ def main(cfg: DictConfig):
     print(f"Input features: {input_features}")
     print(f"Output features: {output_features}")
     # instantiate the policy
-    policy_cfg = instantiate(
-        cfg.policy,
-        input_features=input_features,
-        output_features=output_features,
-        device=cfg.training.device,
-    )
+    policy_cfg = build_policy_config(cfg, input_features, output_features)
 
     # Build policy
     policy = build_policy(cfg.policy_name, policy_cfg, dataset_stats=dataset_metadata.stats)

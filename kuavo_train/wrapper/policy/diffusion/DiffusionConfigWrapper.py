@@ -45,8 +45,8 @@ class CustomDiffusionConfigWrapper(DiffusionConfig):
                     setattr(self, k, v)
                 else:
                     raise ValueError(f"Custom setting '{k}: {v}' conflicts with the parent base configuration. Remove it from 'custom' and modify in the parent configuration instead.")
-        self.input_features = self._normalize_feature_dict(self.input_features)
-        self.output_features = self._normalize_feature_dict(self.output_features)
+        # self.input_features = self._normalize_feature_dict(self.input_features)
+        # self.output_features = self._normalize_feature_dict(self.output_features)
         self._convert_omegaconf_fields()
 
     def _normalize_feature_dict(self, d: Any) -> dict[str, PolicyFeature]:
