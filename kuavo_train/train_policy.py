@@ -1,7 +1,4 @@
-import copy
-from dataclasses import fields
 from typing import Any
-from cv2 import log
 import lerobot_patches.custom_patches  # Ensure custom patches are applied, DON'T REMOVE THIS LINE!
 from lerobot_patches.custom_patches import PolicyFeature
 
