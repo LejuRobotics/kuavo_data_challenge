@@ -130,12 +130,13 @@ commit_and_push() {
   # Check if there are changes to commit
   if [ -n "$(git status --porcelain)" ]; then
     git commit -am "sync ${PROJECT_URL}/commit/${COMMIT_SHA}"
-    retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" push -f origin $CURRENT_BRANCH"
     
-    # If master branch, also push to main branch
+    # If master branch, push to main branch on remote; otherwise push to the same branch name
     if [ "$CURRENT_BRANCH" = "master" ]; then
-      echo "Master branch detected, also pushing to main branch"
-      retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" push -f origin HEAD:main"
+      echo "Master branch detected, pushing to main branch on remote"
+      retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" push -f origin master:main"
+    else
+      retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" push -f origin $CURRENT_BRANCH"
     fi
     
     # Send success notification
