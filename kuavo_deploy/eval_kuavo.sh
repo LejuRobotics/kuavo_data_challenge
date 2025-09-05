@@ -254,7 +254,7 @@ except Exception as e:
             echo "8. 仿真中自动测试模型，执行eval_episodes次"
             echo "执行: python $AUTO_TEST_SCRIPT --task auto_test --config $config_path"
             echo "9. 退出"
-            echo "请选择要执行的示例 (1-9) 或按 Enter 退出:"
+            echo "请选择要执行的示例 (1-9)"
             read -r choice
 
             case $choice in

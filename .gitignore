@@ -211,3 +211,4 @@ outputs/
 log/
 .vscode/
 .claude/
+third_party/

@@ -1,8 +1,12 @@
+import copy
+from dataclasses import fields
+from typing import Any
 from cv2 import log
 import lerobot_patches.custom_patches  # Ensure custom patches are applied, DON'T REMOVE THIS LINE!
+from lerobot_patches.custom_patches import PolicyFeature
 
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf, ListConfig
 from pathlib import Path
 from functools import partial
 
@@ -14,7 +18,7 @@ import shutil
 from hydra.utils import instantiate
 from diffusers.optimization import get_scheduler
 
-from lerobot.configs.types import FeatureType
+from lerobot.configs.types import FeatureType, NormalizationMode
 from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata, LeRobotDataset
 from lerobot.datasets.utils import dataset_to_policy_features
 from lerobot.utils.random_utils import set_seed
@@ -104,6 +108,29 @@ def build_policy(name, policy_cfg, dataset_stats):
     }[name](policy_cfg, dataset_stats)
     return policy
 
+def build_policy_config(cfg, input_features, output_features):
+    def _normalize_feature_dict(d: Any) -> dict[str, PolicyFeature]:
+        if isinstance(d, DictConfig):
+            d = OmegaConf.to_container(d, resolve=True)
+        if not isinstance(d, dict):
+            raise TypeError(f"Expected dict or DictConfig, got {type(d)}")
+
+        return {
+            k: PolicyFeature(**v) if isinstance(v, dict) and not isinstance(v, PolicyFeature) else v
+            for k, v in d.items()
+        }
+
+    policy_cfg = instantiate(
+        cfg.policy,
+        input_features=input_features,
+        output_features=output_features,
+        device=cfg.training.device,
+    )
+                
+    policy_cfg.input_features = _normalize_feature_dict(policy_cfg.input_features)
+    policy_cfg.output_features = _normalize_feature_dict(policy_cfg.output_features)
+    return policy_cfg
+
 
 @hydra.main(config_path="../configs/policy/", config_name="diffusion_config", version_base=None)
 def main(cfg: DictConfig):
@@ -127,13 +154,10 @@ def main(cfg: DictConfig):
 
     print(f"Input features: {input_features}")
     print(f"Output features: {output_features}")
+
     # instantiate the policy
-    policy_cfg = instantiate(
-        cfg.policy,
-        input_features=input_features,
-        output_features=output_features,
-        device=cfg.training.device,
-    )
+    policy_cfg = build_policy_config(cfg, input_features, output_features)
+    print("policy_cfg", policy_cfg)
 
     # Build policy
     policy = build_policy(cfg.policy_name, policy_cfg, dataset_stats=dataset_metadata.stats)
