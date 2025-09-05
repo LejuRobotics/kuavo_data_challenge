@@ -45,8 +45,7 @@ setup_target_repository() {
   
   # Clone repository if not exists
   if [ ! -d "git_repo/.git" ]; then
-    git -c core.sshCommand="ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
-      clone "$GITHUB_REPO_URL" git_repo || echo "After clone github"
+    retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" clone \"$GITHUB_REPO_URL\" git_repo"
   fi
   
   cd git_repo
