@@ -1,5 +1,6 @@
-from cv2 import log
 import lerobot_patches.custom_patches  # Ensure custom patches are applied, DON'T REMOVE THIS LINE!
+from lerobot.configs.policies import PolicyFeature
+from typing import Any
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
