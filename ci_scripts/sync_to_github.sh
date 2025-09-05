@@ -152,6 +152,16 @@ commit_and_push() {
   fi
 }
 
+# Function to send failure notification
+send_failure_notification() {
+  local error_msg="$1"
+  if [ -n "$WECHAT_TOKEN" ]; then
+    bash "$PROJECT_DIR/ci_scripts/wechat_bot_notify.sh" \
+      "kuavo_data_challenge GitHub sync for branch $CURRENT_BRANCH failed: $error_msg" \
+      "$WECHAT_TOKEN"
+  fi
+}
+
 # Function to cleanup
 cleanup() {
   echo "Cleaning up..."
@@ -160,21 +170,33 @@ cleanup() {
   git checkout .
 }
 
-# Main execution
+# Main execution with error handling
 main() {
   echo "Starting GitHub sync process..."
   
   # Setup target repository
-  setup_target_repository
+  if ! setup_target_repository; then
+    send_failure_notification "Failed to setup target repository"
+    exit 1
+  fi
   
   # Sync files
-  sync_files
+  if ! sync_files; then
+    send_failure_notification "Failed to sync files"
+    exit 1
+  fi
   
   # Remove large files
-  remove_large_files
+  if ! remove_large_files; then
+    send_failure_notification "Failed to remove large files"
+    exit 1
+  fi
   
   # Commit and push
-  commit_and_push
+  if ! commit_and_push; then
+    send_failure_notification "Failed to commit and push changes"
+    exit 1
+  fi
   
   # Cleanup
   cleanup
@@ -182,5 +204,8 @@ main() {
   echo "GitHub sync process completed successfully!"
 }
 
-# Run main function
-main "$@"
+# Run main function with error handling
+if ! main "$@"; then
+  echo "GitHub sync process failed!"
+  exit 1
+fi
