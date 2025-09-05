@@ -9,6 +9,7 @@ CURRENT_BRANCH="${CI_COMMIT_BRANCH}"
 PROJECT_DIR="${CI_PROJECT_DIR}"
 PROJECT_URL="${CI_PROJECT_URL}"
 COMMIT_SHA="${CI_COMMIT_SHA}"
+PIPELINE_ID="${CI_PIPELINE_ID}"
 WECHAT_TOKEN="${WECHAT_BOT_TOKEN}"
 
 # Retry function with exponential backoff
@@ -138,12 +139,7 @@ commit_and_push() {
       retry_git_command "git -c core.sshCommand=\"ssh -i /home/gitlab-runner/.ssh/id_ed25519_data_challenge_isd -o IdentitiesOnly=yes -o StrictHostKeyChecking=no\" push -f origin $CURRENT_BRANCH"
     fi
     
-    # Send success notification
-    if [ -n "$WECHAT_TOKEN" ]; then
-      bash "$PROJECT_DIR/ci_scripts/wechat_bot_notify.sh" \
-        "kuavo_data_challenge GitHub sync for branch $CURRENT_BRANCH succeeded" \
-        "$WECHAT_TOKEN"
-    fi
+    echo "Changes pushed successfully"
     
     return 0
   else
@@ -156,8 +152,9 @@ commit_and_push() {
 send_failure_notification() {
   local error_msg="$1"
   if [ -n "$WECHAT_TOKEN" ]; then
+    local pipeline_url="https://www.lejuhub.com/robotembodieddata/kuavo_data_challenge/-/pipelines/${PIPELINE_ID}"
     bash "$PROJECT_DIR/ci_scripts/wechat_bot_notify.sh" \
-      "kuavo_data_challenge GitHub sync for branch $CURRENT_BRANCH failed: $error_msg" \
+      "kuavo_data_challenge GitHub sync for branch $CURRENT_BRANCH failed: $error_msg. Pipeline: $pipeline_url" \
       "$WECHAT_TOKEN"
   fi
 }
@@ -200,6 +197,14 @@ main() {
   
   # Cleanup
   cleanup
+  
+  # Send success notification with pipeline URL
+  if [ -n "$WECHAT_TOKEN" ]; then
+    local pipeline_url="https://www.lejuhub.com/robotembodieddata/kuavo_data_challenge/-/pipelines/${PIPELINE_ID}"
+    bash "$PROJECT_DIR/ci_scripts/wechat_bot_notify.sh" \
+      "kuavo_data_challenge GitHub sync for branch $CURRENT_BRANCH succeeded. Pipeline: $pipeline_url" \
+      "$WECHAT_TOKEN"
+  fi
   
   echo "GitHub sync process completed successfully!"
 }
