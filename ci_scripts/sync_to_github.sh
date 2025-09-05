@@ -87,11 +87,12 @@ sync_files() {
   echo "Syncing files from source to target repository..."
   cd "$PROJECT_DIR"
   
-  # Sync files to target repository, excluding .gitlab-ci.yml and ci_scripts
+  # Sync files to target repository, excluding .gitlab-ci.yml, ci_scripts, and .claude
   rsync -av --delete \
     --exclude='.git' \
     --exclude='.gitlab-ci.yml' \
     --exclude='ci_scripts' \
+    --exclude='.claude' \
     . "$TEMP_REPO_PATH/git_repo"
 }
 
