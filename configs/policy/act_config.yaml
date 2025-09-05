@@ -102,7 +102,7 @@ policy:
     _target_: lerobot.policies.act.configuration_act.ACTConfig  # 用于实例化
     n_obs_steps: 1  # 观测步数
     chunk_size: 100  # 动作块大小
-    n_action_steps: 100  # 动作步数
+    n_action_steps: 1  # 动作步数
 
     use_amp: False  # 是否使用混合精度训练
 
@@ -128,7 +128,7 @@ policy:
 
     # Inference.
     # Note: the value used in ACT when temporal ensembling is enabled is 0.01.
-    temporal_ensemble_coeff: null
+    temporal_ensemble_coeff: -0.1
 
     # Training and loss computation.
     dropout: 0.1
