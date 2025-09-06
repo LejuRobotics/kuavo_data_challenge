@@ -39,6 +39,7 @@ import torch
 from tqdm import tqdm
 
 from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
+from lerobot.policies.act.modeling_act import ACTPolicy
 from lerobot.utils.random_utils import set_seed
 import datetime
 import time
@@ -117,7 +118,7 @@ def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     if policy_type == 'diffusion':
         policy = CustomDiffusionPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     elif policy_type == 'act':
-        raise ValueError(f"Unsupported policy type: {policy_type}")
+        policy = ACTPolicy.from_pretrained(Path(pretrained_path),strict=True)
     else:
         raise ValueError(f"Unsupported policy type: {policy_type}")
     
@@ -141,11 +142,13 @@ def env_success_callback(msg):
 latest_object_position = None
 latest_marker1_position = None
 latest_marker2_position = None
+latest_object_orientation = None
 
 def box_grab_callback(msg):
-    global latest_object_position
+    global latest_object_position, latest_object_orientation
     p = msg.pose.position
     latest_object_position = [p.x, p.y, p.z]
+    latest_object_orientation = [msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w]
 
 def marker1_callback(msg):
     global latest_marker1_position
@@ -331,6 +334,7 @@ def main(config_path: str, episode: int):
         joint_list = js.tolist() if isinstance(js, np.ndarray) else None
         steps_records.append({
             "object_position": latest_object_position,
+            "object_orientation": latest_object_orientation,
             "joint_state": joint_list,
         })
 

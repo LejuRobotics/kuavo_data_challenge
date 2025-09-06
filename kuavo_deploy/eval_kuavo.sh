@@ -2,6 +2,20 @@
 # Kuavo机器人控制示例脚本
 # 展示如何使用命令行参数控制不同的任务
 
+cleanup() {
+    echo "⏹️ 捕获到 Ctrl+C，开始终止任务"
+    if [ -n "$current_pid" ] && kill -0 "$current_pid" 2>/dev/null; then
+        echo "⏹️ 捕获到 Ctrl+C，正在终止任务 (PID: $current_pid)..."
+        kill -9 "$current_pid"
+        wait "$current_pid" 2>/dev/null
+    fi
+    exit 130
+}
+
+# 捕获 Ctrl+C
+trap cleanup SIGINT SIGTERM
+
+
 echo "=== Kuavo机器人控制示例 ==="
 echo "此脚本展示如何使用命令行参数控制不同的任务"
 echo -e "支持暂停、继续、停止功能"
@@ -12,10 +26,18 @@ echo "  ⏹️  停止任务: 发送 SIGUSR2 信号 (kill -USR2 <PID>)"
 echo "  📊 查看日志: tail -f log/kuavo_deploy/kuavo_deploy.log"
 echo ""
 
-# 获取脚本所在目录
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT="$SCRIPT_DIR/kuavo_deploy/examples/scripts/script.py"
-AUTO_TEST_SCRIPT="$SCRIPT_DIR/kuavo_deploy/examples/scripts/script_auto_test.py"
+# 获取脚本所在目录（兼容 bash/sh，支持被 source）
+if [ -n "$BASH_SOURCE" ]; then
+    # bash 下被 source 时仍返回脚本目录
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+else
+    # sh 或没有 BASH_SOURCE 时
+    SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
+fi
+
+# 脚本文件路径
+SCRIPT="$SCRIPT_DIR/examples/scripts/script.py"
+AUTO_TEST_SCRIPT="$SCRIPT_DIR/examples/scripts/script_auto_test.py"
 
 # 交互式控制器函数
 start_interactive_controller() {
@@ -91,7 +113,7 @@ start_interactive_controller() {
 }
 
 # 创建log日志路径
-LOG_DIR="$SCRIPT_DIR/log"
+LOG_DIR="$(dirname "$SCRIPT_DIR")/log"
 if [ ! -d "$LOG_DIR" ]; then
     mkdir -p $LOG_DIR
 fi
@@ -254,7 +276,7 @@ except Exception as e:
             echo "8. 仿真中自动测试模型，执行eval_episodes次"
             echo "执行: python $AUTO_TEST_SCRIPT --task auto_test --config $config_path"
             echo "9. 退出"
-            echo "请选择要执行的示例 (1-9) 或按 Enter 退出:"
+            echo "请选择要执行的示例 (1-9)"
             read -r choice
 
             case $choice in

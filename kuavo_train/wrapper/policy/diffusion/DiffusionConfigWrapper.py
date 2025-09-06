@@ -49,16 +49,16 @@ class CustomDiffusionConfigWrapper(DiffusionConfig):
         # self.output_features = self._normalize_feature_dict(self.output_features)
         self._convert_omegaconf_fields()
 
-    def _normalize_feature_dict(self, d: Any) -> dict[str, PolicyFeature]:
-        if isinstance(d, DictConfig):
-            d = OmegaConf.to_container(d, resolve=True)
-        if not isinstance(d, dict):
-            raise TypeError(f"Expected dict or DictConfig, got {type(d)}")
+    # def _normalize_feature_dict(self, d: Any) -> dict[str, PolicyFeature]:
+    #     if isinstance(d, DictConfig):
+    #         d = OmegaConf.to_container(d, resolve=True)
+    #     if not isinstance(d, dict):
+    #         raise TypeError(f"Expected dict or DictConfig, got {type(d)}")
 
-        return {
-            k: PolicyFeature(**v) if isinstance(v, dict) and not isinstance(v, PolicyFeature) else v
-            for k, v in d.items()
-        }
+    #     return {
+    #         k: PolicyFeature(**v) if isinstance(v, dict) and not isinstance(v, PolicyFeature) else v
+    #         for k, v in d.items()
+    #     }
     
     def _convert_omegaconf_fields(self):
         for f in fields(self):
