@@ -113,7 +113,7 @@ start_interactive_controller() {
 }
 
 # 创建log日志路径
-LOG_DIR="$SCRIPT_DIR/log"
+LOG_DIR="$(dirname "$SCRIPT_DIR")/log"
 if [ ! -d "$LOG_DIR" ]; then
     mkdir -p $LOG_DIR
 fi
