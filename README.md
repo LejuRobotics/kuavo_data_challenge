@@ -59,7 +59,7 @@ sudo apt install nvidia-driver-535
 sudo reboot
 # 验证驱动
 nvidia-smi
-````
+```
 
 #### b. 安装 NVIDIA Container Toolkit
 
