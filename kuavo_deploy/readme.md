@@ -34,6 +34,10 @@ configs/
     ├── kuavo_sim_env.yaml        # kuavo仿真环境参数
     └── others_env.yaml           # 其他评估环境参数
 
+log/
+└── kuavo_deploy/                
+    └── kuavo_deploy.log          # 推理log
+
 outputs/
 └── eval/
     └── {task}/                   # 任务名称（如 pick_place, push 等）
