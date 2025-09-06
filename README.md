@@ -104,7 +104,7 @@ sudo docker info | grep -i runtime
 kuavo mujoco 仿真与真机运行均基于 **ROS Noetic**环境，由于真机kuavo机器人是ubuntu20.04 + ROS Noetic（非docker），因此推荐直接安装 ROS Noetic，若因ubuntu版本较高无法安装 ROS Noetic，可使用docker。
 
 <details>
-<summary>a. 系统直接安装 ROS Noetic（推荐）</summary>
+<summary>a. 系统直接安装 ROS Noetic（<b>推荐</b>）</summary>
 
 * 官方指南：[ROS Noetic 安装](http://wiki.ros.org/noetic/Installation/Ubuntu)
 * 国内加速源推荐：[小鱼ROS](https://fishros.org.cn/forum/topic/20/)
@@ -131,17 +131,70 @@ rosrun turtlesim turtle_teleop_key  # 新建终端
 <details>
 <summary>b. 使用 Docker 安装 ROS Noetic</summary>
 
-有两种方法可选：
-
-**方法一：kuavo仿真器文档（推荐）**
-阅读 [readme for simulator](https://github.com/LejuRobotics/kuavo-ros-opensource/blob/opensource/kuavo-data-challenge/readme.md)，包含镜像构建与mujoco仿真配置的完整说明。
-
-**方法二：直接下载并导入镜像**
+- 首先最好是换个源：
 
 ```bash
-wget https://kuavo.lejurobot.com/docker_images/kuavo_opensource_mpc_wbc_img_v0.6.1.tar.gz
-sudo docker load -i kuavo_opensource_mpc_wbc_img_v0.6.1.tar.gz
+sudo vim /etc/docker/daemon.json
 ```
+
+- 然后在这个json文件中写入一些镜像源：
+
+```json
+{
+    "registry-mirrors": [
+        "https://docker.m.daocloud.io",
+        "https://docker.imgdb.de",
+        "https://docker-0.unsee.tech",
+        "https://docker.hlmirror.com",
+        "https://docker.1ms.run",
+        "https://func.ink",
+        "https://lispy.org",
+        "https://docker.xiaogenban1993.com"
+    ]
+}
+```
+
+- 然后保存文件并退出后，重启docker服务：
+
+```shell
+sudo systemctl daemon-reload && sudo systemctl restart docker
+```
+
+- 现在开始创建镜像，首先建立Dockerfile：
+```shell
+mkdir /path/to/save/docker/ros/image
+cd /path/to/save/docker/ros/image
+vim Dockerfile
+```
+然后在Dockerfile文件中写入如下内容：
+
+```Dockerfile
+FROM ubuntu:20.04
+RUN apt-get update && apt-get install -y locales tzdata gnupg lsb-release
+RUN locale-gen en_US.UTF-8
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
+# 设置ROS的debian源
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+
+# 添加ROS的Keys
+RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+
+# 安装ROS Noetic
+RUN apt-get update && apt-get install -y ros-noetic-desktop-full
+
+RUN apt-get install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+
+# 初始化rosdep
+RUN rosdep init
+```
+写入完毕后保存退出。执行ubuntu20.04 + ROS Noetic镜像的构建：
+
+```shell
+sudo docker build -t ubt2004_ros_noetic .
+```
+
+构建完成后进入镜像即可。
 </details>
 
 <br>
@@ -188,7 +241,7 @@ source kdc/bin/activate
 安装依赖：
 
 ```bash
-pip install -r requirements_ilcode.txt   # 推荐
+pip install -r requirements_ilcode.txt   # 无需ROS Noetic，但只能使用kuavo_train模仿学习训练代码，kuavo_data（数转）及 kuavo_deploy（部署代码）均依赖ROS
 # 或
 pip install -r requirements_total.txt    # 需确保 ROS Noetic 已安装
 ```
@@ -355,10 +408,10 @@ KUAVO-DATA-CHALLENGE/
 该目录包含对 **Lerobot** 的兼容性补丁，主要功能包括：
 
 * 扩展 `FeatureType`，支持 RGB 与 Depth 图像
-* 定制 `compute_episode_stats` 与 `create_stats_buffers`，便于图像与深度数据统计
-* 修改 `dataset_to_policy_features`，确保 Kuavo RGB+深度数据正确映射
+* 定制 `compute_episode_stats` 与 `create_stats_buffers`，用于图像与深度数据的统计量统计，min，max，mean，std等
+* 修改 `dataset_to_policy_features`，确保 Kuavo RGB + Depth的FeatureType正确映射
 
-使用时需在入口脚本开头引入：
+需要使用基于lerobot的定制设计如深度数据、新的FeatureType、归一化方式等，可自行添加，并在使用时在入口脚本（如kuavo_train/train_policy.py等训练文件代码）的最开头一行引入：
 
 ```python
 import lerobot_patches.custom_patches  # Ensure custom patches are applied, DON'T REMOVE THIS LINE!
