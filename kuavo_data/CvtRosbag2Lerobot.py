@@ -127,7 +127,7 @@ def get_cameras(bag_data: dict) -> list[str]:
 def create_empty_dataset(
     repo_id: str,
     robot_type: str,
-    mode: Literal["video", "image"] = "video",
+    mode: Literal["video", "image"] = "image",
     *,
     has_velocity: bool = False,
     has_effort: bool = False,
@@ -477,7 +477,7 @@ def port_kuavo_rosbag(
     episodes: list[int] | None = None,
     push_to_hub: bool = False,
     is_mobile: bool = False,
-    mode: Literal["video", "image"] = "video",
+    mode: Literal["video", "image"] = "image",
     dataset_config: DatasetConfig = DEFAULT_DATASET_CONFIG,
     root: str,
     n: int | None = None,
