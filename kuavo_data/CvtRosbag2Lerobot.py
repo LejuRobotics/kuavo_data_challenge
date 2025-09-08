@@ -284,16 +284,22 @@ def populate_dataset(
             qiangnao_action = np.where(qiangnao_action > 50, 1, 0)
             claw_state = np.where(claw_state > 50, 1, 0)
             claw_action = np.where(claw_action > 50, 1, 0)
-            rq2f85_state = np.where(rq2f85_state > 0.4, 1, 0)
-            rq2f85_action = np.where(rq2f85_action > 70, 1, 0)
+            # rq2f85_state = np.where(rq2f85_state > 0.4, 1, 0)
+            # rq2f85_action = np.where(rq2f85_action > 70, 1, 0)
+
+            rq2f85_state = np.where(rq2f85_state > 0.1, 1, 0)
+            rq2f85_action = np.where(rq2f85_action > 128, 1, 0)
         else:
             # 进行数据归一化处理
             claw_state = claw_state / 100
             claw_action = claw_action / 100
             qiangnao_state = qiangnao_state / 100
             qiangnao_action = qiangnao_action / 100
-            rq2f85_state = rq2f85_state / 0.8
-            rq2f85_action = rq2f85_action / 140
+            # rq2f85_state = rq2f85_state / 0.8
+            # rq2f85_action = rq2f85_action / 140
+
+            rq2f85_state = rq2f85_state / 0.4
+            rq2f85_action = rq2f85_action / 255
         print("eef_type shape: ",claw_action.shape,qiangnao_action.shape, rq2f85_action.shape)
         if len(claw_action)==0 and len(qiangnao_action) == 0:
             claw_action = rq2f85_action
