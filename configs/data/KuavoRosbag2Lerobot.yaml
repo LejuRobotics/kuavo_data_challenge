@@ -10,13 +10,13 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
 rosbag:
   rosbag_dir: /home/yangzhou/data/pick_cu  # rosbag文件目录
   num_used: null # 使用的rosbag数量(若设置为任意数字，则会随机采样选择)
-  lerobot_dir: /home/yangzhou/data/pick_cu  # 转换后的lerobot文件的保存目录
+  lerobot_dir: /home/yangzhou/data/pick_cu_depth  # 转换后的lerobot文件的保存目录
 
 dataset:
   only_arm: true  # 默认true, 是否只使用手臂数据, 目前的模仿学习只用于手臂数据，选择true会自动屏蔽足关节数据
   eef_type: rq2f85 # 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
   which_arm: left  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
-  use_depth: false  # 是否需要深度图像数据，与上面手臂保持一致的深度数据
+  use_depth: True  # 是否需要深度图像数据，与上面手臂保持一致的深度数据
   depth_range: [0, 1000]  # 深度图的裁剪范围，单位：毫米
 
   task_description: "Pick and Place" # 任务描述，自定义
@@ -24,7 +24,7 @@ dataset:
   train_hz: 10  # 训练数据的采样频率
   main_timeline: head_cam_h #将哪个相机设为主相机，默认主相机来自：head_cam_h, 可选：wrist_cam_l, wrist_cam_r
   main_timeline_fps: 30 # 主相机的帧率，必须稳定
-  sample_drop: 10 # 丢弃episode前后的10帧
+  sample_drop: 5 # 丢弃episode前后的10帧
 
   # dex_dof_needed是强脑手需要的自由度数目。强脑灵巧手有6个自由度。标准握拳状态[100] * 6, 张开状态[0] * 6。
   # 1: 不需要精细操作或者多指协同操作时，通常为设置为1，表示只需要第一个关节作为开合依据,此时需要用[0, 100, 0, 0, 0, 0]表示张开状态, [100] * 6表示握拳状态。
