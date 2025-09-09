@@ -272,6 +272,7 @@ class KuavoBaseRosEnv(gym.Env):
         # reset head
         if self.head_init is not None:
             self.robot.control_head(self.head_init[0], self.head_init[1])
+            time.sleep(3)
 
         if self.real:
             if self.which_arm == 'both':

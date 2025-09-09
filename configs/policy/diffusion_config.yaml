@@ -7,11 +7,11 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
 
 
 task: "renjie"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
-method: "rgb_sep_dp"  # 自定义方法名称
+method: "rgb_depth_sep_dp"  # 自定义方法名称
 timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
 # 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
 repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
-root: "/home/yangzhou/data/pick_cu/lerobot"  # 你的本地转换好的lerobot数据的目录
+root: "/home/yangzhou/data/pick_cu_depth/lerobot"  # 你的本地转换好的lerobot数据的目录
 # root: null  # 如果不使用本地数据想使用huggingface官方数据，请在task中指定，例如pusht，aloha_sim_insertion_human，此处就设置为null空
 # 将去云端调用下载数据集
 
@@ -36,7 +36,7 @@ training:
     max_training_step: null  
 
     # resume training，断点续训
-    resume: True
+    resume: false
     resume_timestamp: "run_20250908_194713"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
@@ -156,7 +156,7 @@ policy:
       # support depth image
       use_depth: True
       depth_backbone: resnet18
-      use_separate_depth_encoder_per_camera: False
+      use_separate_depth_encoder_per_camera: True
 
       # resize and augmentation
       resize_shape: [210, 280] 
