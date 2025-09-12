@@ -37,7 +37,7 @@ training:
 
     # resume training，断点续训
     resume: True
-    resume_timestamp: "run_20250909_105256"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    resume_timestamp: "run_20250910_164140"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
     RGB_Augmenter:

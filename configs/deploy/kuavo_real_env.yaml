@@ -26,6 +26,7 @@ head_init: null # 机器人头部初始位置，default=None
 #                 "both":['head_cam_h','depth_h','wrist_cam_l','depth_l','wrist_cam_r','depth_r']
 #                 }][int(self.use_depth)][self.which_arm]
 input_images: ["head_cam_h", "wrist_cam_r"] 
+depth_range: [0, 1000]
 image_size: [480, 848] # 图像大小（高，宽），default=(480, 640)
 ros_rate: 10  # 推理频率，单位Hz
 

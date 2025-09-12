@@ -20,6 +20,7 @@ class Config_Inference:
     epoch: int
     max_episode_steps: int
     env_name: str
+    depth_range: Tuple[float, float]  # (min_depth, max_depth)
 
 def load_inference_config(config_path: str = None) -> Config_Inference:
     """Load configuration from YAML file.
@@ -51,8 +52,10 @@ def load_inference_config(config_path: str = None) -> Config_Inference:
         timestamp=config_dict['timestamp'],
         epoch=config_dict['epoch'],
         max_episode_steps=config_dict['max_episode_steps'],
-        env_name=config_dict['env_name']
+        env_name=config_dict['env_name'],
+        depth_range=config_dict.get('depth_range', (0, 1000))  # Default depth range if not specified
     )
+
 
 if __name__ == "__main__":
     # For testing purposes, default config instance

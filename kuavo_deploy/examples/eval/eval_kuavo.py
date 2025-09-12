@@ -76,8 +76,8 @@ def check_control_signals():
 def img_preprocess(image, device="cpu"):
     return to_tensor(image).unsqueeze(0).to(device, non_blocking=True)
 
-def depth_preprocess(depth, device="cpu"):
-    return torch.tensor(depth,dtype=torch.float32).unsqueeze(0).to(device, non_blocking=True)
+def depth_preprocess(depth, device="cpu", depth_range=(0, 1000)):
+    return torch.tensor(depth, dtype=torch.float32).clamp(*depth_range).unsqueeze(0).to(device, non_blocking=True)
 
 def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     """
@@ -126,6 +126,8 @@ def main(config_path: str, env: gym.Env):
     timestamp = cfg.timestamp
     epoch = cfg.epoch
     env_name = cfg.env_name
+    depth_range = cfg.depth_range
+
 
     pretrained_path = Path(f"outputs/train/{task}/{method}/{timestamp}/epoch{epoch}")
     output_directory = Path(f"outputs/eval/{task}/{method}/{timestamp}/epoch{epoch}")
@@ -199,7 +201,7 @@ def main(config_path: str, env: gym.Env):
                     elif "state" in k:
                         observation[k] = torch.from_numpy(v).float().unsqueeze(0).to(device, non_blocking=True)
                     elif "depth" in k:
-                        observation[k] = depth_preprocess(v, device=device)
+                        observation[k] = depth_preprocess(v, device=device, depth_range=depth_range)
 
                 with torch.inference_mode():
                     action = policy.select_action(observation)
