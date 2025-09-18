@@ -38,6 +38,8 @@ def main(cfg: DictConfig):
                   "pusht": {"env": "gym_pusht/PushT-v0",
                                "obs": "observation.image"}
                     }[cfg.env]
+    if "cube" in cfg.task:
+        env_obs_select["env"] = "gym_aloha/AlohaTransferCube-v0"
 
     env = gym.make(
         env_obs_select["env"],

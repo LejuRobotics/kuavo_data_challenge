@@ -30,7 +30,8 @@ from utils.transforms import ImageTransforms, ImageTransformsConfig, ImageTransf
 
 from functools import partial
 from contextlib import nullcontext
-
+from kuavo_train.utils.custom_sampler import EpisodeContextRateSampler
+import ipdb
 
 def build_augmenter(cfg):
     """Since operations such as cropping and resizing in LeRobot are implemented at the model level 
@@ -55,6 +56,18 @@ def build_augmenter(cfg):
             )
     return ImageTransforms(img_tf_cfg)
 
+def build_sampler(dataset=None, use_custom=False):
+    if not use_custom:
+        return None
+    else:
+        sampler = EpisodeContextRateSampler(dataset,
+                                    target_high_hz=20,
+                                    target_low_hz=10,
+                                    base_hz=50,
+                                    window_size=1.0,
+                                    high_threshold=0.6)
+        print("~~~~~~~~~~~Using custom sampler: EpisodeContextRateSampler")
+        return sampler
 
 def build_delta_timestamps(dataset_metadata, policy_cfg):
     """Build delta timestamps for observations and actions."""
@@ -150,7 +163,6 @@ def build_policy_config(cfg, input_features, output_features):
     policy_cfg.input_features = _normalize_feature_dict(policy_cfg.input_features)
     policy_cfg.output_features = _normalize_feature_dict(policy_cfg.output_features)
     return policy_cfg
-
 
 
 
@@ -269,17 +281,29 @@ def main(cfg: DictConfig):
         root=cfg.root,
         image_transforms=image_transforms,
     )
-
+    # diffs = []
+    # for i in tqdm(range(len(dataset) - 1), desc="Dataset sanity check"):
+    #     diffs.append(torch.norm(torch.tensor(dataset[i+1]["action"]) - torch.tensor(dataset[i]["action"]), p=2).item())
+    # diffs = torch.tensor(diffs)
+    # torch.save(diffs, "action_diffs_ruichen.pth")
+    # index =  []
+    # for i in tqdm(range(len(dataset)), desc="Dataset sanity check"):
+    #     index.append(dataset[i]["episode_index"])
+    # torch.save(index, "all_index_ruichen.pth")
+    # raise Exception("Stop here")
+    # ipdb.set_trace()
+    sampler = build_sampler(dataset=dataset, use_custom=cfg.training.use_custom_sampler)
     # Training loop
     for epoch in range(start_epoch, cfg.training.max_epoch):
         dataloader = DataLoader(
             dataset,
             num_workers=cfg.training.num_workers,
             batch_size=cfg.training.batch_size,
-            shuffle=True,
+            shuffle=True if sampler is None else False,
             pin_memory=(device.type != "cpu"),
             drop_last=cfg.training.drop_last,
             prefetch_factor=1,
+            sampler=sampler,
         )
 
         epoch_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{cfg.training.max_epoch}")
