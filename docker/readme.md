@@ -98,15 +98,17 @@ conda pack -n myenv --ignore-missing-files -o myenv.tar.gz
 - 安装 Miniforge3 并配置环境变量。
 
 #### 5. 项目和 Conda 环境
-- 设置工作目录 `/root/kuavo-data-challenge`。
+- 设置工作目录 `/root/kuavo_data_challenge`。
 - 复制项目代码。
 - 解压 Conda Pack 打包的环境 `myenv.tar.gz`。
 - 使用 `conda-unpack` 修复路径。
 - 安装项目和第三方包（editable 模式）。
+- 删除测试目录和冗余缓存，减小镜像体积。
 
 #### 6. 容器环境优化
 - 自动激活 Conda 环境（写入 `.bashrc`）。
 - 设置默认命令为 `bash`。
+- 多阶段构建：只将最终环境和源码 COPY 到 runtime，避免 builder 中的临时文件占用空间，实现镜像压缩。
 
 ---
 
