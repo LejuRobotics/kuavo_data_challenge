@@ -215,3 +215,4 @@ third_party/
 *.pth
 ana.py
 *.gz
+*.tar
