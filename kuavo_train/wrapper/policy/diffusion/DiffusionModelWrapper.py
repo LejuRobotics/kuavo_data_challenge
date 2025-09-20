@@ -237,6 +237,19 @@ class CustomDiffusionModelWrapper(DiffusionModel):
 
 
 
+
+# class Dinov3RgbEncoder(nn.Module):
+#     def __init__(self, model_name: str = "dinov3_vits16", pretrained: bool = True):
+#         super().__init__()
+#         REPO_DIR = "kuavo_train/wrapper/vision_backbones/dinov3"
+#         # DINOv3 ViT models pretrained on web images
+#         dinov3_vits16 = torch.hub.load(REPO_DIR, 'dinov3_vits16', 
+#                                        source='local', 
+#                                        weights="kuavo_train/wrapper/vision_backbones/dinov3/ckpts/dinov3_vits16_pretrain_lvd1689m-08c60483.pth")
+#         self.model = dinov3_vits16
+#     def forward(self, x: Tensor) -> Tensor:
+#         return self.model.forward_features(x)
+
 class DiffusionRgbEncoder(nn.Module):
     """Encodes an RGB image into a 1D feature vector.
 

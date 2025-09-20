@@ -111,14 +111,14 @@ policy:
 
     # 图像裁剪，（lerobot内有的策略不支持）
     crop_is_random: True
-    crop_shape: [420, 560]  #  [84, 84]
+    crop_shape: [420, 742]  #  [84, 84]
 
     use_amp: True  # 是否使用混合精度训练
 
     # 模型相关超参数设置
-    vision_backbone: resnet18
+    vision_backbone: dinov3_vits16 # resnet18
     spatial_softmax_num_keypoints: 64
-    use_separate_rgb_encoder_per_camera: True
+    use_separate_rgb_encoder_per_camera: False
 
     down_dims:
     - 512
@@ -157,10 +157,10 @@ policy:
       # support depth image
       use_depth: True
       depth_backbone: resnet18
-      use_separate_depth_encoder_per_camera: True
+      use_separate_depth_encoder_per_camera: False
 
       # resize and augmentation
-      resize_shape: [210, 280] 
+      resize_shape: [224, 368] 
 
       # state encoder.
       use_state_encoder: True
