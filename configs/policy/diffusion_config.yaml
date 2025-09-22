@@ -37,7 +37,7 @@ training:
     use_custom_sampler: False  # 是否使用自定义的采样器，默认true，使用自定义采样器可以让高差分点前后采样更密集
 
     # resume training，断点续训
-    resume: True
+    resume: False
     resume_timestamp: "run_20250921_001500"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
@@ -98,9 +98,9 @@ policy_name: diffusion   # 策略类型，支持diffusion和act
 policy:
     _target_: kuavo_train.wrapper.policy.diffusion.DiffusionConfigWrapper.CustomDiffusionConfigWrapper  # 实例化diffusion config
     n_obs_steps: 2
-    horizon: 16
-    n_action_steps: 8
-    drop_n_last_frames: 7  # 丢弃最后n帧
+    horizon: 64
+    n_action_steps: 50
+    drop_n_last_frames: 23  # 丢弃最后n帧
 
     normalization_mapping: # RGB等同于VISUAL类型, diffusion策略另外支持了深度数据，这两个参数用于设置normalize方式
       RGB: 

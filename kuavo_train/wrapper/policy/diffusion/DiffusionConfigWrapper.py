@@ -25,7 +25,10 @@ class CustomDiffusionConfigWrapper(DiffusionConfig):
     custom: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
+        vision_backbone = self.vision_backbone
+        self.vision_backbone = "resnet18"
         super().__post_init__()
+        self.vision_backbone = vision_backbone
         default_map = {
             "VISUAL": NormalizationMode.MEAN_STD,
             "STATE": NormalizationMode.MIN_MAX,
