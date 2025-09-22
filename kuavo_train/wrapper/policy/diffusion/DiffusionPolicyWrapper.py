@@ -35,7 +35,12 @@ class CustomDiffusionPolicyWrapper(DiffusionPolicy):
                  config: CustomDiffusionConfigWrapper,
                  dataset_stats: dict[str, dict[str, Tensor]] | None = None,
     ):
+        vision_backbone = config.vision_backbone
+        config.vision_backbone = "resnet18"  # Change vision backbone to ResNet18
+        # this is important to call the parent constructor to setup normalization and queues,
+        # to prevent original config not supported dinov3 vision backbone
         super().__init__(config, dataset_stats)
+        config.vision_backbone = vision_backbone  # change back to the original config
         self.diffusion = CustomDiffusionModelWrapper(config)
 
 

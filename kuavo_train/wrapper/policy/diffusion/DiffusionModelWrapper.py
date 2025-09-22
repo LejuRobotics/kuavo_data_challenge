@@ -32,9 +32,14 @@ OBS_DEPTH = "observation.depth"
 
 class CustomDiffusionModelWrapper(DiffusionModel):
     def __init__(self, config: CustomDiffusionConfigWrapper):
+        vision_backbone = config.vision_backbone
+        config.vision_backbone = "resnet18"  # Change vision backbone to ResNet18
+        # this is important to call the parent constructor to setup normalization and queues,
+        # to prevent original config not supported dinov3 vision backbone
         super().__init__(config)
+        config.vision_backbone = vision_backbone  # change back to the original config
 
-        # self.config = config
+        self.config = config
 
         # Build observation encoders (depending on which observations are provided).
         # global_cond_dim = self.config.robot_state_feature.shape[0]
@@ -155,6 +160,8 @@ class CustomDiffusionModelWrapper(DiffusionModel):
                 img_features = self.rgb_encoder(
                     einops.rearrange(batch[OBS_IMAGES], "b s n ... -> (b s n) ...")
                 )
+                # print(img_features.shape)
+                # raise Exception("debug")
                 # Separate batch dim and sequence dim back out. The camera index dim gets absorbed into the
                 # feature dim (effectively concatenating the camera features).
                 img_features = einops.rearrange(
@@ -236,21 +243,36 @@ class CustomDiffusionModelWrapper(DiffusionModel):
             return torch.cat(global_cond_feats, dim=-1).flatten(start_dim=1)
 
 
-
-
-# class Dinov3RgbEncoder(nn.Module):
-#     def __init__(self, model_name: str = "dinov3_vits16", pretrained: bool = True):
-#         super().__init__()
-#         REPO_DIR = "kuavo_train/wrapper/vision_backbones/dinov3"
-#         # DINOv3 ViT models pretrained on web images
-#         dinov3_vits16 = torch.hub.load(REPO_DIR, 'dinov3_vits16', 
-#                                        source='local', 
-#                                        weights="kuavo_train/wrapper/vision_backbones/dinov3/ckpts/dinov3_vits16_pretrain_lvd1689m-08c60483.pth")
-#         self.model = dinov3_vits16
-#     def forward(self, x: Tensor) -> Tensor:
-#         return self.model.forward_features(x)
-
 class DiffusionRgbEncoder(nn.Module):
+    def __init__(self, config: CustomDiffusionConfigWrapper):
+        super().__init__()
+        self.config = config
+        if "resnet" in config.vision_backbone:
+            self.model = ResnetRgbEncoder(config)
+        elif "dinov3" in config.vision_backbone:
+            self.model = Dinov3RgbEncoder(model_name=config.vision_backbone)
+        else:
+            raise ValueError(f"Unknown vision backbone: {config.vision_backbone}")
+        self.feature_dim = self.model.feature_dim
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self.model.forward(x)
+    
+
+class Dinov3RgbEncoder(nn.Module):
+    def __init__(self, model_name: str = "dinov3_vits16", pretrained: bool = True):
+        super().__init__()
+        REPO_DIR = "kuavo_train/wrapper/vision_backbones/dinov3"
+        # DINOv3 ViT models pretrained on web images
+        dinov3_vits16 = torch.hub.load(REPO_DIR, 'dinov3_vits16', 
+                                       source='local', 
+                                       weights="kuavo_train/wrapper/vision_backbones/dinov3/ckpts/dinov3_vits16_pretrain_lvd1689m-08c60483.pth")
+        self.model = dinov3_vits16
+        self.feature_dim = self.model.embed_dim
+    def forward(self, x: Tensor) -> Tensor:
+        return self.model(x)
+
+class ResnetRgbEncoder(nn.Module):
     """Encodes an RGB image into a 1D feature vector.
 
     Includes the ability to normalize and crop the image first.
@@ -338,8 +360,49 @@ class DiffusionRgbEncoder(nn.Module):
         return x
     
 
-
 class DiffusionDepthEncoder(nn.Module):
+    def __init__(self, config: CustomDiffusionConfigWrapper):
+        super().__init__()
+        self.config = config
+        if "resnet" in config.depth_backbone:
+            self.model = ResnetDepthEncoder(config)
+        elif "dinov3" in config.depth_backbone:
+            self.model = Dinov3DepthEncoder(model_name=config.depth_backbone)
+        else:
+            raise ValueError(f"Unknown vision backbone: {config.depth_backbone}")
+        self.feature_dim = self.model.feature_dim
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self.model.forward(x)
+
+
+class Dinov3DepthEncoder(nn.Module):
+    def __init__(self, model_name: str = "dinov3_vits16", pretrained: bool = True):
+        super().__init__()
+        REPO_DIR = "kuavo_train/wrapper/vision_backbones/dinov3"
+        # DINOv3 ViT models pretrained on web images
+        dinov3_vits16 = torch.hub.load(REPO_DIR, 'dinov3_vits16', 
+                                       source='local', 
+                                       weights="kuavo_train/wrapper/vision_backbones/dinov3/ckpts/dinov3_vits16_pretrain_lvd1689m-08c60483.pth")
+        # change the first conv layer
+        if isinstance(dinov3_vits16.patch_embed.proj, nn.Conv2d):
+            old_conv = dinov3_vits16.patch_embed.proj
+            dinov3_vits16.patch_embed.proj = nn.Conv2d(
+                in_channels=1,
+                out_channels=old_conv.out_channels,
+                kernel_size=old_conv.kernel_size,
+                stride=old_conv.stride,
+                padding=old_conv.padding,
+                bias=old_conv.bias is not None
+            )
+            with torch.no_grad():
+                dinov3_vits16.patch_embed.proj.weight = nn.Parameter(old_conv.weight.mean(dim=1, keepdim=True))
+        self.model = dinov3_vits16
+        self.feature_dim = self.model.embed_dim
+    def forward(self, x: Tensor) -> Tensor:
+        return self.model(x)
+
+class ResnetDepthEncoder(nn.Module):
     """Encodes an RGB image into a 1D feature vector.
 
     Includes the ability to normalize and crop the image first.
