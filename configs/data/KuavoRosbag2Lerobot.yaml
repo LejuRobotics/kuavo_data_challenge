@@ -21,7 +21,7 @@ dataset:
 
   task_description: "kuaidi" # 任务描述，自定义
 
-  train_hz: 15  # 训练数据的采样频率
+  train_hz: 20  # 训练数据的采样频率
   main_timeline: head_cam_h #将哪个相机设为主相机，默认主相机来自：head_cam_h, 可选：wrist_cam_l, wrist_cam_r
   main_timeline_fps: 30 # 主相机的帧率，必须稳定
   sample_drop: 5 # 丢弃episode前后的10帧
