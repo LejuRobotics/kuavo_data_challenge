@@ -127,7 +127,7 @@ def get_cameras(bag_data: dict) -> list[str]:
 def create_empty_dataset(
     repo_id: str,
     robot_type: str,
-    mode: Literal["video", "image"] = "image",
+    mode: Literal["video", "image"] = "video",
     *,
     has_velocity: bool = False,
     has_effort: bool = False,
@@ -178,8 +178,8 @@ def create_empty_dataset(
     for cam in cameras:
         if 'depth' in cam:
             features[f"observation.{cam}"] = {
-                "dtype": "uint16", 
-                "shape": (1, kuavo.RESIZE_H, kuavo.RESIZE_W),  # Attention: for datasets.features "image" and "video", it must be c,h,w style! 
+                "dtype": mode, 
+                "shape": (3, kuavo.RESIZE_H, kuavo.RESIZE_W),  # Attention: for datasets.features "image" and "video", it must be c,h,w style! 
                 "names": [
                     "channels",
                     "height",
@@ -217,7 +217,7 @@ def load_raw_images_per_camera(bag_data: dict) -> dict[str, np.ndarray]:
     imgs_per_cam = {}
     for camera in get_cameras(bag_data):
         imgs_per_cam[camera] = np.array([msg['data'] for msg in bag_data[camera]])
-        # print(f"camera {camera} image", imgs_per_cam[camera].shape)
+        print(f"camera {camera} image", imgs_per_cam[camera].shape)
     
     return imgs_per_cam
 
@@ -420,13 +420,19 @@ def populate_dataset(
                 "observation.state": torch.from_numpy(output_state).type(torch.float32),
                 "action": torch.from_numpy(output_action).type(torch.float32),
             }
-            
-            for camera, img_array in imgs_per_cam.items():
+
+            for idx, (camera, img_array) in enumerate(imgs_per_cam.items()):
                 if "depth" in camera:
                     # frame[f"observation.{camera}"] = img_array[i]
-                    min_depth, max_dpeth = kuavo.DEPTH_RANGE[0], kuavo.DEPTH_RANGE[1]
-                    frame[f"observation.{camera}"] = np.clip(img_array[i], min_depth, max_dpeth)
-                    print("[info]: Clip depth in range %d ~ %d"%(min_depth, max_dpeth))
+                    min_depth, max_depth = kuavo.DEPTH_RANGE[0], kuavo.DEPTH_RANGE[1]
+                    depth_uint16 = np.clip(img_array[i], min_depth, max_depth)
+                    max_depth = depth_uint16.max()
+                    min_depth = depth_uint16.min()
+                    depth_normalized = (depth_uint16 - min_depth) / (max_depth - min_depth + 1e-9)  # 归一化到 [0, 1]
+                    depth_normalized = (depth_normalized * 255).astype(np.uint8)
+                    frame[f"observation.{camera}"] = depth_normalized[..., np.newaxis].repeat(3, axis=-1)  # 添加通道维度，变为 (H, W, 3)
+                    if idx < 6:
+                        print("[info]: Clip depth in range %d ~ %d"%(min_depth, max_depth))
                 else:
                     frame[f"observation.images.{camera}"] = img_array[i]
             
@@ -477,7 +483,7 @@ def port_kuavo_rosbag(
     episodes: list[int] | None = None,
     push_to_hub: bool = False,
     is_mobile: bool = False,
-    mode: Literal["video", "image"] = "image",
+    mode: Literal["video", "image"] = "video",
     dataset_config: DatasetConfig = DEFAULT_DATASET_CONFIG,
     root: str,
     n: int | None = None,

@@ -37,8 +37,8 @@ training:
     use_custom_sampler: False  # 是否使用自定义的采样器，默认true，使用自定义采样器可以让高差分点前后采样更密集
 
     # resume training，断点续训
-    resume: False
-    resume_timestamp: "run_20250921_001500"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    resume: True
+    resume_timestamp: "run_20250923_195936"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
     RGB_Augmenter:
@@ -134,7 +134,7 @@ policy:
 
     # diffusion settings:
     noise_scheduler_type: DDPM
-    num_train_timesteps: 100
+    num_train_timesteps: 25
     beta_schedule: squaredcos_cap_v2
     beta_start: 0.0001
     beta_end: 0.02

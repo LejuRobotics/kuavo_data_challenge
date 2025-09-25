@@ -152,7 +152,9 @@ class KuavoMsgProcesser:
             print("Warning: The decoded image is not a 16-bit image, actual dtype: ", image.dtype)
         depth_image = cv2.resize(image, (RESIZE_W, RESIZE_H), interpolation=cv2.INTER_NEAREST)
         # print("depth image dtype: ", depth_image.dtype)
-        return {"data": depth_image[np.newaxis,...], "timestamp": msg.header.stamp.to_sec()}
+        # return {"data": depth_image, "timestamp": msg.header.stamp.to_sec()}
+        # return {"data": depth_image[..., np.newaxis], "timestamp": msg.header.stamp.to_sec()}
+        return {"data": depth_image, "timestamp": msg.header.stamp.to_sec()}
 
 
     @staticmethod

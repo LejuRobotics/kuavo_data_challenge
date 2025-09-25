@@ -27,8 +27,26 @@ from lerobot.policies.diffusion.modeling_diffusion import (_make_noise_scheduler
                                                            DiffusionModel
                                                            )
 from kuavo_train.wrapper.policy.diffusion.transformer_diffusion import TransformerForDiffusion
+from diffusers.schedulers.scheduling_ddim import DDIMScheduler
+from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
+from diffusers.schedulers.scheduling_flow_match_euler_discrete import FlowMatchEulerDiscreteScheduler
+
 
 OBS_DEPTH = "observation.depth"
+
+def _make_noise_scheduler(name: str, **kwargs: dict) -> DDPMScheduler | DDIMScheduler | FlowMatchEulerDiscreteScheduler:
+    """
+    Factory for noise scheduler instances of the requested type. All kwargs are passed
+    to the scheduler.
+    """
+    if name == "DDPM":
+        return DDPMScheduler(**kwargs)
+    elif name == "DDIM":
+        return DDIMScheduler(**kwargs)
+    elif name == "FlowMatchEulerDiscrete":
+        return FlowMatchEulerDiscreteScheduler(**kwargs)
+    else:
+        raise ValueError(f"Unsupported noise scheduler type {name}")
 
 class CustomDiffusionModelWrapper(DiffusionModel):
     def __init__(self, config: CustomDiffusionConfigWrapper):
