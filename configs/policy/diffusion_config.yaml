@@ -11,7 +11,8 @@ method: "dinov3_nosep_depth"  # 自定义方法名称
 timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
 # 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
 repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
-root: "/media/yangzhou/Elements/lerobot_handover/lerobot"  # 你的本地转换好的lerobot数据的目录
+# root: "/media/yangzhou/Elements/lerobot_handover/lerobot"  # 你的本地转换好的lerobot数据的目录
+root: /media/yangzhou/80268D01268CFA04/lerobothandover/lerobot
 # root: null  # 如果不使用本地数据想使用huggingface官方数据，请在task中指定，例如pusht，aloha_sim_insertion_human，此处就设置为null空
 # 将去云端调用下载数据集
 
@@ -38,7 +39,7 @@ training:
 
     # resume training，断点续训
     resume: True
-    resume_timestamp: "run_20250923_195936"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    resume_timestamp: "run_20250926_105048"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
     RGB_Augmenter:
@@ -47,7 +48,7 @@ training:
       random_order: True
       tfs:
         notransform:
-          weight: 2.0  # 占比权重
+          weight: 6.0  # 占比权重
           type: "Identity"
           kwargs: {}
         brightness:
@@ -99,8 +100,8 @@ policy:
     _target_: kuavo_train.wrapper.policy.diffusion.DiffusionConfigWrapper.CustomDiffusionConfigWrapper  # 实例化diffusion config
     n_obs_steps: 2
     horizon: 64
-    n_action_steps: 50
-    drop_n_last_frames: 23  # 丢弃最后n帧
+    n_action_steps: 32
+    drop_n_last_frames: 31  # 丢弃最后n帧
 
     normalization_mapping: # RGB等同于VISUAL类型, diffusion策略另外支持了深度数据，这两个参数用于设置normalize方式
       RGB: 
@@ -134,7 +135,7 @@ policy:
 
     # diffusion settings:
     noise_scheduler_type: DDPM
-    num_train_timesteps: 25
+    num_train_timesteps: 60
     beta_schedule: squaredcos_cap_v2
     beta_start: 0.0001
     beta_end: 0.02
@@ -145,7 +146,7 @@ policy:
     do_mask_loss_for_padding: false
 
     # optimizer and scheduler
-    optimizer_lr: 0.0001
+    optimizer_lr: 0.000022
     optimizer_betas:
     - 0.95
     - 0.999
@@ -175,3 +176,6 @@ policy:
       transformer_n_head: 8
       transformer_n_layer: 12
       transformer_dropout: 0.1
+
+      # eta for ddim
+      ddim_eta: 0.3

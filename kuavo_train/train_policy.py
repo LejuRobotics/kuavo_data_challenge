@@ -19,6 +19,7 @@ from lerobot.configs.types import FeatureType, NormalizationMode
 from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata, LeRobotDataset
 from lerobot.datasets.utils import dataset_to_policy_features
 from lerobot.utils.random_utils import set_seed
+from lerobot.policies.factory import make_pre_post_processors
 
 from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
 from kuavo_train.wrapper.dataset.LeRobotDatasetWrapper import CustomLeRobotDataset
@@ -135,11 +136,11 @@ def build_policy_config(cfg, input_features, output_features):
     policy_cfg.output_features = _normalize_feature_dict(policy_cfg.output_features)
     return policy_cfg
 
-def build_policy(name, policy_cfg, dataset_stats):
+def build_policy(name, policy_cfg):
     policy = {
         "diffusion": CustomDiffusionPolicyWrapper,
         "act": ACTPolicy,
-    }[name](policy_cfg, dataset_stats)
+    }[name](policy_cfg)
     return policy
 
 def build_policy_config(cfg, input_features, output_features):
@@ -195,7 +196,8 @@ def main(cfg: DictConfig):
     print("policy_cfg", policy_cfg)
 
     # Build policy
-    policy = build_policy(cfg.policy_name, policy_cfg, dataset_stats=dataset_metadata.stats)
+    policy = build_policy(cfg.policy_name, policy_cfg)
+    preprocessor, postprocessor = make_pre_post_processors(policy_cfg, dataset_stats=dataset_metadata.stats)
     optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"])
     
     # Initialize AMP GradScaler if use_amp is True
@@ -237,12 +239,13 @@ def main(cfg: DictConfig):
 
             """ Warning: using `from_pretrained` creates a new policy instance, 
             so the optimizer must be reinitialized here! """
+            # print("load policy done ! ")
             optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"])
             
             # Load optimizer, scheduler, scaler and training state
             checkpoint = torch.load(resume_path / "learning_state.pth", map_location=device)
             optimizer.load_state_dict(checkpoint["optimizer"])
-            
+
             if "lr_scheduler" in checkpoint:
                 lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
             
@@ -312,7 +315,8 @@ def main(cfg: DictConfig):
         total_loss = 0.0
         for batch in epoch_bar:
             
-            batch = {k: (v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
+            # batch = {k: (v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
+            batch = preprocessor(batch)
             with make_autocast(amp_enabled):
                 loss, _ = policy.forward(batch)
             # Scale loss and backward with AMP if enabled

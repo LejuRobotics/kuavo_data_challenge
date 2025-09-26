@@ -441,9 +441,9 @@ def populate_dataset(
             if effort is not None:
                 frame["observation.effort"] = effort[i]
 
-            # frame["task"] = task
+            frame["task"] = task
             # diagnose_frame_data(frame)
-            dataset.add_frame(frame, task=task)
+            dataset.add_frame(frame)
         # dataset.save_episode(task="Pick the black workpiece from the white conveyor belt on your left and place it onto the white box in front of you",)
         # raise ValueError("stop!")
 

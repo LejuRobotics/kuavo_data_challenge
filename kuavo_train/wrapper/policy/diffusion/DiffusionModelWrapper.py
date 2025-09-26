@@ -13,7 +13,7 @@ import torch.nn.functional as F  # noqa: N812
 import torchvision
 from torch import Tensor, nn
 
-from lerobot.constants import OBS_ENV_STATE, OBS_IMAGES, OBS_STATE
+from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGES, OBS_STATE
 from lerobot.policies.utils import (
     get_device_from_parameters,
     get_dtype_from_parameters,
@@ -259,6 +259,43 @@ class CustomDiffusionModelWrapper(DiffusionModel):
             return torch.cat(global_cond_feats, dim=-1)
         else:
             return torch.cat(global_cond_feats, dim=-1).flatten(start_dim=1)
+        
+
+    # ========= inference  ============
+    def conditional_sample(
+        self, batch_size: int, global_cond: Tensor | None = None, generator: torch.Generator | None = None
+    ) -> Tensor:
+        device = get_device_from_parameters(self)
+        dtype = get_dtype_from_parameters(self)
+
+        # Sample prior.
+        sample = torch.randn(
+            size=(batch_size, self.config.horizon, self.config.action_feature.shape[0]),
+            dtype=dtype,
+            device=device,
+            generator=generator,
+        )
+
+        self.noise_scheduler.set_timesteps(self.num_inference_steps)
+
+        for t in self.noise_scheduler.timesteps:
+            # Predict model output.
+            model_output = self.unet(
+                sample,
+                torch.full(sample.shape[:1], t, dtype=torch.long, device=sample.device),
+                global_cond=global_cond,
+            )
+            # Compute previous image: x_t -> x_t-1
+            if self.config.noise_scheduler_type == "ddim":
+                sample = self.noise_scheduler.step(model_output, t, sample, eta=self.config.ddim_eta, generator=generator).prev_sample
+            elif self.config.noise_scheduler_type == "ddpm":
+                sample = self.noise_scheduler.step(model_output, t, sample, generator=generator).prev_sample
+            elif self.config.noise_scheduler_type == "flowmatch":
+                sample = self.noise_scheduler.step(model_output, t, sample, generator=generator).prev_sample
+            else:
+                raise ValueError(f"Unsupported noise scheduler type {self.config.noise_scheduler_type}")
+
+        return sample
 
 
 class DiffusionRgbEncoder(nn.Module):

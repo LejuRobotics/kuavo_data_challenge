@@ -8,7 +8,7 @@ from kuavo_train.utils.augmenter import (Augmenter,
 from torch import Tensor, nn
 import torch
 from collections import deque
-from lerobot.constants import ACTION, OBS_ENV_STATE, OBS_IMAGES, OBS_STATE
+from lerobot.utils.constants import ACTION, OBS_ENV_STATE, OBS_IMAGES, OBS_STATE
 from kuavo_train.wrapper.policy.diffusion.DiffusionConfigWrapper import CustomDiffusionConfigWrapper
 from lerobot.policies.utils import (
     get_device_from_parameters,
@@ -31,15 +31,15 @@ T = TypeVar("T", bound="CustomDiffusionPolicyWrapper")
 OBS_DEPTH = "observation.depth"
 
 class CustomDiffusionPolicyWrapper(DiffusionPolicy):
-    def __init__(self,         
+    def __init__(self,
                  config: CustomDiffusionConfigWrapper,
-                 dataset_stats: dict[str, dict[str, Tensor]] | None = None,
     ):
         vision_backbone = config.vision_backbone
         config.vision_backbone = "resnet18"  # Change vision backbone to ResNet18
         # this is important to call the parent constructor to setup normalization and queues,
         # to prevent original config not supported dinov3 vision backbone
-        super().__init__(config, dataset_stats)
+        # super().__init__(config, dataset_stats)
+        super().__init__(config)
         config.vision_backbone = vision_backbone  # change back to the original config
         self.diffusion = CustomDiffusionModelWrapper(config)
 
@@ -56,7 +56,8 @@ class CustomDiffusionPolicyWrapper(DiffusionPolicy):
             self._queues["observation.depth"] = deque(maxlen=self.config.n_obs_steps)
         if self.config.env_state_feature:
             self._queues["observation.environment_state"] = deque(maxlen=self.config.n_obs_steps)
-
+    
+    @torch.no_grad()
     def select_action(self, batch: dict[str, Tensor]) -> Tensor:
         """Select a single action given environment observations.
 
@@ -82,7 +83,7 @@ class CustomDiffusionPolicyWrapper(DiffusionPolicy):
         if ACTION in batch:
             batch.pop(ACTION)
         
-        batch = self.normalize_inputs(batch)
+        # batch = self.normalize_inputs(batch)
         
         random_crop = self.config.crop_is_random and self.training
         crop_position = None
@@ -140,7 +141,7 @@ class CustomDiffusionPolicyWrapper(DiffusionPolicy):
             # batch[OBS_DEPTH] = torch.stack([batch[key] for key in self.config.depth_features], dim=-4)
 
 
-        batch = self.normalize_inputs(batch)
+        # batch = self.normalize_inputs(batch)
         # batch[OBS_DEPTH] = torch.tensor(batch[OBS_DEPTH],dtype=batch[OBS_IMAGES].dtype)
         if self.config.image_features:
             batch = dict(batch)  # shallow copy so that adding a key doesn't modify the original
@@ -149,7 +150,8 @@ class CustomDiffusionPolicyWrapper(DiffusionPolicy):
             batch = dict(batch)  # shallow copy so that adding a key doesn't modify the original
             batch[OBS_DEPTH] = torch.stack([batch[key] for key in self.config.depth_features], dim=-4)
             batch[OBS_DEPTH] = batch[OBS_DEPTH].mean(dim=-3, keepdim=True)  # if multiple channels depth images, average them
-        batch = self.normalize_targets(batch)
+            # print("mean depth:",batch[OBS_DEPTH].mean().item(),"max depth:",batch[OBS_DEPTH].max().item(),"min depth:",batch[OBS_DEPTH].min().item())
+        # batch = self.normalize_targets(batch)
         # print(batch[OBS_DEPTH].shape, batch[OBS_DEPTH].max(), batch[OBS_DEPTH].min())
         # print(batch[OBS_IMAGES].shape, batch[OBS_IMAGES].max(), batch[OBS_IMAGES].min())
         # raise ValueError()
