@@ -32,11 +32,9 @@ from utils.transforms import ImageTransforms, ImageTransformsConfig, ImageTransf
 from functools import partial
 from contextlib import nullcontext
 from kuavo_train.utils.custom_sampler import EpisodeContextRateSampler
-from lerobot.processor import ProcessorStep, NormalizerProcessorStep
-from lerobot.processor.core import TransitionKey
-from lerobot.configs.types import PipelineFeatureType, PolicyFeature
 import ipdb
-
+import matplotlib.pyplot as plt
+import einops
 
 def build_augmenter(cfg):
     """Since operations such as cropping and resizing in LeRobot are implemented at the model level 
@@ -170,80 +168,6 @@ def build_policy_config(cfg, input_features, output_features):
     return policy_cfg
 
 
-class AugmentationProcessorStep(ProcessorStep):
-    def __init__(self, transform, cam_keys):
-        super().__init__()
-        self.transform = transform
-        self.cam_keys = [k for k in cam_keys if "depth" not in k]  # list of keys in the transition dict to augment
-
-    def __call__(self, transition):
-        # Store the current transition (required by ProcessorStep)
-        new_transition = transition.copy()
-
-        # Apply transform to each camera key
-        data_dict = new_transition.get(TransitionKey.OBSERVATION)
-        if data_dict is not None:
-            # new_data_dict = {
-            #     k: self.transform(v) if k in self.cam_keys else v
-            #     for k, v in data_dict.items()
-            # }
-            new_data_dict = {}
-            for k, v in data_dict.items():
-                
-                if k in self.cam_keys:
-                    # print(k)
-                    new_data_dict[k] = self.transform(v)
-                else:
-                    new_data_dict[k] = v
-            # print(new_data_dict['observation.images.head_cam_h'].device)
-            new_transition[TransitionKey.OBSERVATION] = new_data_dict
-            return new_transition
-        else:
-            return new_transition
-        
-
-    def transform_features(
-        self, features: dict[PipelineFeatureType, dict[str, PolicyFeature]]
-    ) -> dict[PipelineFeatureType, dict[str, PolicyFeature]]:
-        """
-        Returns the input features unchanged.
-
-        Device and dtype transformations do not alter the fundamental definition of the features (e.g., shape).
-
-        Args:
-            features: A dictionary of policy features.
-
-        Returns:
-            The original dictionary of policy features.
-        """
-        return features
-    
-
-def insert_before_normalizer(pipeline, new_step):
-    """
-    Insert a processor step before the first NormalizerProcessorStep.
-    If no NormalizerProcessorStep is found, append at the end.
-    """
-    for i, step in enumerate(pipeline.steps):
-        if isinstance(step, NormalizerProcessorStep):
-            pipeline.steps.insert(i, new_step)
-            print(f"Inserted {new_step.__class__.__name__} before NormalizerProcessorStep", {i})
-            return new_step
-    pipeline.steps.append(new_step)
-    print(f"No NormalizerProcessorStep found, appended {new_step.__class__.__name__} at the end")
-    return new_step
-
-def remove_aug_step(pipeline, step_to_remove):
-    """
-    Remove the given step from the pipeline if it exists.
-    """
-    if step_to_remove in pipeline.steps:
-        pipeline.steps.remove(step_to_remove)
-        print(f"Removed {step_to_remove.__class__.__name__}")
-    else:
-        print(f"Step {step_to_remove.__class__.__name__} not found in pipeline")
-
-
 
 @hydra.main(config_path="../configs/policy/", config_name="diffusion_config", version_base=None)
 def main(cfg: DictConfig):
@@ -313,7 +237,6 @@ def main(cfg: DictConfig):
             
             # Load policy
             policy = policy.from_pretrained(resume_path, strict=True)
-            preprocessor = preprocessor.from_pretrained(resume_path,config_filename="policy_preprocessor.json")
 
             """ Warning: using `from_pretrained` creates a new policy instance, 
             so the optimizer must be reinitialized here! """
@@ -361,10 +284,8 @@ def main(cfg: DictConfig):
         cfg.repoid,
         delta_timestamps=delta_timestamps,
         root=cfg.root,
-        image_transforms=None,
+        image_transforms=image_transforms,
     )
-    # print(preprocessor.steps)
-    # preprocessor.steps.insert(2, AugmentationProcessorStep(image_transforms, dataset.meta.camera_keys))
     # diffs = []
     # for i in tqdm(range(len(dataset) - 1), desc="Dataset sanity check"):
     #     diffs.append(torch.norm(torch.tensor(dataset[i+1]["action"]) - torch.tensor(dataset[i]["action"]), p=2).item())
@@ -392,48 +313,44 @@ def main(cfg: DictConfig):
 
         epoch_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{cfg.training.max_epoch}")
 
-        aug_step = insert_before_normalizer(preprocessor, AugmentationProcessorStep(image_transforms, dataset.meta.camera_keys))  # just for training
-        
         total_loss = 0.0
         for batch in epoch_bar:
             
             # batch = {k: (v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
-
-            batch = preprocessor(batch)  # will normalize and put batch to device
+            print(batch.keys())
 
             # 假设 batch 是一个字典
-            # import matplotlib.pyplot as plt
-            # import einops
-            # batchsize = 32
-            # nrows, ncols = 4, 8  # 4行8列
+            batchsize = 32
+            nrows, ncols = 4, 8  # 4行8列
 
-            # for k, v in batch.items():
-            #     if k == "observation.images.head_cam_h":
-            #         # v: (B, S, C, H, W)
-            #         v = v.detach().cpu()
-            #         B, S, C, H, W = v.shape
+            for k, v in batch.items():
+                if k == "observation.images.head_cam_h":
+                    # v: (B, S, C, H, W)
+                    v = v.detach().cpu()
+                    B, S, C, H, W = v.shape
 
-            #         # 取第一个时间步
-            #         imgs = v[:, 0]  # (B, C, H, W)
-            #         fig, axes = plt.subplots(nrows, ncols, figsize=(16, 8))
-            #         axes = axes.flatten()
+                    # 取第一个时间步
+                    imgs = v[:, 0]  # (B, C, H, W)
+                    fig, axes = plt.subplots(nrows, ncols, figsize=(16, 8))
+                    axes = axes.flatten()
 
-            #         for i in range(batchsize):
-            #             img = einops.rearrange(imgs[i], "c h w -> h w c")
-            #             if C == 1:
-            #                 axes[i].imshow(img.squeeze(-1), cmap="gray")
-            #             else:
-            #                 axes[i].imshow(img)
-            #             axes[i].axis("off")
-            #             axes[i].set_title(f"{i}")
+                    for i in range(batchsize):
+                        img = einops.rearrange(imgs[i], "c h w -> h w c")
+                        if C == 1:
+                            axes[i].imshow(img.squeeze(-1), cmap="gray")
+                        else:
+                            axes[i].imshow(img)
+                        axes[i].axis("off")
+                        axes[i].set_title(f"{i}")
 
-            #         # 隐藏多余子图（如果 B < nrows*ncols）
-            #         for j in range(B, nrows*ncols):
-            #             axes[j].axis("off")
+                    # 隐藏多余子图（如果 B < nrows*ncols）
+                    for j in range(B, nrows*ncols):
+                        axes[j].axis("off")
 
-            #         plt.tight_layout()
-            #         plt.show()
-            # raise ValueError("stop for debug")
+                    plt.tight_layout()
+                    plt.show()
+            raise ValueError("stop for debug")
+            batch = preprocessor(batch)
             with make_autocast(amp_enabled):
                 loss, _ = policy.forward(batch)
             # Scale loss and backward with AMP if enabled
@@ -470,15 +387,10 @@ def main(cfg: DictConfig):
         # Save checkpoint every N epochs
         if (epoch + 1) % cfg.training.save_freq_epoch == 0:
             policy.save_pretrained(output_directory / f"epoch{epoch+1}")
-            # preprocessor.save_pretrained(output_directory)
 
         # Save last checkpoint (includes AMP scaler & progress for perfect resume)
         # Save last checkpoint
         policy.save_pretrained(output_directory)
-
-        remove_aug_step(preprocessor, aug_step)
-        preprocessor.save_pretrained(output_directory)
-
         # Save training state including optimizer, scheduler, scaler, and step/epoch info
         checkpoint = {
             "optimizer": optimizer.state_dict(),

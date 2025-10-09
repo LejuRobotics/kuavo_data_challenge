@@ -8,9 +8,9 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
 
 # kuavo rosbag数据转换成lerobot-parquet格式0配置文件
 rosbag:
-  rosbag_dir: /media/yangzhou/Elements/算法组重要数据/IL_DATA/快消品翻面 # rosbag文件目录
+  rosbag_dir: /media/yangzhou/80268D01268CFA04/datafactory/data # rosbag文件目录
   num_used: null # 使用的rosbag数量(若设置为任意数字，则会随机采样选择)
-  lerobot_dir: /media/yangzhou/80268D01268CFA04/lerobothandover  # 转换后的lerobot文件的保存目录
+  lerobot_dir: /media/yangzhou/80268D01268CFA04/datafactory/lerobot_handover  # 转换后的lerobot文件的保存目录
 
 dataset:
   only_arm: true  # 默认true, 是否只使用手臂数据, 目前的模仿学习只用于手臂数据，选择true会自动屏蔽足关节数据
