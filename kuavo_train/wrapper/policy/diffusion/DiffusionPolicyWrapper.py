@@ -86,17 +86,18 @@ class CustomDiffusionPolicyWrapper(DiffusionPolicy):
         # batch = self.normalize_inputs(batch)
         
         random_crop = self.config.crop_is_random and self.training
-        crop_position = None
+        crop_position_list = []
         if self.config.image_features:
             batch = dict(batch)  # shallow copy so that adding a key doesn't modify the original
             for key in self.config.image_features:
                 batch[key], crop_position = crop_image(batch[key],target_range=self.config.crop_shape,random_crop=random_crop)
+                crop_position_list.append(crop_position)
                 batch[key] = resize_image(batch[key],target_size=self.config.resize_shape, image_type="rgb")
             batch[OBS_IMAGES] = torch.stack([batch[key] for key in self.config.image_features], dim=-4)
         if self.config.use_depth and self.config.depth_features:
             batch = dict(batch)  # shallow copy so that adding a key doesn't modify the original
 
-            for key in self.config.depth_features:
+            for key, crop_position in zip(self.config.depth_features, crop_position_list):
                 if len(crop_position) == 4:
                     batch[key] = torchvision.transforms.functional.crop(batch[key],*crop_position)
                 else:
