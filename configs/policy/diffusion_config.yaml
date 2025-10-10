@@ -7,7 +7,7 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
 
 
 task: "leju_handover"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
-method: "dinov3_nosep_depth_fuse_state_newdata"  # 自定义方法名称
+method: "dinov3_nosep_depth_fusestate_newdata_goback"  # 自定义方法名称
 timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
 # 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
 repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
@@ -39,7 +39,7 @@ training:
 
     # resume training，断点续训
     resume: True
-    resume_timestamp: "run_20251006_232700"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    resume_timestamp: "run_20251009_205040"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
     RGB_Augmenter:
@@ -99,9 +99,9 @@ policy_name: diffusion   # 策略类型，支持diffusion和act
 policy:
     _target_: kuavo_train.wrapper.policy.diffusion.DiffusionConfigWrapper.CustomDiffusionConfigWrapper  # 实例化diffusion config
     n_obs_steps: 2
-    horizon: 64
-    n_action_steps: 32
-    drop_n_last_frames: 31  # 丢弃最后n帧
+    horizon: 16
+    n_action_steps: 8
+    drop_n_last_frames: 7  # 丢弃最后n帧
 
     normalization_mapping: # RGB等同于VISUAL类型, diffusion策略另外支持了深度数据，这两个参数用于设置normalize方式
       RGB: 
@@ -135,7 +135,7 @@ policy:
 
     # diffusion settings:
     noise_scheduler_type: DDPM
-    num_train_timesteps: 60
+    num_train_timesteps: 100
     beta_schedule: squaredcos_cap_v2
     beta_start: 0.0001
     beta_end: 0.02

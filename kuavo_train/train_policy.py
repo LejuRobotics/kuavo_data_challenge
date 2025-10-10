@@ -478,6 +478,7 @@ def main(cfg: DictConfig):
 
         remove_aug_step(preprocessor, aug_step)
         preprocessor.save_pretrained(output_directory)
+        postprocessor.save_pretrained(output_directory)
 
         # Save training state including optimizer, scheduler, scaler, and step/epoch info
         checkpoint = {
