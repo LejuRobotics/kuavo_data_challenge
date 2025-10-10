@@ -26,9 +26,9 @@ head_init: null # 机器人头部初始位置，default=None
 #                 "both":['head_cam_h','depth_h','wrist_cam_l','depth_l','wrist_cam_r','depth_r']
 #                 }][int(self.use_depth)][self.which_arm]
 input_images: ['head_cam_h','depth_h','wrist_cam_l','depth_l','wrist_cam_r','depth_r'] 
-depth_range: [0, 1000]
+depth_range: [0, 1500]
 image_size: [480, 848] # 图像大小（高，宽），default=(480, 640)
-ros_rate: 15  # 推理频率，单位Hz
+ros_rate: 10  # 推理频率，单位Hz
 
 # 以下环境配置为不建议改动配置
 
@@ -59,7 +59,7 @@ is_binary: false # 是否使用二值化夹爪，灵巧手，default=false
 
 
 # inference config，模型推理配置的修改
-go_bag_path: /home/ubun-new/project/quick_forward_standard_feed_by_2025_09_12_P4-394_20250915112231.bag  # 推理时需要提供bag包的完整路径，如：到达预抓取姿态等，可直接拷贝一个训练用rosbag控制
+go_bag_path: /home/ubun-new/go_bag/bag_for_handover/A10-A01-206-208-92-71-dex_hand-20250930100830-v1.bag  # 推理时需要提供bag包的完整路径，如：到达预抓取姿态等，可直接拷贝一个训练用rosbag控制
 
 policy_type: "diffusion"  # 策略名字，支持diffusion，act等
 use_delta: false  # 是否使用增量动作，default=false（暂未支持）
@@ -67,10 +67,10 @@ eval_episodes: 1  # 测试回合数，真机默认为1
 seed: 42  # 随机种子，真机中仅模型状态可固定，
 start_seed: 42  # 回合开始时的随机种子，真机中仅模型状态可固定
 device: "cuda"  # or "cpu"
-task: "leju_handover"
-method: "dinov3_nosep_depth"
-timestamp: "run_20250921_001500"
-epoch: 40  # 使用训练保存的哪一个epoch。注意：代码将在outputs/<task>/<method>/run_<timestamp>/epoch10中load policy的模型参数
-max_episode_steps: 500  # 最大回合步数，超过自动结束
+task: "test_handover"
+method: "state_fuse"
+timestamp: "run_1008"
+epoch: best  # 使用训练保存的哪一个epoch。注意：代码将在outputs/<task>/<method>/run_<timestamp>/epoch10中load policy的模型参数
+max_episode_steps: 100000  # 最大回合步数，超过自动结束
 env_name: Kuavo-Real  # kuavo真机环境名称
 

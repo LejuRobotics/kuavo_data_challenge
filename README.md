@@ -306,6 +306,23 @@ python kuavo_train/train_policy.py \
 
 ---
 
+### 2.1 模仿学习训练：单机多卡模式
+
+安装accelerate库： pip install accelerate
+
+```bash
+accelerate launch --config_file ./configs/policy/accelerate_config.yaml \ 
+  ./kuavo_train/train_policy_with_accelerate.py  --  \ 
+  --config-path ./configs/policy \ 
+  --config-name diffusion_config.yaml
+```
+
+说明：
+
+* diffusion_config.yaml文件中配置参数设置参考上面《2.0 模仿学习训练》详细参数说明 
+
+---
+
 ### 3. 仿真器测试
 
 完成训练后可启动mujoco仿真器并调用部署代码并进行评估：
