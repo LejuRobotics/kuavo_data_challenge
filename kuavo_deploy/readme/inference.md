@@ -47,31 +47,31 @@ bash kuavo_deploy/eval_kuavo.sh
 
 kuavo_deploy/eval_kuavo.sh: 16: Bad substitution
 1. 显示帮助信息:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --help
+python kuavo_deploy/examples/scripts/script.py --help
 
 2. 干运行模式 - 查看将要执行的操作:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task go --dry_run --config /path/to/custom_config.yaml
+python kuavo_deploy/examples/scripts/script.py --task go --dry_run --config /path/to/custom_config.yaml
 
 3. 到达工作位置:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task go --config /path/to/custom_config.yaml
+python kuavo_deploy/examples/scripts/script.py --task go --config /path/to/custom_config.yaml
 
 4. 从当前位置直接运行模型:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task run --config /path/to/custom_config.yaml
+python kuavo_deploy/examples/scripts/script.py --task run --config /path/to/custom_config.yaml
 
 5. 插值至bag的最后一帧状态开始运行:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task go_run --config /path/to/custom_config.yaml
+python kuavo_deploy/examples/scripts/script.py --task go_run --config /path/to/custom_config.yaml
 
 6. 从go_bag的最后一帧状态开始运行:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task here_run --config /path/to/custom_config.yaml
+python kuavo_deploy/examples/scripts/script.py --task here_run --config /path/to/custom_config.yaml
 
 7. 回到零位:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task back_to_zero --config /path/to/custom_config.yaml
+python kuavo_deploy/examples/scripts/script.py --task back_to_zero --config /path/to/custom_config.yaml
 
 8. 仿真中自动测试模型，执行eval_episodes次:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script_auto_test.py --task auto_test --config /path/to/custom_config.yaml
+python kuavo_deploy/examples/scripts/script_auto_test.py --task auto_test --config /path/to/custom_config.yaml
 
 9. 启用详细输出:
-python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task go --verbose --config /path/to/custom_config.yaml
+python kuavo_deploy/examples/scripts/script.py --task go --verbose --config /path/to/custom_config.yaml
 
 === 任务说明 ===
 go          - 先插值到bag第一帧的位置，再回放bag包前往工作位置
@@ -82,8 +82,8 @@ back_to_zero - 中断模型推理后，倒放bag包回到0位
 auto_test   - 仿真中自动测试模型，执行eval_episodes次
 
 请选择要执行的示例: 1. 显示普通测试帮助信息 2. 显示自动测试帮助信息 3. 进一步选择示例
-1. 执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --help
-2. 执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script_auto_test.py --help
+1. 执行: python kuavo_deploy/examples/scripts/script.py --help
+2. 执行: python kuavo_deploy/examples/scripts/script_auto_test.py --help
 3. 进一步选择示例
 请选择要执行的示例 (1-3) 或按 Enter 退出:
 ```
@@ -106,21 +106,21 @@ auto_test   - 仿真中自动测试模型，执行eval_episodes次
 ✅ 模型路径存在
 可选择要执行的示例如下:
 1. 先插值到bag第一帧的位置，再回放bag包前往工作位置(干运行模式)
-执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task go --dry_run --config /path/to/config.yaml
+执行: python kuavo_deploy/examples/scripts/script.py --task go --dry_run --config /path/to/config.yaml
 2. 先插值到bag第一帧的位置，再回放bag包前往工作位置
-执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task go --config /path/to/config.yaml
+执行: python kuavo_deploy/examples/scripts/script.py --task go --config /path/to/config.yaml
 3. 从当前位置直接运行模型
-执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task run --config /path/to/config.yaml
+执行: python kuavo_deploy/examples/scripts/script.py --task run --config /path/to/config.yaml
 4. 到达工作位置并直接运行模型
-执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task go_run --config /path/to/config.yaml
+执行: python kuavo_deploy/examples/scripts/script.py --task go_run --config /path/to/config.yaml
 5. 插值至bag的最后一帧状态开始运行
-执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task here_run --config /path/to/config.yaml
+执行: python kuavo_deploy/examples/scripts/script.py --task here_run --config /path/to/config.yaml
 6. 回到零位
-执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task back_to_zero --config /path/to/config.yaml
+执行: python kuavo_deploy/examples/scripts/script.py --task back_to_zero --config /path/to/config.yaml
 7. 先插值到bag第一帧的位置，再回放bag包前往工作位置(启用详细输出)
-执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script.py --task go --verbose --config /path/to/config.yaml
+执行: python kuavo_deploy/examples/scripts/script.py --task go --verbose --config /path/to/config.yaml
 8. 仿真中自动测试模型，执行eval_episodes次
-执行: python /home/leju/project/kuavo-data-challenge-old/kuavo_deploy/examples/scripts/script_auto_test.py --task auto_test --config /path/to/config.yaml
+执行: python kuavo_deploy/examples/scripts/script_auto_test.py --task auto_test --config /path/to/config.yaml
 9. 退出
 请选择要执行的示例 (1-9)
 ```

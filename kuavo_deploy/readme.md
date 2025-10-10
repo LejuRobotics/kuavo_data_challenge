@@ -83,8 +83,8 @@ outputs/
 ### 1. 从github拉取代码仓库
 
 ```bash
-git clone https://github.com/LejuRobotics/kuavo-data-challenge.git
-cd kuavo-data-challenge
+git clone https://github.com/LejuRobotics/kuavo_data_challenge.git
+cd kuavo_data_challenge
 git submodule update --init --recursive
 ```
 

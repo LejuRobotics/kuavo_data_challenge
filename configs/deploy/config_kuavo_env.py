@@ -35,6 +35,9 @@ class Config_Kuavo_Env:
 
     # Input features
     input_images: List[str]
+
+    device: str
+    depth_range: List[int]
     
     @property
     def use_leju_claw(self) -> bool:
@@ -145,6 +148,8 @@ def load_kuavo_env_config(config_path: str = None) -> Config_Kuavo_Env:
         eef_max=config_dict['eef_max'],
         is_binary=config_dict['is_binary'],
         input_images=config_dict['input_images'],
+        device=config_dict['device'],
+        depth_range=config_dict['depth_range'],
     )
 
 if __name__ == "__main__":

@@ -54,13 +54,11 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ## a. 重新创建 Conda 环境
 
 * **Create a conda environment (Python 3.10 recommended)**
-    ```bash
-    # Set "kdc" to your conda env name
-    conda create -n kdc python=3.10 #Keep on typing 'a' and enter to accept ToS
-    conda activate kdc
-    ```
-
-* **安装用于通信的kuavo_humanoid_sdk包，参考链接：https://gitee.com/leju-robot/kuavo-ros-opensource/tree/master/src/kuavo_humanoid_sdk**
+  ```bash
+  # Set "kdc" to your conda env name
+  conda create -n kdc python=3.10 #Keep on typing 'a' and enter to accept ToS
+  conda activate kdc
+  ```
 
 
 * **For full system (data transformation, simulator, deployment on real robot, etc.):**
@@ -91,7 +89,7 @@ pip install -e ".[aloha, pusht]"
 # Uninstall torchcodec 
 pip uninstall torchcodec
 
-进入 kuavo-data-challenge 项目的根目录
+进入 kuavo_data_challenge 项目的根目录
 pip install -e .
 
 # 安装用于通信的kuavo_humanoid_sdk包，参考链接：

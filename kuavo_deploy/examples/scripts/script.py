@@ -198,11 +198,11 @@ class ArmMove:
     def _pub_leju_claw(self, msg) -> None:
         """发布夹爪"""
         if self.env.which_arm=="both":
-            target_positions = msg.position
+            target_positions = msg.data.position
         elif self.env.which_arm=="left":
-            target_positions = np.concatenate([msg.position[:self.env.leju_claw_dof_needed],[0]],axis=0)
+            target_positions = np.concatenate([msg.data.position[:self.env.leju_claw_dof_needed],[0]],axis=0)
         elif self.env.which_arm=="right":
-            target_positions = np.concatenate([[0],msg.position[self.env.leju_claw_dof_needed:]],axis=0)
+            target_positions = np.concatenate([[0],msg.data.position[self.env.leju_claw_dof_needed:]],axis=0)
         else:
             raise ValueError(f"Invalid which_arm: {self.env.which_arm}, must be 'left', 'right', or 'both'")
         self.env.lejuclaw.control(target_positions)

@@ -8,7 +8,7 @@ IFACE1=enx00e04c684355
 IFACE2=enxc8a362b260f5
 
 # 检查桥接接口是否存在
-if ! ip link show "$BRIDGE" &>/dev/null; then
+if ip link show "$BRIDGE" &>/dev/null; then
     echo "错误：桥接接口 $BRIDGE 已存在，请先删除或使用其它名称。"
     exit 1
 fi

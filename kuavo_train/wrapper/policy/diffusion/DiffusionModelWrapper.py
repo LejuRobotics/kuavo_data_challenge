@@ -571,14 +571,20 @@ class CustomDiffusionModelWrapper(DiffusionModel):
     # ---------------------------
     # Inference sampling
     # ---------------------------
-    def conditional_sample(self, batch_size: int, global_cond: Optional[Tensor] = None, generator=None) -> Tensor:
+    def conditional_sample(self, batch_size: int, global_cond: Optional[Tensor] = None, generator=None, noise: Tensor | None = None) -> Tensor:
         device = get_device_from_parameters(self)
         dtype = get_dtype_from_parameters(self)
 
-        sample = torch.randn(
-            (batch_size, self.config.horizon, self.config.action_feature.shape[0]),
-            dtype=dtype, device=device, generator=generator
-        )
+        sample = (
+                    noise
+                    if noise is not None
+                    else torch.randn(
+                        size=(batch_size, self.config.horizon, self.config.action_feature.shape[0]),
+                        dtype=dtype,
+                        device=device,
+                        generator=generator,
+                    )
+                )
         self.noise_scheduler.set_timesteps(self.num_inference_steps)
 
         for t in self.noise_scheduler.timesteps:

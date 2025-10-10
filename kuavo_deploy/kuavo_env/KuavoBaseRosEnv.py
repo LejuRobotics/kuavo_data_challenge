@@ -11,11 +11,15 @@ import gymnasium as gym
 import time
 from configs.deploy.config_kuavo_env import load_kuavo_env_config
 import sys
-from kuavo_humanoid_sdk import KuavoSDK,KuavoRobot,KuavoRobotState,LejuClaw,DexterousHand
+from kuavo_humanoid_sdk import KuavoSDK,KuavoRobot,KuavoRobotState,DexterousHand
+from kuavo_humanoid_sdk.msg.kuavo_msgs.msg import lejuClawCommand
 from kuavo_deploy.utils.logging_utils import setup_logger
 
 import traceback
 # import Rq2f85ClawCmd,Rq2f85ClawState
+
+import torch
+from torchvision.transforms.functional import to_tensor
 
 log_robot = setup_logger("robot")
 
@@ -51,6 +55,12 @@ def check_control_signals():
         
     return True  # 正常继续
 
+def img_preprocess(image, device="cuda"):
+    return to_tensor(image).unsqueeze(0).to(device, non_blocking=True)
+
+def depth_preprocess(depth, device="cuda",depth_range=[0,1000]):
+    return torch.tensor(depth,dtype=torch.float32).clamp(*depth_range).unsqueeze(0).to(device, non_blocking=True)
+
 class KuavoBaseRosEnv(gym.Env):
 
     def __init__(self, config_path: str = None):
@@ -81,6 +91,8 @@ class KuavoBaseRosEnv(gym.Env):
         self.eef_max = config_kuavo_env.eef_max
 
         self.input_images = config_kuavo_env.input_images
+        self.device = config_kuavo_env.device
+        self.depth_range = config_kuavo_env.depth_range
 
         self.bridge = CvBridge()
 
@@ -164,12 +176,12 @@ class KuavoBaseRosEnv(gym.Env):
         
         if self.only_arm:
             # ROS subscribers
-            rospy.Subscriber("/cam_h/color/image_raw/compressed", CompressedImage, self.cam_h_callback)
-            rospy.Subscriber("/cam_l/color/image_raw/compressed", CompressedImage, self.cam_l_callback)
-            rospy.Subscriber("/cam_r/color/image_raw/compressed", CompressedImage, self.cam_r_callback)
-            rospy.Subscriber("/cam_h/depth/image_raw/compressedDepth", CompressedImage, self.cam_h_depth_callback)
-            rospy.Subscriber("/cam_l/depth/image_rect_raw/compressedDepth", CompressedImage, self.cam_l_depth_callback)
-            rospy.Subscriber("/cam_r/depth/image_rect_raw/compressedDepth", CompressedImage, self.cam_r_depth_callback)
+            rospy.Subscriber("/cam_h/color/image_raw/compressed", CompressedImage, self.cam_h_callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
+            rospy.Subscriber("/cam_l/color/image_raw/compressed", CompressedImage, self.cam_l_callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
+            rospy.Subscriber("/cam_r/color/image_raw/compressed", CompressedImage, self.cam_r_callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
+            rospy.Subscriber("/cam_h/depth/image_raw/compressedDepth", CompressedImage, self.cam_h_depth_callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
+            rospy.Subscriber("/cam_l/depth/image_rect_raw/compressedDepth", CompressedImage, self.cam_l_depth_callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
+            rospy.Subscriber("/cam_r/depth/image_rect_raw/compressedDepth", CompressedImage, self.cam_r_depth_callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
             
             if not self.real:
                 rospy.Subscriber("/gripper/state", JointState, self.gripper_state_callback)
@@ -272,7 +284,6 @@ class KuavoBaseRosEnv(gym.Env):
         # reset head
         if self.head_init is not None:
             self.robot.control_head(self.head_init[0], self.head_init[1])
-            time.sleep(3)
 
         if self.real:
             if self.which_arm == 'both':
@@ -280,19 +291,22 @@ class KuavoBaseRosEnv(gym.Env):
                     target_positions = [0,100,0,0,0,0,0,100,0,0,0,0]
                     self.qiangnao.control(target_positions=target_positions, target_velocities=None, target_torques=None)
                 elif self.eef_type == 'leju_claw':
-                    raise KeyError("leju_claw is not supported!")
+                    target_positions = [0,0]
+                    self.lejuclaw.control(target_positions=target_positions, target_velocities=None, target_torques=None)
             elif self.which_arm == 'left':
                 if self.eef_type == 'qiangnao':
                     target_positions = [0,100,0,0,0,0]
                     self.qiangnao.control_left(target_positions=target_positions, target_velocities=None, target_torques=None)
                 elif self.eef_type == 'leju_claw':
-                    raise KeyError("leju_claw is not supported!")
+                    target_positions = [0]
+                    self.lejuclaw.control_left(target_positions=target_positions, target_velocities=None, target_torques=None)
             elif self.which_arm == 'right':
                 if self.eef_type == 'qiangnao':
                     target_positions = [0,100,0,0,0,0]
                     self.qiangnao.control_right(target_positions=target_positions, target_velocities=None, target_torques=None)
                 elif self.eef_type == 'leju_claw':
-                    raise KeyError("leju_claw is not supported!")
+                    target_positions = [0]
+                    self.lejuclaw.control_right(target_positions=target_positions, target_velocities=None, target_torques=None)
             else:
                 raise KeyError("which_arm != 'left' or 'right' or 'both' is not supported!")
 
@@ -307,6 +321,8 @@ class KuavoBaseRosEnv(gym.Env):
         self.start_state = self.start_state / average_num
 
         obs = self.get_obs()
+        self.sleep_time = 0
+        self.average_sleep_time = 0
         return obs, {}
 
     def step(self, action):
@@ -316,8 +332,13 @@ class KuavoBaseRosEnv(gym.Env):
         action = np.clip(action, self.action_space.low, self.action_space.high) # 限制动作范围 
         log_robot.info(f"clip action: {action}")
         self.exec_action(action)
+
+        start_time = time.time()
         self.rate.sleep()
-        
+        self.sleep_time = time.time() - start_time
+        self.average_sleep_time += self.sleep_time
+        log_robot.info(f"rate.sleep time: {self.sleep_time:.3f}s")
+
         # Get new observation
         obs = self.get_obs()
         
@@ -508,7 +529,7 @@ class KuavoBaseRosEnv(gym.Env):
             else:
                 raise KeyError("which_arm != 'left' or 'right' or 'both' is not supported!")
 
-        obs = {"observation.state": self.state}
+        obs = {"observation.state": torch.from_numpy(self.state).float().unsqueeze(0).to("cuda", non_blocking=True)}
         for image in self.input_images:
             if 'depth' in image:
                 obs[f"observation.{image}"] = getattr(self, f"{image}_img")
@@ -526,22 +547,31 @@ class KuavoBaseRosEnv(gym.Env):
         # 色域转换由BGR->RGB
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         height,width = self.image_size
+
+        # 检查图像尺寸并进行resize
+        if cv_img.shape[0] != height or cv_img.shape[1] != width:
+            # 使用插值方法进行resize，可以根据需要选择不同的插值方法
+            # cv2.INTER_LINEAR: 双线性插值（默认）
+            # cv2.INTER_CUBIC: 双三次插值
+            # cv2.INTER_NEAREST: 最近邻插值
+            # print(f"Image resized from {cv_img.shape[:2]} to {height}x{width}")
+            cv_img = cv2.resize(cv_img, (width, height), interpolation=cv2.INTER_LINEAR)
+            
         img_array = np.array(cv_img)
         # check image size
-        if img_array.shape[0] != height or img_array.shape[1] != width:
-            raise ValueError(f"Image size is not correct! {img_array.shape} != {height}x{width}")
+        # if img_array.shape[0] != height or img_array.shape[1] != width:
+        #     raise ValueError(f"Image size is not correct! {img_array.shape} != {height}x{width}")
         return img_array
 
     # ROS callbacks
     def cam_h_callback(self, msg):
-        self.head_cam_h_img = self.process_rgb_img(msg)
+        self.head_cam_h_img = img_preprocess(self.process_rgb_img(msg), device=self.device)
 
     def cam_l_callback(self, msg):
-        self.wrist_cam_l_img = self.process_rgb_img(msg)
+        self.wrist_cam_l_img = img_preprocess(self.process_rgb_img(msg), device=self.device)
     
     def cam_r_callback(self, msg):
-        # print("cam_r_callback!")
-        self.wrist_cam_r_img = self.process_rgb_img(msg)
+        self.wrist_cam_r_img = img_preprocess(self.process_rgb_img(msg), device=self.device)
 
     def process_depth_img(self, msg):
         if not (hasattr(msg, 'format') and hasattr(msg, 'data')):
@@ -566,18 +596,20 @@ class KuavoBaseRosEnv(gym.Env):
         # check image size
         height,width = self.image_size
         if image.shape[0] != height or image.shape[1] != width:
-            raise ValueError(f"Depth image size is not correct! {image.shape} != {height}x{width}")
+            # print(f"Depth resized from {image.shape[:2]} to {height}x{width}")
+            image = cv2.resize(image, (width, height), interpolation=cv2.INTER_NEAREST)
+        #     raise ValueError(f"Depth image size is not correct! {image.shape} != {height}x{width}")
         # print("depth image dtype: ", depth_image.dtype)
         return image[np.newaxis,...]
 
     def cam_h_depth_callback(self, msg):
-        self.depth_h_img = self.process_depth_img(msg)
+        self.depth_h_img = depth_preprocess(self.process_depth_img(msg), device=self.device, depth_range=self.depth_range)
     
     def cam_l_depth_callback(self, msg):
-        self.depth_l_img = self.process_depth_img(msg)
+        self.depth_l_img = depth_preprocess(self.process_depth_img(msg), device=self.device, depth_range=self.depth_range)
     
     def cam_r_depth_callback(self, msg):
-        self.depth_r_img = self.process_depth_img(msg)
+        self.depth_r_img = depth_preprocess(self.process_depth_img(msg), device=self.device, depth_range=self.depth_range)
 
     def gripper_state_callback(self, msg):
         self.gripper_state = msg.position
@@ -622,6 +654,63 @@ class KuavoBaseRosEnv(gym.Env):
             raise KeyError("only_arm = False is not supported!")
         
         self.state = output_state
+
+class LejuClaw():
+    def __init__(self):
+        self._pub_leju_claw_cmd = rospy.Publisher('/leju_claw_command', lejuClawCommand, queue_size=10)
+
+    def control(self, target_positions:list, target_velocities:list=None, target_torques:list=None):
+        assert len(target_positions) == 2, "target_positions must be a list of length 2"
+        assert target_velocities is None or len(target_velocities) == 2, "target_velocities must be a list of length 2"
+        assert target_torques is None or len(target_torques) == 2, "target_torques must be a list of length 2"
+
+        cmd = lejuClawCommand()
+        cmd.data.name = ['left_claw','right_claw']
+        target_positions = [max(0.0, min(100.0, pos)) for pos in target_positions]
+        if target_velocities is None:
+            target_velocities = [90, 90]
+        else:
+           target_velocities = [max(0.0, min(100.0, vel)) for vel in target_velocities]
+        
+        if target_torques is None:
+            target_torques = [1.0, 1.0]
+        else:
+            target_torques = [max(0.0, min(10.0, torque)) for torque in target_torques]
+        cmd.data.position = target_positions
+        cmd.data.velocity = target_velocities
+        cmd.data.effort = target_torques
+        self._pub_leju_claw_cmd.publish(cmd)
+
+    def control_left(self, target_positions:list, target_velocities:list=None, target_torques:list=None):
+        assert len(target_positions) == 1, "target_positions must be a list of length 1"
+        assert target_velocities is None or len(target_velocities) == 1, "target_velocities must be a list of length 1"
+        assert target_torques is None or len(target_torques) == 1, "target_torques must be a list of length 1"
+
+        if target_velocities is None:
+            target_velocities = [90]
+        if target_torques is None:
+            target_torques = [1.0]
+        
+        target_positions = [target_positions[0],0]
+        target_velocities = [target_velocities[0],0]
+        target_torques = [target_torques[0],0]
+        self.control(target_positions, target_velocities, target_torques)
+    
+    def control_right(self, target_positions:list, target_velocities:list=None, target_torques:list=None):
+        assert len(target_positions) == 1, "target_positions must be a list of length 1"
+        assert target_velocities is None or len(target_velocities) == 1, "target_velocities must be a list of length 1"
+        assert target_torques is None or len(target_torques) == 1, "target_torques must be a list of length 1"
+
+        if target_velocities is None:
+            target_velocities = [90]
+        if target_torques is None:
+            target_torques = [1.0]
+
+        target_positions = [0,target_positions[0]]
+        target_velocities = [0,target_velocities[0]]
+        target_torques = [0,target_torques[0]]
+        self.control(target_positions, target_velocities, target_torques)
+        
 
 # Usage example
 if __name__ == "__main__":
