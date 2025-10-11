@@ -71,17 +71,6 @@ stop_sub = rospy.Subscriber('/kuavo/stop_state', Bool, stop_callback, queue_size
 stop_flag = threading.Event()
 pause_flag = threading.Event()
 
-def check_control_signals():
-    """检查控制信号"""
-        # 添加调试信息
-    log_model.info(f"🔍 检查控制信号 - 暂停状态: {pause_flag}, 停止状态: {stop_flag}")
-    
-
-def img_preprocess(image, device="cpu"):
-    return to_tensor(image).unsqueeze(0).to(device, non_blocking=True)
-
-def depth_preprocess(depth, device="cpu",depth_range=[0,1000]):
-    return torch.tensor(depth,dtype=torch.float32).clamp(*depth_range).unsqueeze(0).to(device, non_blocking=True)
 
 def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     """
