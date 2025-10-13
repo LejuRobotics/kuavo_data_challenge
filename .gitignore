@@ -216,3 +216,4 @@ third_party/
 ana.py
 *.gz
 *.tar
+error.txt
