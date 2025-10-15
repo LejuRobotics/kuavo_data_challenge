@@ -59,7 +59,7 @@ def img_preprocess(image, device="cuda"):
     return to_tensor(image).unsqueeze(0).to(device, non_blocking=True)
 
 def depth_preprocess(depth, device="cpu",depth_range=[0,1000]):
-    depth_uint16 =  torch.tensor(depth,dtype=torch.float32).clamp(*depth_range).unsqueeze(0).unsqueeze(0).to(device, non_blocking=True)
+    depth_uint16 =  torch.tensor(depth,dtype=torch.float32).clamp(*depth_range).unsqueeze(0).to(device, non_blocking=True)
     max_depth = depth_uint16.max()
     min_depth = depth_uint16.min()
     depth_normalized = (depth_uint16 - min_depth) / (max_depth - min_depth + 1e-9)  # 归一化到 [0, 1]

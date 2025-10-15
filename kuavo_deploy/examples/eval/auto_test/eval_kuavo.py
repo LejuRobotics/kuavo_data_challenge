@@ -60,6 +60,7 @@ log_robot = setup_logger("robot")
 
 from kuavo_deploy.kuavo_env.kuavo_sim_env.KuavoSimEnv import KuavoSimEnv
 from kuavo_deploy.kuavo_env.kuavo_real_env.KuavoRealEnv import KuavoRealEnv
+from lerobot.policies.factory import make_pre_post_processors
 
 def pause_callback(msg):
     if msg.data:
@@ -230,6 +231,7 @@ def main(config_path: str, episode: int):
     device = torch.device(cfg.device)
 
     policy = setup_policy(pretrained_path, policy_type, device)
+    preprocessor, postprocessor = make_pre_post_processors(None,Path(str(pretrained_path).split("/epoch", 1)[0]))
 
     # Initialize evaluation environment to render two observation types:
     # an image of the scene and state/position of the agent.
@@ -271,6 +273,7 @@ def main(config_path: str, episode: int):
     # Reset the policy and environments to prepare for rollout
     policy.reset()
     observation, info = env.reset(seed=seed)
+    observation = preprocessor(observation)
     start_service(TriggerRequest())
 
     # Prepare to collect every rewards and all the frames of the episode,
@@ -300,7 +303,7 @@ def main(config_path: str, episode: int):
 
         with torch.inference_mode():
             action = policy.select_action(observation)
-
+        action = postprocessor(action)
         action_infer_time = time.time()
         log_model.debug(f"action infer time: {action_infer_time - start_time:.3f}s")
         average_action_infer_time += action_infer_time - start_time
@@ -331,6 +334,7 @@ def main(config_path: str, episode: int):
 
         # 执行动作
         observation, reward, terminated, truncated, info = env.step(numpy_action)
+        observation = preprocessor(observation)
         exec_time = time.time()
         log_model.debug(f"exec time: {exec_time - action_infer_time:.3f}s")
         average_exec_time += exec_time - action_infer_time
