@@ -1,4 +1,4 @@
-file_path = "outputs/train/test_handover/state_fuse/run_1008/epochbest/policy_preprocessor_step_3_normalizer_processor.safetensors"
+file_path = "outputs/train/aloha_sim_transfer_cube_human/dinov3_nosep_depth_nofusestate/run_20251017_095912/policy_preprocessor_step_3_normalizer_processor.safetensors"
 
 from safetensors import safe_open
 import torch

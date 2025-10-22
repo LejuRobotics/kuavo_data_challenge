@@ -466,7 +466,7 @@ def main(cfg: DictConfig):
         if total_loss < best_loss:
             best_loss = total_loss
             # Save best model
-            policy.save_pretrained(output_directory / "best")
+            policy.save_pretrained(output_directory / "epochbest")
         # Save checkpoint every N epochs
         if (epoch + 1) % cfg.training.save_freq_epoch == 0:
             policy.save_pretrained(output_directory / f"epoch{epoch+1}")

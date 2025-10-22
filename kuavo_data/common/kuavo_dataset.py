@@ -52,6 +52,7 @@ def init_parameters(cfg):
     global ONLY_HALF_UP_BODY, USE_LEJU_CLAW, USE_QIANGNAO
     global USE_DEPTH, DEPTH_RANGE
     global TASK_DESCRIPTION
+    global USE_EEPOSE_6D, EEPOSE_6D_DIM
 
     
     from .config_dataset import load_config
@@ -86,6 +87,10 @@ def init_parameters(cfg):
     USE_QIANGNAO = config.use_qiangnao  # 由eef_type决定
 
     TASK_DESCRIPTION = config.task_description  # 任务描述
+
+    # 是否使用ee_pose_6d
+    USE_EEPOSE_6D = config.use_eepose_6d
+    EEPOSE_6D_DIM = config.eepose_6d_dim
 
 
 # ================ 数据处理函数定义 ==================

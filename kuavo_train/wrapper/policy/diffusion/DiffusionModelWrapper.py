@@ -402,7 +402,7 @@ class CustomDiffusionModelWrapper(DiffusionModel):
         # ---- state-guided fusion block ----
         self.fusion_hidden = getattr(self.config, "fusion_hidden_dim", 256)
         self.state_guided = None
-        if getattr(self.config, "image_features", None):
+        if getattr(self.config, "state_fuse", False):
             vis_dim_for_fusion = (self.rgb_attn_layer.embed_dim if hasattr(self, "rgb_attn_layer") else self.rgb_feat_dim)
             dep_dim_for_fusion = (self.depth_attn_layer.embed_dim if hasattr(self, "depth_attn_layer") else None)
             state_dim_for_fusion = final_state_dim
@@ -530,14 +530,18 @@ class CustomDiffusionModelWrapper(DiffusionModel):
             feats.append(batch[OBS_ENV_STATE])
 
         # ---------- State-guided fusion: run on per-(b*s) samples ----------
-        if hasattr(self, "state_guided"):
+        if getattr(self, "state_guided", None) is not None:
             # prepare tokens for fusion block
             # choose tokens: if rgb_q_tokens & dep_q_tokens exist -> concat them (combined tokens),
             # else fallback to img_features (or depth_features if only depth exists)
             if (rgb_q_tokens is not None) and (dep_q_tokens is not None):
                 # concat tokens along sequence dim to give more information to fusion
-                vis_tokens_for_fusion = torch.cat([rgb_q_tokens, dep_q_tokens], dim=1)  # (b*s, n_r + n_d, feat)
-                dep_tokens_for_fusion = None
+                # vis_tokens_for_fusion = torch.cat([rgb_q_tokens, dep_q_tokens], dim=1)  # (b*s, n_r + n_d, feat)
+                # vis_tokens_for_fusion = rgb_q_tokens
+                # dep_tokens_for_fusion = dep_q_tokens
+                vis_tokens_for_fusion = img_features
+                dep_tokens_for_fusion = depth_features
+                # print("~~~~~~~~~~~~~~~~~~~~~~~~~~use rgb_q and dep_q~~~~~~~~~~~~~~~~~~~~~~~~~~")
             elif img_features is not None:
                 vis_tokens_for_fusion = img_features  # (b*s, n, feat)
                 dep_tokens_for_fusion = None

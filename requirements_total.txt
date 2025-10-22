@@ -25,7 +25,7 @@ cmake==4.0.3
 controller-manager==0.20.0
 controller-manager-msgs==0.20.0
 cv-bridge==1.16.2
-datasets==3.6.0
+datasets
 deepdiff==8.5.0
 diagnostic-analysis==1.12.1
 diagnostic-common-diagnostics==1.12.1
@@ -61,7 +61,7 @@ gnupg==2.3.1
 grpcio==1.74.0
 gym-aloha==0.1.1
 gym-pusht==0.1.5
-gymnasium==0.29.1
+gymnasium
 hf-xet==1.1.5
 hf_transfer==0.1.9
 huggingface-hub==0.34.3

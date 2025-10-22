@@ -27,6 +27,30 @@ logging.basicConfig(
 from pympler import asizeof
 import matplotlib.pyplot as plt
 
+
+
+# 临时测试使用：
+# -------------------------------------------------
+DEFAULT_ARM_JOINT_RANGE = [
+    [-3.14159, 1.5708], 
+    [-0.349066, 2.0944], 
+    [-1.5708, 1.5708],
+    [-2.61799, 0],
+    [-1.5708, 1.5708], 
+    [-1.309, 0.698132], 
+    [-0.698132, 0.698132],
+    [-1, 1],
+    [-3.14159, 1.5708], 
+    [-2.0944, 0.349066], 
+    [-1.5708, 1.5708], 
+    [-2.61799, 0], 
+    [-1.5708, 1.5708], 
+    [-0.698132, 1.309], 
+    [-0.698132, 0.698132],
+    [-1, 1]
+] 
+# -------------------------------------------------
+
 def get_attr_sizes(obj, prefix=""):
     """递归获取对象每个属性及嵌套属性的内存占用"""
     sizes = {}
@@ -98,7 +122,8 @@ import tqdm
 import json
 
 import common.kuavo_dataset as kuavo
-
+import rospy
+from common.fk_srv import fk_changed_joint_angle_2_eepose6d
 
 @dataclasses.dataclass(frozen=True)
 class DatasetConfig:
@@ -140,7 +165,33 @@ def create_empty_dataset(
     # TODO: auto detect cameras
     cameras = kuavo.DEFAULT_CAMERA_NAMES
 
+    # 将双臂关节角替换为末端rotation_6d 对应维度
+    use_eepose_dim = int(len(motors) - len(kuavo.DEFAULT_ARM_JOINT_NAMES) + kuavo.EEPOSE_6D_DIM) 
+
     features = {
+        # 临时测试使用：
+        # -------------------------------------------------
+        "eepose_6d": {
+            "dtype": "float32",
+            "shape": (20,),
+            "names": {
+                "motors": motors
+            }
+        },
+        "joint_angles": {
+            "dtype": "float32",
+            "shape": (14,),
+            "names": {
+                "motors": motors
+            }
+        },
+        "gripper": {
+            "dtype": "float32",
+            "shape": (2,),
+            "names": {
+                "motors": motors
+            }
+        },
         "observation.state": {
             "dtype": "float32",
             "shape": (len(motors),),
@@ -148,9 +199,20 @@ def create_empty_dataset(
                 "motors": motors
             }
         },
+        # -------------------------------------------------
+
+        # 后续保留代码 -- 别删
+        # "observation.state": {
+        #     "dtype": "float32",
+        #     "shape": (len(motors),) if not kuavo.USE_EEPOSE_6D else (use_eepose_dim,),
+        #     "names": {
+        #         "motors": motors
+        #     }
+        # },
+        
         "action": {
             "dtype": "float32",
-            "shape": (len(motors),),
+            "shape": (len(motors),) if not kuavo.USE_EEPOSE_6D else (use_eepose_dim,),
             "names": {
                 "motors": motors
             }
@@ -284,22 +346,22 @@ def populate_dataset(
             qiangnao_action = np.where(qiangnao_action > 50, 1, 0)
             claw_state = np.where(claw_state > 50, 1, 0)
             claw_action = np.where(claw_action > 50, 1, 0)
-            # rq2f85_state = np.where(rq2f85_state > 0.4, 1, 0)
-            # rq2f85_action = np.where(rq2f85_action > 70, 1, 0)
+            rq2f85_state = np.where(rq2f85_state > 0.4, 1, 0)
+            rq2f85_action = np.where(rq2f85_action > 70, 1, 0)
 
-            rq2f85_state = np.where(rq2f85_state > 0.1, 1, 0)
-            rq2f85_action = np.where(rq2f85_action > 128, 1, 0)
+            # rq2f85_state = np.where(rq2f85_state > 0.1, 1, 0)
+            # rq2f85_action = np.where(rq2f85_action > 128, 1, 0)
         else:
             # 进行数据归一化处理
             claw_state = claw_state / 100
             claw_action = claw_action / 100
             qiangnao_state = qiangnao_state / 100
             qiangnao_action = qiangnao_action / 100
-            # rq2f85_state = rq2f85_state / 0.8
-            # rq2f85_action = rq2f85_action / 140
-
-            rq2f85_state = rq2f85_state / 0.4
+            rq2f85_state = rq2f85_state / 0.8
             rq2f85_action = rq2f85_action / 255
+
+            # rq2f85_state = rq2f85_state / 0.8
+            # rq2f85_action = rq2f85_action / 255
         print("eef_type shape: ",claw_action.shape,qiangnao_action.shape, rq2f85_action.shape)
         if len(claw_action)==0 and len(qiangnao_action) == 0:
             claw_action = rq2f85_action
@@ -416,10 +478,58 @@ def populate_dataset(
                     output_action = np.concatenate((output_action, action[i, 19:26]), axis=0)
                     output_action = np.concatenate((output_action, qiangnao_action[i, 6:12].astype(np.float32)), axis=0)
                     output_action = np.concatenate((output_action, action[i, 26:28]), axis=0)  
+            
+            
+  
+            assert len(DEFAULT_ARM_JOINT_RANGE) == output_action.shape[0]
+            for k in range(len(DEFAULT_ARM_JOINT_RANGE)):
+                if output_action[k] < DEFAULT_ARM_JOINT_RANGE[k][0]:
+                    output_action[k] = DEFAULT_ARM_JOINT_RANGE[k][0]
+                elif output_action[k] > DEFAULT_ARM_JOINT_RANGE[k][1]:
+                    output_action[k] = DEFAULT_ARM_JOINT_RANGE[k][1]
+                    
+
+            # 临时测试使用：
+            # -------------------------------------------------
+            gripper_dim = 1
+            eepose_state = fk_changed_joint_angle_2_eepose6d(output_state, gripper_dim)
+            output_action = fk_changed_joint_angle_2_eepose6d(output_action, gripper_dim)
+            joint_angles = np.concatenate([output_state[0:7], output_state[8:15]])
+            gripper = np.concatenate([output_state[7:8], output_state[15:16]])
             frame = {
-                "observation.state": torch.from_numpy(output_state).type(torch.float32),
-                "action": torch.from_numpy(output_action).type(torch.float32),
+                "observation.state": torch.from_numpy(output_state).type(torch.float32),      # left+right: pos+rot6d+gripper;  dim: 2*10           
+                "action": torch.from_numpy(output_action).type(torch.float32),                # left+right: pos+rot6d+gripper;  dim: 2*10     
+                "eepose_6d": torch.from_numpy(eepose_state).type(torch.float32),  
+                "joint_angles": torch.from_numpy(joint_angles).type(torch.float32),  
+                "gripper": torch.from_numpy(gripper).type(torch.float32),         
             }
+            # -------------------------------------------------
+
+            # 后续保留代码 -- 别删
+            # if config use eepose6d, convert to eepose6d. only use for both arms.
+            # if kuavo.USE_EEPOSE_6D:
+            #     gripper_dim = len(kuavo.DEFAULT_LEJUCLAW_JOINT_NAMES) // 2 if kuavo.USE_LEJU_CLAW else kuavo.DEFAULT_DEXHAND_JOINT_NAMES // 2
+            #     if kuavo.ONLY_HALF_UP_BODY:
+            #         output_state = fk_changed_joint_angle_2_eepose6d(output_state, gripper_dim)
+            #         output_action = fk_changed_joint_angle_2_eepose6d(output_action, gripper_dim)
+            #     else:
+            #         arm_start_dim = len(DEFAULT_JOINT_NAMES_LIST) - len(kuavo.DEFAULT_LEG_JOINT_NAMES)
+            #         arm_end_dim = len(DEFAULT_JOINT_NAMES_LIST) - len(kuavo.DEFAULT_HEAD_JOINT_NAMES)
+            #         arm_state = output_state[arm_start_dim:arm_end_dim]
+            #         arm_action = output_action[arm_start_dim:arm_end_dim]
+            #         arm_state = fk_changed_joint_angle_2_eepose6d(arm_state, gripper_dim)
+            #         arm_action = fk_changed_joint_angle_2_eepose6d(arm_action, gripper_dim)
+            #         mid_state = np.concatenate((output_state[0:arm_start_dim], arm_state), axis=0)
+            #         mid_state = np.concatenate((mid_state, output_state[-arm_end_dim:]), axis=0)
+            #         mid_action = np.concatenate((output_action[0:arm_start_dim], arm_action), axis=0)
+            #         mid_action = np.concatenate((mid_action, output_action[-arm_end_dim:]), axis=0)
+            #         output_state = mid_state
+            #         output_action = mid_action
+
+            # frame = {
+            #     "observation.state": torch.from_numpy(output_state).type(torch.float32),      # left+right: pos+rot6d+gripper;  dim: 2*10           
+            #     "action": torch.from_numpy(output_action).type(torch.float32),                # left+right: pos+rot6d+gripper;  dim: 2*10                  
+            # }
 
             for idx, (camera, img_array) in enumerate(imgs_per_cam.items()):
                 if "depth" in camera:
@@ -528,6 +638,12 @@ def main(cfg: DictConfig):
     global DEFAULT_JOINT_NAMES_LIST
     kuavo.init_parameters(cfg)
 
+    if kuavo.USE_EEPOSE_6D:
+        rospy.init_node("example_fk_srv_node", anonymous=True)
+        print("Wait for fk service ..., please launch a simulator ...")
+        rospy.wait_for_service('/ik/fk_srv')
+        print("Fk service ok!")
+
     n = cfg.rosbag.num_used
     raw_dir = cfg.rosbag.rosbag_dir
     version = cfg.rosbag.lerobot_dir
@@ -568,6 +684,12 @@ def main(cfg: DictConfig):
         DEFAULT_JOINT_NAMES_LIST = kuavo.DEFAULT_LEG_JOINT_NAMES + DEFAULT_ARM_JOINT_NAMES + kuavo.DEFAULT_HEAD_JOINT_NAMES
 
     port_kuavo_rosbag(raw_dir, repo_id, root=lerobot_dir,n = n, task=kuavo.TASK_DESCRIPTION)
+
+    if kuavo.USE_EEPOSE_6D:
+        rospy.signal_shutdown("Processing completed")
+        if hasattr(rospy, '_shutdown_flag'):
+            rospy._shutdown_flag = True
+        os._exit(0)
 
 if __name__ == "__main__":
     

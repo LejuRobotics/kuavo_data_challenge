@@ -28,7 +28,11 @@ class Config:
     is_binary: bool
     delta_action: bool
     relative_start: bool
-    
+
+    # eepose6d settings
+    use_eepose_6d: bool
+    eepose_6d_dim: int
+
     # Image resize settings
     resize: ResizeConfig
 
@@ -143,6 +147,8 @@ def load_config(cfg) -> Config:
         delta_action=OmegaConf.select(cfg, 'dataset.delta_action', default=False),
         relative_start=OmegaConf.select(cfg, 'dataset.relative_start', default=False),
         resize=resize_config,
-        task_description=OmegaConf.select(cfg, 'dataset.task_description', default="Pick and Place Task")
+        task_description=OmegaConf.select(cfg, 'dataset.task_description', default="Pick and Place Task"),
+        use_eepose_6d=OmegaConf.select(cfg, 'dataset.use_eepose_6d', default=False),
+        eepose_6d_dim=OmegaConf.select(cfg, 'dataset.eepose_6d_dim', default=18),
     )
 
