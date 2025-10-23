@@ -217,7 +217,7 @@ git clone --depth=1 https://github.com/LejuRobotics/kuavo-data-challenge.git
 ```bash
 cd kuavo-data-challenge
 git submodule init
-git submodule update --recursive
+git submodule update --recursive --progress
 ```
 
 ---

@@ -38,7 +38,7 @@ training:
     use_custom_sampler: False  # 是否使用自定义的采样器，默认true，使用自定义采样器可以让高差分点前后采样更密集
 
     # resume training，断点续训
-    resume: True
+    resume: False
     resume_timestamp: "run_20251022_155715"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
