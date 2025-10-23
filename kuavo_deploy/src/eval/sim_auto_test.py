@@ -57,8 +57,8 @@ from lerobot.policies.factory import make_pre_post_processors
 log_model = setup_logger("model")
 log_robot = setup_logger("robot")
 
-from kuavo_deploy.kuavo_env.kuavo_sim_env.KuavoSimEnv import KuavoSimEnv
-from kuavo_deploy.kuavo_env.kuavo_real_env.KuavoRealEnv import KuavoRealEnv
+from kuavo_deploy.kuavo_env.KuavoSimEnv import KuavoSimEnv
+from kuavo_deploy.kuavo_env.KuavoRealEnv import KuavoRealEnv
 from kuavo_deploy.utils.ros_manager import ROSManager
 
 
@@ -230,6 +230,7 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
         max_episode_steps=cfg.max_episode_steps,
         config=config,
     )
+
     run_single_ros_manager = ROSManager()
     # Setup ROS subscribers and services
     run_single_ros_manager.register_subscriber("/simulator/success", Bool, env_success_callback)
@@ -259,6 +260,12 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     # Reset the policy and environments to prepare for rollout
     policy.reset()
     observation, info = env.reset(seed=seed)
+    first_img =  (observation["observation.images.head_cam_h"].squeeze().permute(1,2,0).numpy()*255).astype(np.uint8)
+    
+    import cv2
+    first_img = cv2.cvtColor(first_img,cv2.COLOR_RGB2BGR)
+    cv2.imwrite( "obs.png", first_img)
+    # raise ValueError("stop for debug!")
     start_service(TriggerRequest())
 
     # Prepare to collect every rewards and all the frames of the episode,
@@ -419,19 +426,18 @@ def kuavo_eval_autotest(config: KuavoConfig):
     
     # first reset
     reset_service = rospy.ServiceProxy('/simulator/reset', Trigger)
-    safe_reset_service(reset_service)
-
     # Ros service
     init_service = rospy.Service("/simulator/init", Trigger, env_init_service)
-    # wait for first init
     while not init_evt.is_set():
         log_robot.info("Waiting for first env init...")
         if not check_control_signals():
             log_robot.info("🛑 收到停止信号，退出机械臂运动")
             return
-        time.sleep(5)
+        time.sleep(1)
 
-    
+    safe_reset_service(reset_service)
+    init_evt.clear()
+
     success_count = 0
     for episode in range(eval_episodes):
 
@@ -440,7 +446,7 @@ def kuavo_eval_autotest(config: KuavoConfig):
             if not check_control_signals():
                 log_robot.info("🛑 收到停止信号，退出机械臂运动")
                 return
-            time.sleep(5)
+            time.sleep(1)
 
         result = run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory, json_file_path)
         log_robot.info(f"Episode {episode+1} completed with return code: {result}")
@@ -459,10 +465,11 @@ def kuavo_eval_autotest(config: KuavoConfig):
         with log_file_path.open("a") as log_file:
             log_file.write("\n")
             log_file.write(f"Success Count: {success_count} / Already eval episodes: {episode+1}")
-        
+    
+        safe_reset_service(reset_service)
         init_evt.clear()
         success_evt.clear()
-        safe_reset_service(reset_service)
+    
 
     # Display final statistics
     log_model.info("\n" + "="*50)

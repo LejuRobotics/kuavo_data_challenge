@@ -32,8 +32,8 @@ def find_example_process():
             if (proc.info['name'] == 'python' or proc.info['name'] == 'python3') and proc.info['cmdline']:
                 cmdline = ' '.join(proc.info['cmdline'])
                 
-                # 精确匹配 kuavo_deploy/examples/scripts/script.py 路径
-                if 'kuavo_deploy/examples/scripts/script.py' in cmdline:
+                # 精确匹配 kuavo_deploy/src/scripts/script.py 路径
+                if 'kuavo_deploy/src/scripts/script.py' in cmdline:
                     target_processes.append((proc, 'exact'))
                     
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
@@ -157,12 +157,12 @@ def main():
         if not target_proc:
             print("❌ 未找到运行中的script.py进程")
             print("💡 请确保script.py正在运行，或使用 --pid 参数指定进程ID")
-            print("💡 预期的进程路径: kuavo_deploy/examples/scripts/script.py")
+            print("💡 预期的进程路径: kuavo_deploy/src/scripts/script.py")
             sys.exit(1)
         
         # 显示找到的进程信息
         cmdline = ' '.join(target_proc.cmdline())
-        if 'kuavo_deploy/examples/scripts/script.py' in cmdline:
+        if 'kuavo_deploy/src/scripts/script.py' in cmdline:
             print(f"✅ 找到精确匹配的进程: {target_proc.pid}")
         else:
             print(f"⚠️  找到部分匹配的进程: {target_proc.pid}")

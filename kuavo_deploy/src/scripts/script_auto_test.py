@@ -144,7 +144,7 @@ class ArmMove:
 
     def auto_test(self) -> None:
         """执行自动测试"""
-        from kuavo_deploy.examples.eval.sim_auto_test import kuavo_eval_autotest
+        from kuavo_deploy.src.eval.sim_auto_test import kuavo_eval_autotest
         kuavo_eval_autotest(config=self.config)
     
 def parse_args():

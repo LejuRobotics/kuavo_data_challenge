@@ -401,7 +401,7 @@ class ArmMove:
 
     def run(self) -> None:
         """执行运行"""
-        from kuavo_deploy.examples.eval.eval_kuavo import kuavo_eval
+        from kuavo_deploy.src.eval.real_single_test import kuavo_eval
         kuavo_eval(config=self.config, env=self.env)
 
 def parse_args():

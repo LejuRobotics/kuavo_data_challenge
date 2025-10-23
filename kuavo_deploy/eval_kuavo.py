@@ -50,8 +50,8 @@ def print_header():
 
 def get_script_paths():
     script_dir = Path(__file__).resolve().parent
-    script = script_dir / "examples" / "scripts" / "script.py"
-    auto_test = script_dir / "examples" / "scripts" / "script_auto_test.py"
+    script = script_dir / "src" / "scripts" / "script.py"
+    auto_test = script_dir / "src" / "scripts" / "script_auto_test.py"
     return script_dir, script, auto_test
 
 
@@ -205,9 +205,9 @@ def print_task_menu(config_path="<config_path>", use_color=True):
     # 统一输出命令行模板
     print(f"📋 数字选择后，会自动执行的命令示例:{RESET}")
     print(f"普通任务:{RESET}")
-    print(f"{YELLOW}  python kuavo_deploy/examples/scripts/script.py --task <chosen_task> --config {config_path}{RESET}")
+    print(f"{YELLOW}  python kuavo_deploy/src/scripts/script.py --task <chosen_task> --config {config_path}{RESET}")
     print(f"自动测试任务:{RESET}")
-    print(f"{YELLOW}  python kuavo_deploy/examples/scripts/script_auto_test.py --task auto_test --config {config_path}{RESET}")
+    print(f"{YELLOW}  python kuavo_deploy/src/scripts/script_auto_test.py --task auto_test --config {config_path}{RESET}")
 
 
 

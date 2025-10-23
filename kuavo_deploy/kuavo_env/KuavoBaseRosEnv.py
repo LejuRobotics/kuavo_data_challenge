@@ -45,6 +45,7 @@ class KuavoBaseRosEnv(gym.Env):
         
         # 等待ROS话题初始化
         log_robot.info(f"Inializing done!")
+        print(f"Inializing done!")
 
     def _set_config(self, config_kuavo_env):
         """设置配置参数"""
@@ -273,19 +274,19 @@ class KuavoBaseRosEnv(gym.Env):
             return
         if self.which_arm == 'both':
             if self.eef_type == 'qiangnao':
-                self.qiangnao.control(target_positions=[0, 100, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0])
+                self.qiangnao.control(target_positions=[0, 100, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0], target_velocities=None, target_torques=None)
             elif self.eef_type == 'leju_claw':
-                self.lejuclaw.control(target_positions=[0, 0])
+                self.lejuclaw.control(target_positions=[0, 0], target_velocities=None, target_torques=None)
         elif self.which_arm == 'left':
             if self.eef_type == 'qiangnao':
-                self.qiangnao.control_left(target_positions=[0, 100, 0, 0, 0, 0])
+                self.qiangnao.control_left(target_positions=[0, 100, 0, 0, 0, 0], target_velocities=None, target_torques=None)
             elif self.eef_type == 'leju_claw':
-                self.lejuclaw.control_left(target_positions=[0])
+                self.lejuclaw.control_left(target_positions=[0], target_velocities=None, target_torques=None)
         elif self.which_arm == 'right':
             if self.eef_type == 'qiangnao':
-                self.qiangnao.control_right(target_positions=[0, 100, 0, 0, 0, 0])
+                self.qiangnao.control_right(target_positions=[0, 100, 0, 0, 0, 0], target_velocities=None, target_torques=None)
             elif self.eef_type == 'leju_claw':
-                self.lejuclaw.control_right(target_positions=[0])
+                self.lejuclaw.control_right(target_positions=[0], target_velocities=None, target_torques=None)
         else:
             raise KeyError(f"Unsupported arm type: {self.which_arm}")
 
