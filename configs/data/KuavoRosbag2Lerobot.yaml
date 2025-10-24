@@ -10,15 +10,17 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
 rosbag:
   rosbag_dir: /media/yangzhou/80268D01268CFA04/datafactory/1023task1 # rosbag文件目录
   num_used: null # 使用的rosbag数量(若设置为任意数字，则会随机采样选择)
-  lerobot_dir: /media/yangzhou/80268D01268CFA04/datafactory/lerobot_ruichen_task1_onlyrgb_eef_new  # 转换后的lerobot文件的保存目录
+  lerobot_dir: /media/yangzhou/80268D01268CFA04/datafactory/lerobot_ruichen_task1_onlyrgb_eefctrl_stateeef  # 转换后的lerobot文件的保存目录
 
 dataset:
   only_arm: true  # 默认true, 是否只使用手臂数据, 目前的模仿学习只用于手臂数据，选择true会自动屏蔽足关节数据
   eef_type: rq2f85 # 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
+  control_mode: joint # joint or eef as action
   which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
   use_depth: False  # 是否需要深度图像数据，与上面手臂保持一致的深度数据
   depth_range: [0, 1500]  # 深度图的裁剪范围，单位：毫米
-
+  state_type: ["eefpose"]  # state类型可选择joint,eefpose的所有组合
+ 
   task_description: "lerobot_ruichen_task1" # 任务描述，自定义
 
   train_hz: 10  # 训练数据的采样频率
@@ -39,8 +41,8 @@ dataset:
   resize:
     width: 640  # 图像缩放
     height: 480  # 图像缩放
+  
 
-  use_eepose_6d: true
-  eepose_6d_dim: 18
+  
 
 

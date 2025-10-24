@@ -7,7 +7,7 @@ class ROSManager:
         self.publishers = []
 
     def register_subscriber(self, topic, msg_type, callback):
-        sub = rospy.Subscriber(topic, msg_type, callback)
+        sub = rospy.Subscriber(topic, msg_type, callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
         self.subscribers.append(sub)
         return sub
 

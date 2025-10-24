@@ -63,10 +63,8 @@ def fk_changed_joint_angle_2_eepose6d(obs_state: np.ndarray, gripper_dim = 1)->n
     left_ee_pose_6d, right_ee_pose_6d = joint_angle_2_eep6d(joint_angles)
     left_gripper = obs_state[(half_dim-gripper_dim):half_dim] 
     right_gripper = obs_state[-gripper_dim:]
-    out_state = np.concatenate([left_ee_pose_6d.flatten(), left_gripper])
-    out_state = np.concatenate([out_state, right_ee_pose_6d.flatten()])
-    out_state = np.concatenate([out_state, right_gripper])
-
+    out_state = np.concatenate([left_ee_pose_6d.flatten(), left_gripper, 
+                                right_ee_pose_6d.flatten(), right_gripper])
     return out_state
 
 

@@ -166,55 +166,75 @@ def create_empty_dataset(
     cameras = kuavo.DEFAULT_CAMERA_NAMES
 
     # 将双臂关节角替换为末端rotation_6d 对应维度
-    use_eepose_dim = int(len(motors) - len(kuavo.DEFAULT_ARM_JOINT_NAMES) + kuavo.EEPOSE_6D_DIM) 
+    if kuavo.CONTROL_MODE == "eef":  # (xyz + rotation6d)*2 + eef action
+        action_dim = ((3 + 6) * 2 + int(len(motors) - len(kuavo.DEFAULT_ARM_JOINT_NAMES)),)
+    else:
+        action_dim = (len(motors),)
 
+    # set action name/dim, state name/dim,
+    action_name = {
+        "joint": motors,
+        "eef":[
+                "x_l", "y_l", "z_l",
+                "rotation_6d_1_l", "rotation_6d_2_l", "rotation_6d_3_l",
+                "rotation_6d_4_l", "rotation_6d_5_l", "rotation_6d_6_l",
+                "gripper_l",
+                "x_r", "y_r", "z_r",
+                "rotation_6d_1_r", "rotation_6d_2_r", "rotation_6d_3_r",
+                "rotation_6d_4_r", "rotation_6d_5_r", "rotation_6d_6_r",
+                "gripper_r"
+                ]
+        }[kuavo.CONTROL_MODE]
+    
+    state_dim_dict = {
+        "joint": len(kuavo.DEFAULT_ARM_JOINT_NAMES),
+        "eefpose": (3 + 6) * 2 ,
+    }
+
+    state_dim = sum(state_dim_dict[state] for state in kuavo.STATE_TYPE) + len(motors) - len(kuavo.DEFAULT_ARM_JOINT_NAMES)  # add eef gripper 2
+    state_dim = (state_dim,)
+
+    state_name_dict = {
+        "joint": kuavo.DEFAULT_ARM_JOINT_NAMES,
+        "eefpose": [
+            "x_l", "y_l", "z_l",
+            "rotation_6d_1_l", "rotation_6d_2_l", "rotation_6d_3_l",
+            "rotation_6d_4_l", "rotation_6d_5_l", "rotation_6d_6_l",
+            "x_r", "y_r", "z_r",
+            "rotation_6d_1_r", "rotation_6d_2_r", "rotation_6d_3_r",
+            "rotation_6d_4_r", "rotation_6d_5_r", "rotation_6d_6_r",
+        ]
+    }
+
+    if set(kuavo.STATE_TYPE) == {"joint", "eefpose"}:
+        joint = state_name_dict["joint"]
+        eefpose = state_name_dict["eefpose"]
+        state_name = joint[:7] + eefpose[:9] + joint[7:] + eefpose[9:]
+    else:
+        state_name = [n for s in kuavo.STATE_TYPE for n in state_name_dict[s]]
+
+    state_name = (
+        state_name[:len(state_name)//2]
+        + ["gripper_l"]
+        + state_name[len(state_name)//2:]
+        + ["gripper_r"]
+    )
+
+
+    # create corresponding features
     features = {
-        # 临时测试使用：
-        # -------------------------------------------------
-        "eepose_6d": {
-            "dtype": "float32",
-            "shape": (20,),
-            "names": {
-                "motors": motors
-            }
-        },
-        "joint_angles": {
-            "dtype": "float32",
-            "shape": (14,),
-            "names": {
-                "motors": motors
-            }
-        },
-        "gripper": {
-            "dtype": "float32",
-            "shape": (2,),
-            "names": {
-                "motors": motors
-            }
-        },
         "observation.state": {
             "dtype": "float32",
-            "shape": (len(motors),),
+            "shape": state_dim,
             "names": {
-                "motors": motors
+                "state_names": state_name
             }
         },
-        # -------------------------------------------------
-
-        # 后续保留代码 -- 别删
-        # "observation.state": {
-        #     "dtype": "float32",
-        #     "shape": (len(motors),) if not kuavo.USE_EEPOSE_6D else (use_eepose_dim,),
-        #     "names": {
-        #         "motors": motors
-        #     }
-        # },
-        
         "action": {
             "dtype": "float32",
-            "shape": (len(motors),) if not kuavo.USE_EEPOSE_6D else (use_eepose_dim,),
+            "shape": action_dim,
             "names": {
-                "motors": motors
+                "action_names": action_name
             }
         },
     }
@@ -362,7 +382,7 @@ def populate_dataset(
 
             # rq2f85_state = rq2f85_state / 0.8
             # rq2f85_action = rq2f85_action / 255
-        print("eef_type shape: ",claw_action.shape,qiangnao_action.shape, rq2f85_action.shape)
+        print(f"eef_action shape, leju_claw: {claw_action.shape},qiangnao: {qiangnao_action.shape}, rq2f85: {rq2f85_action.shape}")
         if len(claw_action)==0 and len(qiangnao_action) == 0:
             claw_action = rq2f85_action
             claw_state = rq2f85_state
@@ -489,19 +509,54 @@ def populate_dataset(
                     output_action[k] = DEFAULT_ARM_JOINT_RANGE[k][1]
                     
 
-            # 临时测试使用：
-            # -------------------------------------------------
+            # prepare state and action under every setting
             gripper_dim = 1
-            eepose_state = fk_changed_joint_angle_2_eepose6d(output_state, gripper_dim)
-            output_action = fk_changed_joint_angle_2_eepose6d(output_action, gripper_dim)
-            joint_angles = np.concatenate([output_state[0:7], output_state[8:15]])
-            gripper = np.concatenate([output_state[7:8], output_state[15:16]])
+            if kuavo.CONTROL_MODE == "eef":
+                final_action = fk_changed_joint_angle_2_eepose6d(output_action, gripper_dim)
+            else:
+                final_action = output_action
+            
+
+            if set(kuavo.STATE_TYPE) == {"joint", "eefpose"}:
+                eefpose_state = fk_changed_joint_angle_2_eepose6d(output_state, gripper_dim)
+
+                half_joint = len(output_state) // 2
+                half_eefpose = len(eefpose_state) // 2
+
+                left_joint = output_state[:half_joint - gripper_dim]
+                right_joint = output_state[half_joint:-gripper_dim]
+                left_eefpose = eefpose_state[:half_eefpose - gripper_dim]
+                right_eefpose = eefpose_state[half_eefpose:-gripper_dim]
+
+                left_gripper = output_state[half_joint - gripper_dim:half_joint]
+                right_gripper = output_state[-gripper_dim:]
+
+                final_state = np.concatenate([
+                    left_joint, left_eefpose, left_gripper,
+                    right_joint, right_eefpose, right_gripper
+                ])
+
+            elif kuavo.STATE_TYPE == ["eefpose"]:
+                final_state = fk_changed_joint_angle_2_eepose6d(output_state, gripper_dim)
+
+            elif kuavo.STATE_TYPE == ["joint"]:
+                final_state = output_state
+
+            else: 
+                raise ValueError("Unsupported kuavo.STATE_TYPE: %s" % kuavo.STATE_TYPE)
+
+
+            # eepose_state = fk_changed_joint_angle_2_eepose6d(output_state, gripper_dim)
+            # eef_action = fk_changed_joint_angle_2_eepose6d(output_action, gripper_dim)
+
+            # joint_angles = np.concatenate([output_state[0:7], output_state[8:15]])
+            # gripper = np.concatenate([output_state[7:8], output_state[15:16]])
             frame = {
-                "observation.state": torch.from_numpy(output_state).type(torch.float32),      # left+right: pos+rot6d+gripper;  dim: 2*10           
-                "action": torch.from_numpy(output_action).type(torch.float32),                # left+right: pos+rot6d+gripper;  dim: 2*10     
-                "eepose_6d": torch.from_numpy(eepose_state).type(torch.float32),  
-                "joint_angles": torch.from_numpy(joint_angles).type(torch.float32),  
-                "gripper": torch.from_numpy(gripper).type(torch.float32),         
+                "observation.state": torch.from_numpy(final_state).type(torch.float32),      # left+right: pos+rot6d+gripper;  dim: 2*10           
+                "action": torch.from_numpy(final_action).type(torch.float32),                # left+right: pos+rot6d+gripper;  dim: 2*10     
+                # "eepose_6d": torch.from_numpy(eepose_state).type(torch.float32),  
+                # "joint_angles": torch.from_numpy(joint_angles).type(torch.float32),  
+                # "gripper": torch.from_numpy(gripper).type(torch.float32),         
             }
             # -------------------------------------------------
 
@@ -638,7 +693,7 @@ def main(cfg: DictConfig):
     global DEFAULT_JOINT_NAMES_LIST
     kuavo.init_parameters(cfg)
 
-    if kuavo.USE_EEPOSE_6D:
+    if kuavo.CONTROL_MODE == "eef" or "eefpose" in kuavo.STATE_TYPE:
         rospy.init_node("example_fk_srv_node", anonymous=True)
         print("Wait for fk service ..., please launch a simulator ...")
         rospy.wait_for_service('/ik/fk_srv')
