@@ -134,14 +134,9 @@ policy:
     use_film_scale_modulation: true
 
     # diffusion settings:
-    noise_scheduler_type: DDPM
-    num_train_timesteps: 100
-    beta_schedule: squaredcos_cap_v2
-    beta_start: 0.0001
-    beta_end: 0.02
-    prediction_type: epsilon
-    clip_sample: true
-    clip_sample_range: 1.0
+    noise_scheduler_type: FlowMatch
+    scheduler_params:
+      num_train_timesteps: 100
     num_inference_steps: null
     do_mask_loss_for_padding: false
 

@@ -71,7 +71,7 @@ class KuavoBaseRosEnv(gym.Env):
             config=config_kuavo_env, 
             obs_key_map=self.obs_key_map,
         )
-        self.arm_state_keys = ['joint_q', 'gripper','eef_pose'] # observation.state 的key顺序
+        self.arm_state_keys = config_kuavo_env.arm_state_keys # observation.state 的key顺序
         self.ratio = config_kuavo_env.ratio
         self.frame_alignment = config_kuavo_env.frame_alignment
 
@@ -565,7 +565,10 @@ class KuavoBaseRosEnv(gym.Env):
         """根据 eef_type 控制不同的末端执行器"""
         if self.eef_type == 'rq2f85':
             eef_msg = JointState()
-            eef_msg.name = ['left_gripper_joint', 'right_gripper_joint']
+            try:
+                eef_msg.name = ['left_gripper_joint', 'right_gripper_joint']
+            except Exception as e:
+                log_robot.info(f"_control_eef error! {e}")
             eef_msg.position = np.array([left_eef * 255, right_eef * 255])
             self.pub_eef_joint.publish(eef_msg)
 
@@ -616,9 +619,11 @@ class KuavoBaseRosEnv(gym.Env):
         if self.is_binary:
             self.arm_state['gripper'] = np.where(self.arm_state['gripper']>0.5, 1, 0)
 
-        assert len(self.arm_state.keys()) == 2, f"arm_state must have exactly 2 elements, but got {len(self.arm_state.keys())}"
+        assert len(self.arm_state.keys()) >= 2, f"arm_state must have exactly 2 elements, but got {len(self.arm_state.keys())}"
         
         state_keys = [k for k in self.arm_state_keys if k in self.arm_state]
+        # print(state_keys)
+        # raise ValueError
         arm_data = { "left": [], "right": [] }
 
         for key in state_keys:
@@ -640,6 +645,7 @@ class KuavoBaseRosEnv(gym.Env):
         obs["observation.state"] = np.concatenate(
             arm_data["left"] + arm_data["right"], axis=0
         )
+        log_robot.info(f"STATE: {obs['observation.state']}")
         
         obs["observation.state"] = torch.from_numpy(obs["observation.state"]).float().unsqueeze(0)
         return obs    

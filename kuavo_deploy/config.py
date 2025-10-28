@@ -55,6 +55,7 @@ class ConfigEnv:
     image_size: List[int] = field(default_factory=lambda: [640, 480])
     depth_range: List[int] = field(default_factory=lambda: [0, 1500])
     obs_key_map: Dict[str, List[Any]] = field(default_factory=dict)
+    arm_state_keys: List[str]=field(default_factory=list)
     ratio: float = 0.5
     frame_alignment: bool = True
     qiangnao_dof_needed: int = 1
@@ -257,3 +258,4 @@ if __name__ == "__main__":
     print("=== Inference basic ===")
     print("policy_type:", cfg.inference.policy_type)
     print("device:", cfg.inference.device)
+    print("arm_state_keys",cfg.env.arm_state_keys)

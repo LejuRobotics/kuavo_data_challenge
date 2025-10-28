@@ -44,11 +44,12 @@ env:
     # depth_l: ["/cam_l/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]
     # depth_r: ["/cam_r/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]
     joint_q: ["/sensors_data_raw", "sensorsData", 500]
-    qiangnao: ["/dexhand/state", "JointState", 500]
-    leju_claw: ["/leju_claw_state", "lejuClawState", 500]
+    # qiangnao: ["/dexhand/state", "JointState", 500]
+    # leju_claw: ["/leju_claw_state", "lejuClawState", 500]
     rq2f85: ["/gripper/state", "JointState", 500]
-    # eef_pose: ["computed", "joint_q", 500]  # 计算型观测：[类型, 依赖源key, 频率] 通过FK从joint_q计算末端执行器位姿
+    eef_pose: ["computed", "joint_q", 500]  # 计算型观测：[类型, 依赖源key, 频率] 通过FK从joint_q计算末端执行器位姿
   
+  arm_state_keys: ["eef_pose","gripper"]  # ['joint_q', 'eef_pose', 'gripper']
   frame_alignment: true
   ratio: 1.0 # 帧对齐时获取最近观测的比例，default=1.0
   # Limits配置
@@ -104,13 +105,13 @@ env:
 # =====================================================
 inference:
   go_bag_path: //home/yangzhou/data/pick_cu/rosbag_arminit/pick_and_place_rj_20250908133630.bag  # 推理时需要提供bag包的完整路径，如：到达预抓取姿态等，可直接拷贝一个训练用rosbag控制。仿真器中可不用
-  policy_type: "diffusion"  # 策略名字，支持diffusion，act等
+  policy_type: "act"  # 策略名字，支持diffusion，act等
   eval_episodes: 10  # 测试回合数，仿真默认为100，用于打分
   seed: 42  # 随机种子，仿真中可用于固定各物体初始状态，便于复现
   start_seed: 42  # 回合开始时的随机种子，仿真中可用于固定各物体初始状态，便于复现  
   device: "cuda"  # or "cpu"
   task: "ruichen_task1"
-  method: "rgb_dp"
-  timestamp: "run_20251022_220302" # 类似的运行时时间戳
+  method: "rgb_act_new"
+  timestamp: "run_20251027_182147" # 类似的运行时时间戳
   epoch: best  # 使用训练保存的哪一个epoch。注意：代码将在outputs/<task>/<method>/run_<timestamp>/epochxxx中load policy的模型参数
   max_episode_steps: 200  # 最大回合步数，超过自动结束，根据任务所需时长调整

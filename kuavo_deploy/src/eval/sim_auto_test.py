@@ -292,6 +292,7 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
         observation = preprocessor(observation)
         with torch.inference_mode():
             action = policy.select_action(observation)
+        log_model.info(f"Step {step}: predict action {action}")
         action = postprocessor(action)
         # print(f"action: {action}, action.shape: {action.shape}, action min: {action.min()}, action max: {action.max()}")
         action_infer_time = time.time()

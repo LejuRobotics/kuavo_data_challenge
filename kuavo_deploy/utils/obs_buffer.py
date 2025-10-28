@@ -16,6 +16,7 @@ from kuavo_deploy.utils.signal_controller import ControlSignalManager
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.utils.ros_manager import ROSManager
 from kuavo_deploy.utils.kinetic_func import fk_compute_func
+from kuavo_data.common.R_Transform import Transform
 log_robot = setup_logger("robot")
 
 
@@ -39,17 +40,19 @@ def process_eef_pose(eef_pose, which_arm='both'):
     
     if which_arm in ['left', 'both']:
         # 左手位置和姿态
-        left_pos = list(eef_pose.left_pose.pos)  # [x, y, z]
+        left_pos = list(eef_pose.left_pose.pos_xyz)  # [x, y, z]
         left_quat = list(eef_pose.left_pose.quat_xyzw)  # [x, y, z, w]
-        eef_data.extend(left_pos + left_quat)
+        left_rotation_6d = Transform.convert(tf=np.array(left_pos + left_quat), from_rep="quat", to_rep="rotation_6d")
+        eef_data.extend(list(left_rotation_6d))
     
     if which_arm in ['right', 'both']:
         # 右手位置和姿态
-        right_pos = list(eef_pose.right_pose.pos)  # [x, y, z]
+        right_pos = list(eef_pose.right_pose.pos_xyz)  # [x, y, z]
         right_quat = list(eef_pose.right_pose.quat_xyzw)  # [x, y, z, w]
-        eef_data.extend(right_pos + right_quat)
+        right_rotation_6d = Transform.convert(tf=np.array(right_pos + right_quat), from_rep="quat", to_rep="rotation_6d")
+        eef_data.extend(list(right_rotation_6d))
     
-    return eef_data
+    return np.array(eef_data)
 
 
 # ================ 计算函数映射表 ================
@@ -245,19 +248,29 @@ class ObsBuffer:
         self.ros_manager.close()
 
     def wait_buffer_ready(self):
-        bars = {k: tqdm(total=v["frequency"], desc=f"Filling {k}", position=i, leave=True)
-                for i, (k, v) in enumerate(self.obs_key_map.items())}
+        progress = {k: 0 for k in self.obs_key_map}
+        total = {k: v["frequency"] for k, v in self.obs_key_map.items()}
+        last_log_time = 0
+
         while not self.obs_buffer_is_ready():
             if not self.control_signal_manager.check_control_signals():
                 log_robot.info("🛑 停止信号已接收，退出")
                 sys.exit(1)
-            for k in bars:
-                new_len = len(self.obs_buffer_data[k]["data"])
-                diff = new_len - bars[k].n
-                if diff > 0:
-                    bars[k].update(diff)
+
+            now = time.time()
+            # 每隔 1 秒打印一次日志
+            if now - last_log_time > 0.2:
+                logs = []
+                for k in progress:
+                    new_len = len(self.obs_buffer_data[k]["data"])
+                    progress[k] = new_len
+                    logs.append(f"{k}: {new_len}/{total[k]}")
+                log_robot.info(" | ".join(logs))
+                last_log_time = now
+
+            time.sleep(0.1)
+
         log_robot.info("✅ All buffers ready!")
-        time.sleep(0.1)
         return True
 
     def get_latest_obs(self):

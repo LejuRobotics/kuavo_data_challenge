@@ -23,7 +23,7 @@ from kuavo_train.wrapper.policy.diffusion.transformer_diffusion import Transform
 from diffusers.schedulers.scheduling_ddim import DDIMScheduler
 from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
 from diffusers.schedulers.scheduling_flow_match_euler_discrete import FlowMatchEulerDiscreteScheduler
-
+from diffusers import StableDiffusion3Pipeline
 OBS_DEPTH = "observation.depth"
 
 
@@ -35,7 +35,7 @@ def _make_noise_scheduler_factory(name: str, **kwargs: Dict[str, Any]):
         return DDPMScheduler(**kwargs)
     elif name == "DDIM":
         return DDIMScheduler(**kwargs)
-    elif name == "FlowMatchEulerDiscrete":
+    elif name == "FlowMatch":
         return FlowMatchEulerDiscreteScheduler(**kwargs)
     else:
         raise ValueError(f"Unsupported noise scheduler type {name}")
@@ -453,6 +453,10 @@ class CustomDiffusionModelWrapper(DiffusionModel):
             clip_sample_range=config.clip_sample_range,
             prediction_type=config.prediction_type,
         )
+        # self.noise_scheduler = _make_noise_scheduler_factory(
+        #     config.noise_scheduler_type,
+        #     config.scheduler_params
+        # )
         self.num_inference_steps = config.num_inference_steps or self.noise_scheduler.config.num_train_timesteps
 
     def _prepare_global_conditioning(self, batch: Dict[str, Tensor]) -> Tensor:

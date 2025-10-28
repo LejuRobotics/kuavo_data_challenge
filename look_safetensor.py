@@ -1,4 +1,4 @@
-file_path = "outputs/train/aloha_sim_transfer_cube_human/dinov3_nosep_depth_nofusestate/run_20251017_095912/policy_preprocessor_step_3_normalizer_processor.safetensors"
+file_path = "outputs/train/ruichen_task1/rgb_act_new/run_20251027_182147/policy_postprocessor_step_0_unnormalizer_processor.safetensors"
 
 from safetensors import safe_open
 import torch
@@ -23,6 +23,6 @@ with safe_open(file_path, framework="pt", device="cpu") as f:
         print(f"  均值: {tensor.mean():.6f}")
         
         # 对于小张量，可以直接打印值
-        if tensor.numel() <= 10:  # 元素数量小于等于10
+        if tensor.numel() <= 50:  # 元素数量小于等于10
             print(f"  值: {tensor}")
         print("-" * 50)

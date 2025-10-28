@@ -551,6 +551,8 @@ def populate_dataset(
 
             # joint_angles = np.concatenate([output_state[0:7], output_state[8:15]])
             # gripper = np.concatenate([output_state[7:8], output_state[15:16]])
+            # print("final_state: ",final_state)
+            # print("final_action: ",final_action)
             frame = {
                 "observation.state": torch.from_numpy(final_state).type(torch.float32),      # left+right: pos+rot6d+gripper;  dim: 2*10           
                 "action": torch.from_numpy(final_action).type(torch.float32),                # left+right: pos+rot6d+gripper;  dim: 2*10     
@@ -740,7 +742,7 @@ def main(cfg: DictConfig):
 
     port_kuavo_rosbag(raw_dir, repo_id, root=lerobot_dir,n = n, task=kuavo.TASK_DESCRIPTION)
 
-    if kuavo.USE_EEPOSE_6D:
+    if kuavo.CONTROL_MODE == "eef" or "eefpose" in kuavo.STATE_TYPE:
         rospy.signal_shutdown("Processing completed")
         if hasattr(rospy, '_shutdown_flag'):
             rospy._shutdown_flag = True

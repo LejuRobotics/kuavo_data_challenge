@@ -1,5 +1,7 @@
 import rospy
-
+from sensor_msgs.msg import CompressedImage, JointState
+from kuavo_deploy.utils.logging_utils import setup_logger
+log_robot = setup_logger("robot")
 class ROSManager:
     def __init__(self):
         self.subscribers = []
@@ -7,7 +9,10 @@ class ROSManager:
         self.publishers = []
 
     def register_subscriber(self, topic, msg_type, callback):
-        sub = rospy.Subscriber(topic, msg_type, callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
+        if msg_type == CompressedImage:
+            sub = rospy.Subscriber(topic, msg_type, callback, queue_size=1, tcp_nodelay=True, buff_size=2**20)
+        else:
+            sub = rospy.Subscriber(topic, msg_type, callback, queue_size=1, tcp_nodelay=True)
         self.subscribers.append(sub)
         return sub
 
@@ -31,7 +36,7 @@ class ROSManager:
         self.subscribers.clear()
         self.services.clear()
         self.publishers.clear()
-        rospy.loginfo("All ROS resources released.")
+        log_robot.info("All ROS resources released.")
     
     def __del__(self):
         self.close()

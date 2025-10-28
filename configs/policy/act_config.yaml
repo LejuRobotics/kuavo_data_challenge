@@ -7,11 +7,11 @@ hydra: # Hydra 配置文件保存目录，仅供参数检查使用
 
 
 task: "ruichen_task1"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
-method: "rgb_dp_new"  # 自定义方法名称
+method: "rgb_act_new"  # 自定义方法名称
 timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
 # 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
 repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
-root: "/media/yangzhou/80268D01268CFA04/datafactory/lerobot_ruichen_task1_onlyrgb_eef_new/lerobot"  # 你的本地转换好的lerobot数据的目录
+root: "/media/yangzhou/80268D01268CFA04/datafactory/lerobot_ruichen_task1_onlyrgb_eefctrl_eefstate/lerobot"  # 你的本地转换好的lerobot数据的目录
 # root: null  # 如果不使用本地数据想使用huggingface官方数据，请在task中指定，例如pusht，aloha_sim_insertion_human，此处就设置为null空
 # 将去云端调用下载数据集
 
