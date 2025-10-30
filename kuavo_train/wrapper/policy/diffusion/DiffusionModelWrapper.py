@@ -22,7 +22,8 @@ from kuavo_train.wrapper.policy.diffusion.transformer_diffusion import Transform
 # diffusers scheduler classes (factory expects these names)
 from diffusers.schedulers.scheduling_ddim import DDIMScheduler
 from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
-from diffusers.schedulers.scheduling_flow_match_euler_discrete import FlowMatchEulerDiscreteScheduler
+# from diffusers.schedulers.scheduling_flow_match_euler_discrete import FlowMatchEulerDiscreteScheduler
+from kuavo_train.wrapper.noise_scheduler.FlowMatchingWrapper import CustomFlowMatchEulerDiscreteSchedulerWrapper
 from diffusers import StableDiffusion3Pipeline
 OBS_DEPTH = "observation.depth"
 
@@ -36,7 +37,7 @@ def _make_noise_scheduler_factory(name: str, **kwargs: Dict[str, Any]):
     elif name == "DDIM":
         return DDIMScheduler(**kwargs)
     elif name == "FlowMatch":
-        return FlowMatchEulerDiscreteScheduler(kwargs["num_train_timesteps"])
+        return CustomFlowMatchEulerDiscreteSchedulerWrapper(kwargs["num_train_timesteps"])
     else:
         raise ValueError(f"Unsupported noise scheduler type {name}")
 
