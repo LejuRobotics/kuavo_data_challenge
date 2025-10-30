@@ -65,20 +65,11 @@ nvidia-smi
 
 ```bash
 sudo apt install curl
-curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg \
-  --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-  && curl -s -L \
-  https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
-  | sed 's#deb https://#deb \
-   [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
-  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 sudo apt-get update
 export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.8-1
-sudo apt-get install -y \
-    nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-    nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-    libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-    libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
+sudo apt-get install -y nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
 ```
 
 #### c. 安装 Docker
@@ -197,6 +188,33 @@ sudo docker build -t ubt2004_ros_noetic .
 构建完成后进入镜像即可。
 </details>
 
+启动镜像
+```shell
+#!/bin/bash
+
+# Paths
+CODE_DIR=/data/yangzhou/code
+PYTHON_DIR=/data/yangzhou/python_env
+DATA_DIR=/data/yangzhou/data
+IMAGE=ros:noetic
+CONTAINER=ros_noetic
+
+# Create container if it doesn't exist
+if ! docker ps | grep -q "$CONTAINER"; then
+    echo "🛠  Creating container $CONTAINER ..."
+    docker create --name=$CONTAINER $IMAGE
+fi
+
+# Run container with mounts and environment
+echo "🚀 Starting container $CONTAINER ..."
+docker run \
+    -i -t \
+    -v $CODE_DIR:/code \
+    -v $DATA_DIR:/data \
+    -v $PYTHON_DIR:$PYTHON_DIR \
+    --env PATH=/data/yangzhou/python_venv/kdc/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    $CONTAINER /bin/bash
+```
 <br>
 ⚠️ 警告：如果上述中ROS使用的是docker环境，下方后续的代码可能需要在容器里面运行，如有问题，请核对当前是否在容器内！
 

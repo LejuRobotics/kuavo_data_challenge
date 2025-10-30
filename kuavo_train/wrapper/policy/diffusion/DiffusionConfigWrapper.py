@@ -27,8 +27,12 @@ class CustomDiffusionConfigWrapper(DiffusionConfig):
     def __post_init__(self):
         vision_backbone = self.vision_backbone
         self.vision_backbone = "resnet18"
+        noise_scheduler = self.noise_scheduler_type
+        self.noise_scheduler_type = "DDPM"
         super().__post_init__()
+        self.noise_scheduler_type = noise_scheduler
         self.vision_backbone = vision_backbone
+
         default_map = {
             "VISUAL": NormalizationMode.MEAN_STD,
             "STATE": NormalizationMode.MIN_MAX,

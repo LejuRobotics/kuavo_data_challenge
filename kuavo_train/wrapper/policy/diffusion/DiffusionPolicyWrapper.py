@@ -39,8 +39,12 @@ class CustomDiffusionPolicyWrapper(DiffusionPolicy):
         # this is important to call the parent constructor to setup normalization and queues,
         # to prevent original config not supported dinov3 vision backbone
         # super().__init__(config, dataset_stats)
+        noise_scheduler = config.noise_scheduler_type
+        config.noise_scheduler_type = "DDPM"
         super().__init__(config)
         config.vision_backbone = vision_backbone  # change back to the original config
+        config.noise_scheduler_type = noise_scheduler
+        
         self.diffusion = CustomDiffusionModelWrapper(config)
 
 

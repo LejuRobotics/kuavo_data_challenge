@@ -36,7 +36,7 @@ def _make_noise_scheduler_factory(name: str, **kwargs: Dict[str, Any]):
     elif name == "DDIM":
         return DDIMScheduler(**kwargs)
     elif name == "FlowMatch":
-        return FlowMatchEulerDiscreteScheduler(**kwargs)
+        return FlowMatchEulerDiscreteScheduler(kwargs["num_train_timesteps"])
     else:
         raise ValueError(f"Unsupported noise scheduler type {name}")
 
@@ -336,8 +336,11 @@ class CustomDiffusionModelWrapper(DiffusionModel):
         # ensure parent init runs with safe backbone
         orig_vis = config.vision_backbone
         config.vision_backbone = "resnet18"
+        orig_noise_scheduler = config.noise_scheduler_type
+        config.noise_scheduler_type = "DDPM"
         super().__init__(config)
         config.vision_backbone = orig_vis
+        config.noise_scheduler_type = orig_noise_scheduler
 
         self.config = config
         global_cond_dim = 0

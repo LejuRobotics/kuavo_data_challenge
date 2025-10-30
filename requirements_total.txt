@@ -148,7 +148,7 @@ qt-gui-cpp==0.4.5
 qt-gui-py-common==0.4.5
 regex==2025.7.34
 requests==2.32.4
-rerun-sdk==0.22.1
+rerun-sdk
 resource-retriever==1.12.10
 rich==14.1.0
 rosbag==1.17.4
@@ -251,4 +251,5 @@ zipp==3.23.0
 kuavo_humanoid_sdk
 pympler
 matplotlib
+ipdb
 -e .
