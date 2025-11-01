@@ -16,7 +16,7 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
 env:
   env_name: Kuavo-Sim  # kuavo仿真器环境名称
   real: false # 是否使用真实机器人，仿真环境为false
-  control_mode: eef # or eef（暂未支持）
+  control_mode: joint # joint or eef
   eef_type: rq2f85  # 末端执行器类型: 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
   which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
   head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, 真机可根据需要调整，一般为null
@@ -47,9 +47,9 @@ env:
     # qiangnao: ["/dexhand/state", "JointState", 500]
     # leju_claw: ["/leju_claw_state", "lejuClawState", 500]
     rq2f85: ["/gripper/state", "JointState", 500]
-    eef_pose: ["computed", "joint_q", 500]  # 计算型观测：[类型, 依赖源key, 频率] 通过FK从joint_q计算末端执行器位姿
+    # eef_pose: ["computed", "joint_q", 500]  # 计算型观测：[类型, 依赖源key, 频率] 通过FK从joint_q计算末端执行器位姿
   
-  arm_state_keys: ["eef_pose","gripper"]  # ['joint_q', 'eef_pose', 'gripper']
+  arm_state_keys: ["joint_q","gripper"]  # ['joint_q', 'eef_pose', 'gripper']
   frame_alignment: true
   ratio: 1.0 # 帧对齐时获取最近观测的比例，default=1.0
   # Limits配置
@@ -105,13 +105,13 @@ env:
 # =====================================================
 inference:
   go_bag_path: //home/yangzhou/data/pick_cu/rosbag_arminit/pick_and_place_rj_20250908133630.bag  # 推理时需要提供bag包的完整路径，如：到达预抓取姿态等，可直接拷贝一个训练用rosbag控制。仿真器中可不用
-  policy_type: "act"  # 策略名字，支持diffusion，act等
+  policy_type: "diffusion"  # 策略名字，支持diffusion，act等
   eval_episodes: 10  # 测试回合数，仿真默认为100，用于打分
   seed: 42  # 随机种子，仿真中可用于固定各物体初始状态，便于复现
   start_seed: 42  # 回合开始时的随机种子，仿真中可用于固定各物体初始状态，便于复现  
   device: "cuda"  # or "cpu"
   task: "ruichen_task1"
-  method: "rgb_act_new"
-  timestamp: "run_20251027_182147" # 类似的运行时时间戳
+  method: "dp_fm"
+  timestamp: "run_1031" # 类似的运行时时间戳
   epoch: best  # 使用训练保存的哪一个epoch。注意：代码将在outputs/<task>/<method>/run_<timestamp>/epochxxx中load policy的模型参数
   max_episode_steps: 200  # 最大回合步数，超过自动结束，根据任务所需时长调整
