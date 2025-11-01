@@ -17,7 +17,10 @@ class CustomFlowMatchEulerDiscreteSchedulerWrapper(FlowMatchEulerDiscreteSchedul
         t: 时间步, shape [B], 范围 [0, 1]
         """
         # 扩展 t 维度匹配 x0
-        # t = t[:, None, None, None]
+        # print(t.shape, x0.shape)
+        # raise ValueError
+        t = t[:, None, None]
+        
         # 线性混合
         x_t = (1 - t) * x0 + t * noise
         return x_t

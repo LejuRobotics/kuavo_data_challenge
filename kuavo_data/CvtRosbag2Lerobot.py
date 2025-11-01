@@ -501,12 +501,28 @@ def populate_dataset(
             
             
   
-            assert len(DEFAULT_ARM_JOINT_RANGE) == output_action.shape[0]
-            for k in range(len(DEFAULT_ARM_JOINT_RANGE)):
-                if output_action[k] < DEFAULT_ARM_JOINT_RANGE[k][0]:
-                    output_action[k] = DEFAULT_ARM_JOINT_RANGE[k][0]
-                elif output_action[k] > DEFAULT_ARM_JOINT_RANGE[k][1]:
-                    output_action[k] = DEFAULT_ARM_JOINT_RANGE[k][1]
+            assert len(DEFAULT_ARM_JOINT_RANGE) >= 16, "DEFAULT_ARM_JOINT_RANGE should have at least 16 joint ranges"
+
+            if kuavo.CONTROL_HAND_SIDE == "left":
+                joint_indices = range(0, 8)
+            elif kuavo.CONTROL_HAND_SIDE == "right":
+                joint_indices = range(8, 16)
+            else:
+                raise ValueError(f"Invalid CONTROL_HAND_SIDE: {kuavo.CONTROL_HAND_SIDE}")
+
+            # 保证 output_action 长度匹配选中的手臂
+            assert len(joint_indices) == output_action.shape[0], (
+                f"Expected output_action of length {len(joint_indices)}, "
+                f"but got {output_action.shape[0]}"
+            )
+
+            for i, k in enumerate(joint_indices):
+                low, high = DEFAULT_ARM_JOINT_RANGE[k]
+                if output_action[i] < low:
+                    output_action[i] = low
+                elif output_action[i] > high:
+                    output_action[i] = high
+
                     
 
             # prepare state and action under every setting
