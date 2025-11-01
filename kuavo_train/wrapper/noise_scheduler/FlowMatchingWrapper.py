@@ -1,5 +1,6 @@
 from diffusers import FlowMatchEulerDiscreteScheduler
 import torch
+from diffusers.pipelines.stable_diffusion_3 import StableDiffusion3ControlNetPipeline
 
 class CustomFlowMatchEulerDiscreteSchedulerWrapper(FlowMatchEulerDiscreteScheduler):
     """
