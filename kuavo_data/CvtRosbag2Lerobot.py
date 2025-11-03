@@ -516,12 +516,12 @@ def populate_dataset(
                 f"but got {output_action.shape[0]}"
             )
 
-            for i, k in enumerate(joint_indices):
-                low, high = DEFAULT_ARM_JOINT_RANGE[k]
-                if output_action[i] < low:
-                    output_action[i] = low
-                elif output_action[i] > high:
-                    output_action[i] = high
+            for enu_i, jidx_k in enumerate(joint_indices):
+                low, high = DEFAULT_ARM_JOINT_RANGE[jidx_k]
+                if output_action[enu_i] < low:
+                    output_action[enu_i] = low
+                elif output_action[enu_i] > high:
+                    output_action[enu_i] = high
 
                     
 
