@@ -507,6 +507,8 @@ def populate_dataset(
                 joint_indices = range(0, 8)
             elif kuavo.CONTROL_HAND_SIDE == "right":
                 joint_indices = range(8, 16)
+            elif kuavo.CONTROL_HAND_SIDE == "both":
+                joint_indices = range(0, 16)
             else:
                 raise ValueError(f"Invalid CONTROL_HAND_SIDE: {kuavo.CONTROL_HAND_SIDE}")
 
