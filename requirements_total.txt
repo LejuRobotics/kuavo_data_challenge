@@ -29,7 +29,7 @@ charset-normalizer==3.4.2
 click==8.2.1
 cloudpickle==3.1.1
 cmake==4.0.3
-conda-pack @ file:///home/conda/feedstock_root/build_artifacts/conda-pack_1734292804024/work
+conda-pack
 contourpy==1.3.2
 controller-manager==0.20.0
 controller-manager-msgs==0.20.0
@@ -111,12 +111,12 @@ jsonschema-specifications==2025.9.1
 kiwisolver==1.4.9
 kornia==0.8.1
 kornia_rs==0.1.9
--e git+ssh://git@www.lejuhub.com:10026/robotembodieddata/kuavo_data_challenge.git@7c7c7bf389bfb6a2de3c696ba0a3dce4d8d0426b#egg=kuavo_data_challenge
--e git+ssh://git@www.lejuhub.com:10026/highlydynamic/kuavo-ros-control.git@4dedd180548b0534ba7236e7f29b17072c78becd#egg=kuavo_humanoid_sdk&subdirectory=src/kuavo_humanoid_sdk
+-e .
+kuavo_humanoid_sdk
 labmaze==1.0.6
 laser-geometry==1.6.8
 lazy_loader==0.4
--e git+https://github.com/huggingface/lerobot.git@9ebbe05b09ba23d07cbd919e476cabae476c1a78#egg=lerobot&subdirectory=../../../third_party/lerobot
+-e ./third_party/lerobot
 lxml==6.0.0
 Markdown==3.8.2
 markdown-it-py==3.0.0

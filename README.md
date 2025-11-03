@@ -252,7 +252,7 @@ conda activate kdc
 或：
 
 ```bash
-python -m venv --system-site-packages kdc
+python -m venv kdc
 source kdc/bin/activate
 ```
 
