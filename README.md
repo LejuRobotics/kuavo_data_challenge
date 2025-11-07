@@ -95,7 +95,7 @@ sudo docker info | grep -i runtime
 kuavo mujoco 仿真与真机运行均基于 **ROS Noetic**环境，由于真机kuavo机器人是ubuntu20.04 + ROS Noetic（非docker），因此推荐直接安装 ROS Noetic，若因ubuntu版本较高无法安装 ROS Noetic，可使用docker。
 
 <details>
-<summary>a. 系统直接安装 ROS Noetic（<b>推荐</b>）</summary>
+<summary>a. 系统直接安装 ROS Noetic（<b>推荐</b>）（展开查看），仅供参考</summary>
 
 * 官方指南：[ROS Noetic 安装](http://wiki.ros.org/noetic/Installation/Ubuntu)
 * 国内加速源推荐：[小鱼ROS](https://fishros.org.cn/forum/topic/20/)
@@ -120,7 +120,7 @@ rosrun turtlesim turtle_teleop_key  # 新建终端
 </details>
 
 <details>
-<summary>b. 使用 Docker 安装 ROS Noetic</summary>
+<summary>b. 使用 Docker 安装 ROS Noetic（展开查看），仅供参考</summary>
 
 - 首先最好是换个源：
 
@@ -161,6 +161,12 @@ vim Dockerfile
 
 ```Dockerfile
 FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|http://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.ubuntu.com/ubuntu/|http://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g' /etc/apt/sources.list
+
 RUN apt-get update && apt-get install -y locales tzdata gnupg lsb-release
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
@@ -172,30 +178,51 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
 RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
 # 安装ROS Noetic
-RUN apt-get update && apt-get install -y ros-noetic-desktop-full
-
-RUN apt-get install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+# 设置键盘布局为 Chinese
+RUN apt-get update && \
+    apt-get install -y keyboard-configuration apt-utils && \
+    echo 'keyboard-configuration keyboard-configuration/layoutcode string cn' | debconf-set-selections && \
+    echo 'keyboard-configuration keyboard-configuration/modelcode string pc105' | debconf-set-selections && \
+    echo 'keyboard-configuration keyboard-configuration/variant string ' | debconf-set-selections && \
+    apt-get install -y ros-noetic-desktop-full && \
+    apt-get install -y python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
 # 初始化rosdep
 RUN rosdep init
 ```
-写入完毕后保存退出。执行ubuntu20.04 + ROS Noetic镜像的构建：
+写入完毕后保存退出。
+
+- 执行ubuntu20.04 + ROS Noetic镜像的构建：
 
 ```shell
 sudo docker build -t ubt2004_ros_noetic .
 ```
 
-构建完成后进入镜像即可。
-</details>
+- 构建完成后进入镜像即可，初次启动容器加载镜像：
 
-启动镜像
+```shell
+sudo docker run -it --name ubuntu_ros_container ubt2004_ros_noetic /bin/bash
+# 或 GPU 启动（推荐）
+sudo docker run -it --gpus all --runtime nvidia --name ubuntu_ros_container ubt2004_ros_noetic /bin/bash
+# 可选，挂载本地目录路径等
+# sudo docker run -it --gpus all --runtime nvidia --name ubuntu_ros_container -v /path/to/your/code:/root/code ubt2004_ros_noetic /bin/bash
+```
+
+之后每次加载：
+```shell
+sudo docker start ubuntu_ros_container
+sudo docker exec -it ubuntu_ros_container /bin/bash
+```
+
+- 或者自定义启动加载文件，launch_docker.sh
 ```shell
 #!/bin/bash
 
 # Paths
-CODE_DIR=/data/yangzhou/code
-PYTHON_DIR=/data/yangzhou/python_env
-DATA_DIR=/data/yangzhou/data
+CODE_DIR=/path/to/code
+PYTHON_DIR=/path/to/python_env
+DATA_DIR=/path/to/data
 IMAGE=ros:noetic
 CONTAINER=ros_noetic
 
@@ -212,9 +239,22 @@ docker run \
     -v $CODE_DIR:/code \
     -v $DATA_DIR:/data \
     -v $PYTHON_DIR:$PYTHON_DIR \
-    --env PATH=/data/yangzhou/python_venv/kdc/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    --env PATH=/path/to/python_venv/kdc/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     $CONTAINER /bin/bash
 ```
+
+
+- 进入镜像后，初始化ros环境变量，然后启动roscore
+
+```shell
+source /opt/ros/noetic/setup.bash
+roscore
+```
+
+无误的话，ubuntu20.04 + ros noetic的docker配置方式就结束了。
+
+</details>
+
 <br>
 ⚠️ 警告：如果上述中ROS使用的是docker环境，下方后续的代码可能需要在容器里面运行，如有问题，请核对当前是否在容器内！
 
@@ -224,10 +264,10 @@ docker run \
 
 ```bash
 # SSH
-git clone --depth=1 git@github.com:LejuRobotics/kuavo-data-challenge.git
-
+git clone git@github.com:LejuRobotics/kuavo_data_challenge.git
+# 或者
 # HTTPS
-git clone --depth=1 https://github.com/LejuRobotics/kuavo-data-challenge.git
+git clone https://github.com/LejuRobotics/kuavo_data_challenge.git
 ```
 
 更新third_party下的lerobot子模块：
@@ -244,36 +284,108 @@ git submodule update --recursive --progress
 
 使用 conda （推荐）或 python venv 创建虚拟环境（推荐 python 3.10）：
 
+- ananconda配置：
+
 ```bash
 conda create -n kdc python=3.10
 conda activate kdc
 ```
 
-或：
+- 或，源码安装Python3.10.18，再用venv创建虚拟环境
+
+注意：```ppa:deadsnakes``` 在2025年6月后不能在ubuntu20.04上提供了
 
 ```bash
-python -m venv kdc
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install -y python3.10 python3.10-venv python3.10-dev
+```
+可以尝试下，不行请使用源码安装：
+```bash
+sudo apt update
+sudo apt install -y build-essential libssl-dev zlib1g-dev libncurses5-dev libncursesw5-devlibreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev tk-dev libffi-dev uuid-dev wget
+
+wget https://www.python.org/ftp/python/3.10.18/Python-3.10.18.tgz
+tar -xzf Python-3.10.18.tgz
+cd Python-3.10.18
+./configure --prefix=$HOME/python3.10 --enable-optimizations
+make -j$(nproc)
+sudo make install
+
+python3.10 -m venv kdc
 source kdc/bin/activate
 ```
+
+- 查看和确保安装正确：
+```shell
+python  # 查看python版本，看到确认输出为3.10.xxx（通常是3.10.18）
+# 输出示例：
+# Python 3.10.18 (main, Jun  5 2025, 13:14:17) [GCC 11.2.0] on linux
+# Type "help", "copyright", "credits" or "license" for more information.
+# >>> 
+
+pip --version # 查看pip对应的版本，看到确认输出为3.10的pip
+# 输出示例：pip 25.1 from /path/to/your/env/python3.10/site-packages/pip (python 3.10)
+```
+
 
 安装依赖：
 
 ```bash
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple  # 建议首先换源，能加快下载安装速度
+
 pip install -r requirements_ilcode.txt   # 无需ROS Noetic，但只能使用kuavo_train模仿学习训练代码，kuavo_data（数转）及 kuavo_deploy（部署代码）均依赖ROS
 # 或
-pip install -r requirements_total.txt    # 需确保 ROS Noetic 已安装
+pip install -r requirements_total.txt    # 需确保 ROS Noetic 已安装 (推荐)
 ```
 
-如果运行时报ffmpeg或torchcodec的错：
+如果pip安装完毕但运行训练代码时报ffmpeg或torchcodec的错：
 
 ```bash
 conda install ffmpeg==6.1.1
 
 # 或
 
-pip uninstall torchcodec
+# pip uninstall torchcodec
 ```
 
+如果想使用torchcodec，又没有conda，环境是用python venv创建的：
+- 源码构建：参考[ffmpeg官方库](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu#GettheDependencies)
+
+&nbsp;&nbsp;&nbsp;&nbsp; (a). 提前把osm那些包装好，仿照官方文档
+
+&nbsp;&nbsp;&nbsp;&nbsp; (b). openh264:
+```bash
+cd ~/python-pkg/ffmpeg_source
+git clone https://github.com/cisco/openh264.git
+cd openh264
+git checkout v2.4.1   # 对应 FFmpeg 官方支持版本
+make -j$(nproc)
+sudo make install PREFIX=$HOME/ffmpeg_build
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp; (c). 编译安装ffmpeg，这种安装和conda安装一模一样的功能，验证不会有问题
+```bash
+PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig" ./configure   --prefix=/usr/local   --disable-doc --extra-cflags=-I$HOME/ffmpeg_build/include --extra-ldflags=-L$HOME/ffmpeg_build/lib  --enable-swresample   --enable-swscale   --enable-openssl   --enable-libxml2   --enable-libtheora   --enable-demuxer=dash   --enable-postproc   --enable-hardcoded-tables   --enable-libfreetype   --enable-libharfbuzz   --enable-libfontconfig   --enable-libdav1d   --enable-zlib   --enable-libaom   --enable-pic   --enable-shared   --disable-static   --disable-gpl   --enable-version3   --disable-sdl2   --enable-libopenh264   --enable-libopus   --enable-libmp3lame   --enable-libopenjpeg   --enable-libvorbis   --enable-pthreads   --enable-libtesseract   --enable-libvpx
+sudo make -j$(nproc)
+sudo make install
+sudo ldconfig
+# ffmpeg -version验证
+```
+
+
+- 关于 kuavo_humanoid_sdk：
+
+有时会出现版本不匹配的问题，上述是通过pip install在pypi.org上找包安装的，若出现相关问题，可以手动至kuavo-ros-control或kuavo-ros-opensource源码安装，例如，激活Python环境后：
+```bash
+cd /your/path/to/kuavo-ros-control/src/kuavo_humanoid_sdk
+# 或
+# cd /your/path/to/kuavo-ros-opensource/src/kuavo_humanoid_sdk
+
+./install.sh
+```
 ---
 
 ## 📨 使用方法

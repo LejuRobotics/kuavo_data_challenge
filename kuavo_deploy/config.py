@@ -51,6 +51,7 @@ class ConfigEnv:
     which_arm: str = "both"
     head_init: Optional[List[float]] = field(default_factory=lambda: [0.0, 0.0])
     use_delta: bool = False
+    delta_type: str = "Tsub"  # "Tsub","Tinv","RPY"
     ros_rate: int = 10
     image_size: List[int] = field(default_factory=lambda: [640, 480])
     depth_range: List[int] = field(default_factory=lambda: [0, 1500])
@@ -59,6 +60,10 @@ class ConfigEnv:
     ratio: float = 0.5
     frame_alignment: bool = True
     qiangnao_dof_needed: int = 1
+
+    fk_joint_angles_for_reset: Optional[List[float]] = None
+    rotation_threshold: Optional[float] = None
+    
     limits: LimitsConfig = field(default_factory=LimitsConfig)
     is_binary: bool = False
 

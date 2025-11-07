@@ -50,16 +50,22 @@ sudo systemctl status docker
 
 ## 2️⃣ 使用 Conda Pack 打包环境
 
-1. 假设你已有 Conda 环境 `myenv`：
+1. 安装 conda-pack
 
 ```bash
-conda activate myenv
+conda install -c conda-forge conda-pack
 ```
 
-2. 打包环境：
+2. 假设你已有 Conda 环境 `kdc`：
 
 ```bash
-conda pack -n myenv -o myenv.tar.gz
+conda activate kdc
+```
+
+3. 打包环境：
+
+```bash
+conda pack -n kdc -o myenv.tar.gz
 ```
 
 ⚠️ 注意：
@@ -67,14 +73,17 @@ conda pack -n myenv -o myenv.tar.gz
 - 示例：
 
 ```bash
-conda pack -n myenv --ignore-missing-files -o myenv.tar.gz
+conda pack -n kdc --ignore-editable-packages -o myenv.tar.gz
 ```
 
-3. 将打包好的环境压缩包myenv.tar.gz放在项目根目录下
+4. 将打包好的环境压缩包 myenv.tar.gz 放在项目根目录下
 
 ---
 
 ## 3️⃣ Dockerfile 构建项目镜像
+
+⚠️ 注意：
+- 请确保你的outputs文件夹里只有一组你要上传测试的模型文件及其配置文件，避免打包得到的 docker 镜像体积过大
 
 ### 下面提供一个 **Dockerfile的可用示例**：
 

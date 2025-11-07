@@ -221,7 +221,6 @@ def marker2_callback(msg):
 def run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory, json_file_path):
     """运行单个episode"""
     cfg = config.inference
-    use_delta = config.env.use_delta
     seed = cfg.seed
     task = cfg.task
     # Initialize environment

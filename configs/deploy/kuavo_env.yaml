@@ -19,9 +19,9 @@ env:
   control_mode: joint # joint or eef
   eef_type: rq2f85  # 末端执行器类型: 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
   which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
-  head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, 真机可根据需要调整，一般为null
+  head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, task4 [0,0.087], 真机可根据需要调整，一般为null
   ros_rate: 10  # 推理频率，单位Hz
-  use_delta: false # 是否使用增量动作，default=false（暂未支持）
+
   only_arm: true  # 默认true, 是否只使用手臂数据, 目前的模仿学习只用于手臂数据，选择true会自动屏蔽足关节数据
   
   # obs_key_map：输入图像，可选"head_cam_h",'depth_h','wrist_cam_l','depth_l','wrist_cam_r','depth_r'
@@ -34,6 +34,12 @@ env:
   #                 "right":['head_cam_h','depth_h','wrist_cam_r','depth_r'],
   #                 "both":['head_cam_h','depth_h','wrist_cam_l','depth_l','wrist_cam_r','depth_r']
   #                 }][int(self.use_depth)][self.which_arm]
+  fk_joint_angles_for_reset: null # [-10, 15, 25, -85, -90, 15, -20, 50, 0, 0, -140, 90, 0, 0]  # FK服务在reset时使用的14个关节角度（度），用以设置初始eef state和eef action
+  rotation_threshold: null  # 当use_delta=True时，旋转动作小于此阈值时置0。null表示不启用
+  
+  use_delta: false # 是否使用增量动作，default=false（暂未支持）
+  delta_type: "Tsub"  # 增量动作类型，可选："Tsub","Tinv"，"RPY",仅当use_delta=True时有效
+
   image_size: &IMGSIZE [640, 480]  # 图像大小：宽，高
   depth_range: &DEPTHRANGE [0, 1500]  # 深度图范围设置，单位mm，default=[0,1500]
   obs_key_map:  # 话题、消息类型、频率、图像尺寸、深度裁剪等配置，深度图范围设置，单位mm，default=[0,1500]
@@ -97,9 +103,6 @@ env:
   is_binary: false # 是否使用二值化夹爪，灵巧手，default=false
 
 
-
-
-
 # =====================================================
 # inference config，模型推理配置的修改
 # =====================================================
@@ -112,6 +115,6 @@ inference:
   device: "cuda"  # or "cpu"
   task: "ruichen_task1"
   method: "dp_fm"
-  timestamp: "run_1031" # 类似的运行时时间戳
+  timestamp: "run_20251104_143922" # 类似的运行时时间戳
   epoch: best  # 使用训练保存的哪一个epoch。注意：代码将在outputs/<task>/<method>/run_<timestamp>/epochxxx中load policy的模型参数
   max_episode_steps: 200  # 最大回合步数，超过自动结束，根据任务所需时长调整

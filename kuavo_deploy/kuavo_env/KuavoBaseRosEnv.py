@@ -61,6 +61,8 @@ class KuavoBaseRosEnv(gym.Env):
         self.is_binary = config_kuavo_env.is_binary
         self.head_init = config_kuavo_env.head_init
         self.arm_init = np.array([0]*14)
+        self.fk_joint_angles_for_reset = config_kuavo_env.fk_joint_angles_for_reset
+        self.rotation_threshold = config_kuavo_env.rotation_threshold
 
         self.use_delta = config_kuavo_env.use_delta
 
@@ -300,7 +302,7 @@ class KuavoBaseRosEnv(gym.Env):
 
         for i in range(average_num):
             state = self.get_obs()
-            fk_joint_angles = self._get_full_joint_angles(self.arm_state["joint_q"])
+            fk_joint_angles = self._get_init_joint_angles(self.arm_state["joint_q"])
             eef_state = fk_compute_func(list(fk_joint_angles))
 
             quat_l = np.array(eef_state.left_pose.quat_xyzw)
@@ -338,8 +340,13 @@ class KuavoBaseRosEnv(gym.Env):
     # ==========================================================
     # 子函数 5. 构造完整 FK 输入
     # ==========================================================
-    def _get_full_joint_angles(self, joint_q):
-        """根据控制臂类型补全14维关节角"""
+    def _get_init_joint_angles(self, joint_q):
+        # if self.which_arm == 'both':
+        #     if self.fk_joint_angles_for_reset is not None:
+        #         fk_joint_angles = np.array(self.fk_joint_angles_for_reset) / 180 * np.pi
+        #     else:
+        #         fk_joint_angles = np.array([-10, 15, 25, -85, -90, 15, -20,   50, 0, 0, -140, 90, 0, 0])/180*np.pi
+        #     return fk_joint_angles
         if self.which_arm == 'both':
             return np.array(joint_q)
         elif self.which_arm == 'left':
@@ -413,6 +420,8 @@ class KuavoBaseRosEnv(gym.Env):
             move_flag = base_action[-1]  # 0-1之间的值，用于判断是否执行base移动
             if move_flag > 0.5:  # 如果大于0.5，执行base移动
                 # 执行base移动，这里需要调用相关的base移动接口
+                log_robot.info(f"➡️  执行【底盘移动】(mode_flag > 0.5)")
+                log_robot.info(f"cmd_pos_world = [x:{base_action[0]:.4f}, y:{base_action[1]:.4f}, yaw:{base_action[2]:.4f}], move_flag={move_flag:.4f}")
                 self.robot.control_command_pose_world(base_action[0], base_action[1], 0, base_action[2])
                 self.rate.sleep()
                 self._record_sleep_time(t1)
@@ -466,6 +475,7 @@ class KuavoBaseRosEnv(gym.Env):
     
 
     def _process_arm_delta(self, action, arm='left'):
+        action = self.check_action(action, mode='eef_rel')
         """处理增量式末端动作"""
         if arm == 'both':
             delta_l = Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=action[:9])
@@ -478,6 +488,31 @@ class KuavoBaseRosEnv(gym.Env):
             delta = Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=action[:9])
             cur_tf = getattr(self, f'cur_eef_action_tf_{arm[0]}') * delta
             action[:9] = cur_tf.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
+        return action
+    
+    def _process_arm_delta_add(self, action, arm='left'):
+        action = self.check_action(action, mode='eef_rel')
+        """处理增量式末端动作"""
+        if arm == 'both':
+            # 如果设置了rotation_threshold，对旋转部分进行阈值过滤
+            if self.rotation_threshold is not None:
+                # action格式：[pos_x, pos_y, pos_z, rot_6d(6), gripper, pos_x, pos_y, pos_z, rot_6d(6), gripper]
+                # 左臂旋转部分在 action[3:9]，右臂旋转部分在 action[13:19]
+                if np.max(np.abs(action[3:9])) < self.rotation_threshold:
+                    action[3:9] = np.array([0, 0, 0, 0, 0, 0])
+                if np.max(np.abs(action[13:19])) < self.rotation_threshold:
+                    action[13:19] = np.array([0, 0, 0, 0, 0, 0])
+            action[:9] += self.cur_eef_action_tf_l.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
+            action[10:19] += self.cur_eef_action_tf_r.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
+        else:
+            # 如果设置了rotation_threshold，对旋转部分进行阈值过滤
+            if self.rotation_threshold is not None:
+                # action格式：[pos_x, pos_y, pos_z, rot_6d(6), gripper]
+                # 左臂旋转部分在 action[3:9]
+                if np.max(np.abs(action[3:9])) < self.rotation_threshold:
+                    action[3:9] = np.array([0, 0, 0, 0, 0, 0])
+
+            action[:9] += getattr(self, f'cur_eef_action_tf_{arm[0]}').to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
         return action
     
     def _update_eef_tf(self, action, arm='left'):
@@ -535,30 +570,42 @@ class KuavoBaseRosEnv(gym.Env):
 
     def exec_action(self, action):
         """执行机械臂与末端执行器动作"""
-        if not self.only_arm:
-            return
+        # if not self.only_arm:
+        #     return
+
+        def safe_control_arm(target_position):
+            try:
+                self.robot.control_arm_joint_positions(target_position)
+            except RuntimeError as e:
+                # 当机器人处于 command_pose_world 状态（底盘移动）时，无法控制手臂
+                if "must be in stance state" in str(e):
+                    log_robot.warning(f"⚠️  无法发送手臂命令：机器人当前状态不允许 (可能正在底盘移动)")
+                    log_robot.debug(f"   详细错误: {e}")
+                else:
+                    raise
+
 
         if self.which_arm == 'both':
             left_joints, left_eef = action[:7], action[7]
             right_joints, right_eef = action[8:15], action[15]
             target_position = np.concatenate((left_joints, right_joints), axis=0)
-            self.robot.control_arm_joint_positions(target_position)
+            safe_control_arm(target_position)
             self._control_eef(left_eef, right_eef)
 
         elif self.which_arm == 'left':
             left_joints, left_eef = action[:7], action[7]
             target_position = np.concatenate((left_joints, self.arm_init[7:14]), axis=0)
-            self.robot.control_arm_joint_positions(target_position)
+            safe_control_arm(target_position)
             self._control_eef(left_eef, 0)
 
         elif self.which_arm == 'right':
             right_joints, right_eef = action[:7], action[7]
             target_position = np.concatenate((self.arm_init[:7], right_joints), axis=0)
-            self.robot.control_arm_joint_positions(target_position)
+            safe_control_arm(target_position)
             self._control_eef(0, right_eef)
-
         else:
             raise KeyError(f"Unsupported which_arm: {self.which_arm}")
+
 
 
     def _control_eef(self, left_eef, right_eef):

@@ -111,7 +111,6 @@ def main(config_path: str, env: gym.Env):
     # load config
     cfg = load_inference_config(config_path)
 
-    use_delta = cfg.use_delta
     eval_episodes = cfg.eval_episodes
     seed = cfg.seed
     start_seed = cfg.start_seed
@@ -204,27 +203,6 @@ def main(config_path: str, env: gym.Env):
 
                 numpy_action = action.squeeze(0).cpu().numpy()
                 log_model.debug(f"numpy_action: {numpy_action}")
-
-                # Clip the action to the action space limits
-                if use_delta:
-                    if env.real:
-                        if env.which_arm == "both":
-                            for i in [(0, 7), (8, 15)]:
-                                numpy_action[i[0]:i[1]] = np.clip(numpy_action[i[0]:i[1]], -0.05, 0.05) + env.start_state[i[0]:i[1]]
-                            env.start_state = np.concatenate([
-                                np.clip(numpy_action[0:7], env.action_space.low[0:7], env.action_space.high[0:7]),
-                                np.clip(numpy_action[8:15], env.action_space.low[8:15], env.action_space.high[8:15])
-                            ])
-                        else:
-                            numpy_action[:7] = np.clip(numpy_action[:7], -0.05, 0.05) + env.start_state[:7]
-                            env.start_state = np.clip(numpy_action[:7], env.action_space.low[:7], env.action_space.high[:7])
-                    else:
-                        if env.which_arm == "both":
-                            numpy_action[:7] = np.clip(numpy_action[:7], -0.1, 0.1)
-                            numpy_action[8:15] = np.clip(numpy_action[8:15], -0.1, 0.1)
-                            numpy_action[7] = np.clip(numpy_action[7], -0.05, 0.05)
-                            numpy_action[15] = np.clip(numpy_action[15], -0.05, 0.05)
-                            numpy_action += observation["observation.state"].squeeze(0).cpu().numpy()
 
                 # 执行动作
                 observation, reward, terminated, truncated, info = env.step(numpy_action)

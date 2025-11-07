@@ -481,3 +481,38 @@ if __name__ == "__main__":
         to_rep= "quat"  
     )
     print(right_ee_pose_quat)
+
+
+def calculate_eepose_delta_Tinv(last_output_action,output_action):
+
+    T_l_1 = Transform.from_rep(from_rep="rotation_6d",tfs=last_output_action[:9])
+    T_l_2 = Transform.from_rep(from_rep="rotation_6d",tfs=output_action[:9])
+    T_l_delta = T_l_1.inverse() * T_l_2
+    l_delta_rotation_6d = T_l_delta.to_rep("rotation_6d")
+
+    T_r_1 = Transform.from_rep(from_rep="rotation_6d",tfs=last_output_action[10:19])
+    T_r_2 = Transform.from_rep(from_rep="rotation_6d",tfs=output_action[10:19])
+    T_r_delta = T_r_1.inverse() * T_r_2
+    r_delta_rotation_6d = T_r_delta.to_rep("rotation_6d")
+
+    o = np.concatenate((l_delta_rotation_6d,np.array([output_action[9]]), r_delta_rotation_6d, np.array([output_action[19]])),axis=0)
+
+    return o
+
+def calculate_eepose_delta_Tsub(last_output_action,output_action):
+
+    T_l_delta = output_action[:9] - last_output_action[:9]
+    T_r_delta = output_action[10:19] - last_output_action[10:19]
+
+    o = np.concatenate((T_l_delta,np.array([output_action[9]]), T_r_delta, np.array([output_action[19]])),axis=0)
+
+    return o
+
+def calculate_eepose_delta_rpysub(last_output_action,output_action):
+
+    T_l_delta = output_action[:6] - last_output_action[:6]
+    T_r_delta = output_action[7:13] - last_output_action[7:13]
+
+    o = np.concatenate((T_l_delta,np.array([output_action[6]]), T_r_delta, np.array([output_action[13]])),axis=0)
+
+    return o

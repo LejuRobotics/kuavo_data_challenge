@@ -67,7 +67,32 @@ def fk_changed_joint_angle_2_eepose6d(obs_state: np.ndarray, gripper_dim = 1)->n
                                 right_ee_pose_6d.flatten(), right_gripper])
     return out_state
 
+def fk_changed_joint_angle_2_eepose6d_rpy(obs_state: np.ndarray, gripper_dim = 1)->np.ndarray: 
+    '''
+    obs_state: (dim, ) np.array([joint1, joint2, ..., gripper_left, joint1, joint2, ..., gripper_right])
+    out_state: (16, )
+    '''
+    half_dim = obs_state.shape[0] // 2
+    end_joint_dim = obs_state.shape[0] - gripper_dim
+    left_joint_angles = obs_state[0:(half_dim-gripper_dim)]
+    right_joint_angles = obs_state[half_dim:end_joint_dim]
+    joint_angles = np.concatenate([left_joint_angles, right_joint_angles]).tolist()
+    hand_poses = fk_srv_client(joint_angles)
+    left_ee_pos = hand_poses.left_pose.pos_xyz
+    left_ee_pose_quat = np.concatenate([left_ee_pos, hand_poses.left_pose.quat_xyzw])
+    right_ee_pos = hand_poses.right_pose.pos_xyz
+    right_ee_pose_quat = np.concatenate([right_ee_pos, hand_poses.right_pose.quat_xyzw])
 
+    left_ee_pose_rpy = Transform.convert(tf=left_ee_pose_quat, from_rep="quat", to_rep="euler", seq="ZYX", degrees=False)
+    right_ee_pose_rpy = Transform.convert(tf=right_ee_pose_quat, from_rep="quat", to_rep="euler", seq="ZYX", degrees=False)
+
+    left_gripper = obs_state[(half_dim-gripper_dim):half_dim] 
+    right_gripper = obs_state[-gripper_dim:]
+    out_state = np.concatenate([left_ee_pose_rpy, left_gripper])
+    out_state = np.concatenate([out_state, right_ee_pose_rpy])
+    out_state = np.concatenate([out_state, right_gripper])
+
+    return out_state
 
 if __name__ == "__main__":
     # rospy.init_node("example_fk_srv_node", anonymous=True)

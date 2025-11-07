@@ -28,6 +28,7 @@ class Config:
     is_binary: bool
     delta_action: bool
     relative_start: bool
+    eefpose_type: str
 
     # control_mode settings
     control_mode: str
@@ -146,6 +147,7 @@ def load_config(cfg) -> Config:
         is_binary=OmegaConf.select(cfg, 'dataset.is_binary', default=False),
         delta_action=OmegaConf.select(cfg, 'dataset.delta_action', default=False),
         relative_start=OmegaConf.select(cfg, 'dataset.relative_start', default=False),
+        eefpose_type=OmegaConf.select(cfg, 'dataset.eefpose_type', default="Tsub"),
         resize=resize_config,
         task_description=OmegaConf.select(cfg, 'dataset.task_description', default="Pick and Place Task"),
         control_mode=OmegaConf.select(cfg, 'dataset.control_mode', default="joint"),
