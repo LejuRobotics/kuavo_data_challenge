@@ -184,6 +184,7 @@ class ResnetDepthEncoder(nn.Module):
                 func=lambda x: nn.GroupNorm(num_groups=max(1, x.num_features // 16), num_channels=x.num_features),
             )
         images_shape = next(iter(config.depth_features.values())).shape
+        
         if config.resize_shape is not None:
             dummy_shape_h_w = config.resize_shape
         elif config.crop_shape is not None:
@@ -194,7 +195,8 @@ class ResnetDepthEncoder(nn.Module):
                 dummy_shape_h_w = config.crop_shape
         else:
             dummy_shape_h_w = images_shape[1:]
-        dummy_shape = (1, images_shape[0], *dummy_shape_h_w)
+        dummy_shape = (1, 1, *dummy_shape_h_w)
+
         feature_map_shape = get_output_shape(self.backbone, dummy_shape)[1:]
         self.pool = SpatialSoftmax(feature_map_shape, num_kp=config.spatial_softmax_num_keypoints)
         self.feature_dim = config.spatial_softmax_num_keypoints * 2
