@@ -28,8 +28,8 @@ training:
     accumulation_steps: 1  # 梯度累积步数，自定义
     ema_power: 0.75  # 如果使用ema移动指数平均方法可使用这个参数，目前测试使用ema会掉性能，所以代码中不再支持
 
-    batch_size: 64  # 批次大小
-    num_workers: 8  # dataloader的num_workers
+    batch_size: 32  # 批次大小
+    num_workers: 4  # dataloader的num_workers
     drop_last: False  # 是否丢弃最后一个不完整的batch
 
     # 最大训练步数，用于控制学习率调整器，如果指定了 `max_training_step`，则它将优先生效，否则，该值将根据上述的 `max_epoch` 自动确定。
@@ -39,7 +39,7 @@ training:
 
     # resume training，断点续训
     resume: true
-    resume_timestamp: "run_20251107_112648"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    resume_timestamp: "run_20251110_104721"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
     RGB_Augmenter:
@@ -115,7 +115,7 @@ policy:
     crop_is_random: True
     crop_shape: [420, 560]  #  [84, 84] [420, 742]
 
-    use_amp: True  # 是否使用混合精度训练
+    use_amp: False  # 是否使用混合精度训练
 
     # 模型相关超参数设置
     vision_backbone: resnet18 # resnet18, dinov3_vits16

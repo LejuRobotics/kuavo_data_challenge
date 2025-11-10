@@ -275,6 +275,8 @@ def main(cfg: DictConfig):
     # Build policy
     policy = build_policy(cfg.policy_name, policy_cfg)
     preprocessor, postprocessor = make_pre_post_processors(policy_cfg, dataset_stats=dataset_metadata.stats)
+    preprocessor.save_pretrained(output_directory)
+    postprocessor.save_pretrained(output_directory)
     optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"])
     
     # Initialize AMP GradScaler if use_amp is True
@@ -288,7 +290,7 @@ def main(cfg: DictConfig):
             return nullcontext()
         if device.type == "cuda":
             if has_torch_autocast:
-                return torch.autocast(device_type="cuda")
+                return torch.autocast(device_type="cuda", dtype=torch.float16, enabled=enabled)  # noqa
             else:
                 from torch.cuda.amp import autocast as cuda_autocast  # noqa
                 return cuda_autocast()
@@ -378,6 +380,7 @@ def main(cfg: DictConfig):
     # ipdb.set_trace()
     sampler = build_sampler(dataset=dataset, use_custom=cfg.training.use_custom_sampler)
     # Training loop
+    aug_step = insert_before_normalizer(preprocessor, AugmentationProcessorStep(image_transforms, dataset.meta.camera_keys))  # just for training
     for epoch in range(start_epoch, cfg.training.max_epoch):
         dataloader = DataLoader(
             dataset,
@@ -392,7 +395,6 @@ def main(cfg: DictConfig):
 
         epoch_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{cfg.training.max_epoch}")
 
-        aug_step = insert_before_normalizer(preprocessor, AugmentationProcessorStep(image_transforms, dataset.meta.camera_keys))  # just for training
         
         total_loss = 0.0
         for batch in epoch_bar:
@@ -475,10 +477,6 @@ def main(cfg: DictConfig):
         # Save last checkpoint (includes AMP scaler & progress for perfect resume)
         # Save last checkpoint
         policy.save_pretrained(output_directory)
-
-        remove_aug_step(preprocessor, aug_step)
-        preprocessor.save_pretrained(output_directory)
-        postprocessor.save_pretrained(output_directory)
 
         # Save training state including optimizer, scheduler, scaler, and step/epoch info
         checkpoint = {
