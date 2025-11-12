@@ -564,7 +564,6 @@ class KuavoRosbagReader:
 
         print(f"Aligned {key}: {len((data[main_timeline]))} -> {len(next(iter(aligned_data.values())))}")
         for k, v in aligned_data.items():
-            print(k,v)
             if len(v) > 0:
                 print(v[0]['timestamp'], v[1]['timestamp'],"length", k,len(v))
         return aligned_data
