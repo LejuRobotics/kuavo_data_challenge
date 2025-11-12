@@ -8,21 +8,17 @@ import gymnasium as gym
 import time
 import sys
 from kuavo_humanoid_sdk import KuavoSDK, KuavoRobot, KuavoRobotState, DexterousHand
-from kuavo_humanoid_sdk.msg.kuavo_msgs.msg import ikSolveParam, lejuClawCommand,sensorsData,lejuClawState, twoArmHandPoseCmd
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.config import KuavoConfig
 from kuavo_deploy.utils.ros_manager import ROSManager
 import traceback
-from scipy.spatial.transform import Rotation as R
-from kuavo_deploy.utils.kinetic_func import fk_compute_func, ik_compute_func, fkSrv, twoArmHandPoseCmdSrv
 import torch
 from torchvision.transforms.functional import to_tensor
 from kuavo_deploy.utils.obs_buffer import ObsBuffer
 from kuavo_deploy.utils.signal_controller import ControlSignalManager
-from kuavo_data.common.R_Transform import Transform
+
 
 log_robot = setup_logger("robot")
-
 
 
 class KuavoBaseRosEnv(gym.Env):
@@ -39,7 +35,6 @@ class KuavoBaseRosEnv(gym.Env):
         self.bridge = CvBridge()
         self._set_observation_space()
         self._set_action_space()
-        self._set_ik_param()
         self._init_kuavo_sdk()
         self._set_ros_topics()
         
@@ -49,7 +44,6 @@ class KuavoBaseRosEnv(gym.Env):
 
     def _set_config(self, config_kuavo_env):
         """设置配置参数"""
-        self.real = config_kuavo_env.real
         self.ros_rate = config_kuavo_env.ros_rate
         self.control_mode = config_kuavo_env.control_mode
         self.obs_key_map = config_kuavo_env.obs_key_map
@@ -61,10 +55,7 @@ class KuavoBaseRosEnv(gym.Env):
         self.is_binary = config_kuavo_env.is_binary
         self.head_init = config_kuavo_env.head_init
         self.arm_init = np.array([0]*14)
-        self.fk_joint_angles_for_reset = config_kuavo_env.fk_joint_angles_for_reset
-        self.rotation_threshold = config_kuavo_env.rotation_threshold
 
-        self.use_delta = config_kuavo_env.use_delta
 
         # 从配置中获取limits部分
         self.limits = config_kuavo_env.limits
@@ -154,7 +145,8 @@ class KuavoBaseRosEnv(gym.Env):
                     )
 
             elif self.control_mode == 'eef':
-                key = 'eef_relative' if self.use_delta else 'eef'
+                # key = 'eef_relative' if self.use_delta else 'eef'
+                key = 'eef'
                 inf_pad = [-np.inf] * 6
                 inf_pad_pos = [np.inf] * 6
 
@@ -196,19 +188,6 @@ class KuavoBaseRosEnv(gym.Env):
             dtype=np.float64,
         )
 
-    def _set_ik_param(self):
-        """设置逆向运动学参数"""
-        self.ik_solve_param = ikSolveParam()
-        # snopt params
-        self.ik_solve_param.major_optimality_tol = 1e-3
-        self.ik_solve_param.major_feasibility_tol = 1e-3
-        self.ik_solve_param.minor_feasibility_tol = 1e-3
-        self.ik_solve_param.major_iterations_limit = 100
-        # constraint and cost params
-        self.ik_solve_param.oritation_constraint_tol= 1e-3
-        self.ik_solve_param.pos_constraint_tol = 1e-3 # 0.001m, work when pos_cost_weight==0.0
-        self.ik_solve_param.pos_cost_weight = 0.0 # If U need high accuracy, set this to 0.0 !!!
-
     def _init_kuavo_sdk(self):
         """初始化Kuavo SDK"""
         if not KuavoSDK().Init():
@@ -221,13 +200,12 @@ class KuavoBaseRosEnv(gym.Env):
         """设置ROS话题"""
         self.rate = rospy.Rate(self.ros_rate)
         
-        if self.only_arm:
-            if self.eef_type == 'rq2f85':
-                self.pub_eef_joint = self.ros_manager.register_publisher('/gripper/command', JointState, queue_size=10)
-            elif self.eef_type == 'leju_claw':
-                self.lejuclaw = LejuClaw()
-            elif self.eef_type == 'qiangnao':
-                self.qiangnao = DexterousHand()
+        if self.eef_type == 'rq2f85':
+            self.pub_eef_joint = self.ros_manager.register_publisher('/gripper/command', JointState, queue_size=10)
+        elif self.eef_type == 'leju_claw':
+            self.lejuclaw = LejuClaw()
+        elif self.eef_type == 'qiangnao':
+            self.qiangnao = DexterousHand()
         # obs buffer 初始化            
         self.obs_buffer.wait_buffer_ready()
 
@@ -239,15 +217,11 @@ class KuavoBaseRosEnv(gym.Env):
         self._reset_eef()
 
         # === 平均当前观测和位姿 ===
-        avg_data = self._compute_average_state(fk_compute_func=fk_compute_func, average_num=10)
+        avg_data = self._compute_average_state(average_num=10)
 
         # === 更新状态 ===
         self.cur_state = avg_data["state"]
         self.cur_joint_angles_action = avg_data["joint_action"]
-        self.cur_eef_tf_l = avg_data["eef_tf_l"]
-        self.cur_eef_tf_r = avg_data["eef_tf_r"]
-        self.cur_eef_action_tf_l = avg_data["eef_tf_l"]
-        self.cur_eef_action_tf_r = avg_data["eef_tf_r"]
 
         obs = self.get_obs()
         self.sleep_time = 0
@@ -272,8 +246,6 @@ class KuavoBaseRosEnv(gym.Env):
     # 子函数 3. 末端执行器（夹爪）复位
     # ==========================================================
     def _reset_eef(self):
-        if not self.real:
-            return
         if self.which_arm == 'both':
             if self.eef_type == 'qiangnao':
                 self.qiangnao.control(target_positions=[0, 100, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0], target_velocities=None, target_torques=None)
@@ -295,18 +267,12 @@ class KuavoBaseRosEnv(gym.Env):
     # ==========================================================
     # 子函数 4. 求平均状态与末端姿态
     # ==========================================================
-    def _compute_average_state(self, fk_compute_func, average_num=10):
-        quat_list_l, quat_list_r = [], []
-        cur_eef_pos_l, cur_eef_pos_r = np.zeros(3), np.zeros(3)
+    def _compute_average_state(self, average_num=10):
         state_sum, joint_sum = None, None
 
         for i in range(average_num):
             state = self.get_obs()
             fk_joint_angles = self._get_init_joint_angles(self.arm_state["joint_q"])
-            eef_state = fk_compute_func(list(fk_joint_angles))
-
-            quat_l = np.array(eef_state.left_pose.quat_xyzw)
-            quat_r = np.array(eef_state.right_pose.quat_xyzw)
 
             if i == 0:
                 state_sum = np.array(state["observation.state"], dtype=float)
@@ -314,27 +280,15 @@ class KuavoBaseRosEnv(gym.Env):
             else:
                 state_sum += np.array(state["observation.state"], dtype=float)
                 joint_sum += fk_joint_angles
-
-            cur_eef_pos_l += np.array(eef_state.left_pose.pos_xyz)
-            cur_eef_pos_r += np.array(eef_state.right_pose.pos_xyz)
-            quat_list_l.append(quat_l)
-            quat_list_r.append(quat_r)
-
             time.sleep(0.001)
 
         # 平均计算
         avg_state = state_sum / average_num
         avg_joint = joint_sum / average_num
-        avg_pos_l = cur_eef_pos_l / average_num
-        avg_pos_r = cur_eef_pos_r / average_num
-        rot_l = R.from_quat(quat_list_l).mean()
-        rot_r = R.from_quat(quat_list_r).mean()
 
         return {
             "state": avg_state,
             "joint_action": avg_joint,
-            "eef_tf_l": Transform(rotation=rot_l, translation=avg_pos_l),
-            "eef_tf_r": Transform(rotation=rot_r, translation=avg_pos_r),
         }
 
     # ==========================================================
@@ -368,41 +322,7 @@ class KuavoBaseRosEnv(gym.Env):
                 action = np.clip(action, self.action_space.low, self.action_space.high)
             return action
 
-        # ------- 通用 EEF 限制检查 -------
-        if mode in ['eef_abs', 'eef_rel']:
-            limit_key = 'eef' if mode == 'eef_abs' else 'eef_relative'
-            eef_min = self.limits[limit_key]['min']
-            eef_max = self.limits[limit_key]['max']
-
-            # 内部辅助函数：对某一机械臂检查并裁剪动作
-            def _clip_eef_action(a_slice, idx_range, arm_name):
-                tf = Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=a_slice)
-                rpy = tf.to_rep(to_rep='euler', seq='ZYX', degrees=False)
-                min_lim, max_lim = eef_min[idx_range], eef_max[idx_range]
-
-                if np.any(rpy < min_lim) or np.any(rpy > max_lim):
-                    log_robot.warning(
-                        f"{arm_name} eef {mode} action out of range, "
-                        f"action: {rpy}, min: {min_lim}, max: {max_lim}"
-                    )
-                    rpy = np.clip(rpy, min_lim, max_lim)
-                    tf = Transform.from_rep(from_rep='euler', seq='ZYX', tfs=rpy)
-                    a_slice = tf.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
-                return a_slice
-
-            if self.which_arm == 'left':
-                action[:9] = _clip_eef_action(action[:9], slice(0, 6), 'left')
-            elif self.which_arm == 'right':
-                action[:9] = _clip_eef_action(action[:9], slice(6, 12), 'right')
-            elif self.which_arm == 'both':
-                action[:9] = _clip_eef_action(action[:9], slice(0, 6), 'left')
-                action[10:19] = _clip_eef_action(action[10:19], slice(6, 12), 'right')
-            else:
-                raise KeyError(f"Unsupported which_arm: {self.which_arm}")
-
-            return action
-
-        raise ValueError(f"Unknown mode: {mode}")
+        raise ValueError(f"Unsupported mode: {mode}")
 
 
 
@@ -429,22 +349,14 @@ class KuavoBaseRosEnv(gym.Env):
             # 如果不执行base移动，则执行手部动作，此时使用action的前面部分
             action = action[:-4]
 
-        if self.control_mode == 'eef':
-            action, ik_action = self._process_eef_action(action)
-        else:
-            ik_action = None
-
-        t2 = time.time()
-        log_robot.info(f"eef time: {t2 - t1:.3f}s")
 
         # === 4. 执行动作 ===
-        self.cur_joint_angles_action = (
-            ik_action if self.control_mode == 'eef'
-            else np.concatenate((action[:7], action[8:15]), axis=0)
-        )
+        t2 = time.time()
+        self.cur_joint_angles_action = np.concatenate((action[:7], action[8:15]), axis=0)
         self.exec_action(action)
 
         # === 5. 延时与观测 ===
+        
         self.rate.sleep()
         self._record_sleep_time(t2)
 
@@ -455,113 +367,7 @@ class KuavoBaseRosEnv(gym.Env):
         # === 6. 奖励与返回 ===
         reward = self.compute_reward()
         return obs, reward, False, False, {}
-
-
-    def _process_eef_action(self, action):
-        """处理末端执行器(EFF)的相对或绝对动作与IK求解"""
-        action = self._process_arm_delta(action, arm=self.which_arm) if self.use_delta else action
-        action = self.check_action(action, mode='eef_abs')
-        self._update_eef_tf(action, arm=self.which_arm)
-        ik_action = self._compute_ik(action, arm=self.which_arm)
-        if self.which_arm == 'both':
-            action = np.concatenate((
-                ik_action[:7], [action[9]], ik_action[7:14], [action[19]]
-            ), axis=0)
-        else:
-            arm = self.which_arm
-            idx = 7 if arm == 'left' else 14
-            action = np.concatenate((ik_action[idx-7:idx], [action[9]]), axis=0)
-        return action, ik_action
     
-
-    def _process_arm_delta(self, action, arm='left'):
-        action = self.check_action(action, mode='eef_rel')
-        """处理增量式末端动作"""
-        if arm == 'both':
-            delta_l = Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=action[:9])
-            delta_r = Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=action[10:19])
-            self.cur_eef_action_tf_l *= delta_l
-            self.cur_eef_action_tf_r *= delta_r
-            action[:9] = self.cur_eef_action_tf_l.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
-            action[10:19] = self.cur_eef_action_tf_r.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
-        else:
-            delta = Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=action[:9])
-            cur_tf = getattr(self, f'cur_eef_action_tf_{arm[0]}') * delta
-            action[:9] = cur_tf.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
-        return action
-    
-    def _process_arm_delta_add(self, action, arm='left'):
-        action = self.check_action(action, mode='eef_rel')
-        """处理增量式末端动作"""
-        if arm == 'both':
-            # 如果设置了rotation_threshold，对旋转部分进行阈值过滤
-            if self.rotation_threshold is not None:
-                # action格式：[pos_x, pos_y, pos_z, rot_6d(6), gripper, pos_x, pos_y, pos_z, rot_6d(6), gripper]
-                # 左臂旋转部分在 action[3:9]，右臂旋转部分在 action[13:19]
-                if np.max(np.abs(action[3:9])) < self.rotation_threshold:
-                    action[3:9] = np.array([0, 0, 0, 0, 0, 0])
-                if np.max(np.abs(action[13:19])) < self.rotation_threshold:
-                    action[13:19] = np.array([0, 0, 0, 0, 0, 0])
-            action[:9] += self.cur_eef_action_tf_l.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
-            action[10:19] += self.cur_eef_action_tf_r.to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
-        else:
-            # 如果设置了rotation_threshold，对旋转部分进行阈值过滤
-            if self.rotation_threshold is not None:
-                # action格式：[pos_x, pos_y, pos_z, rot_6d(6), gripper]
-                # 左臂旋转部分在 action[3:9]
-                if np.max(np.abs(action[3:9])) < self.rotation_threshold:
-                    action[3:9] = np.array([0, 0, 0, 0, 0, 0])
-
-            action[:9] += getattr(self, f'cur_eef_action_tf_{arm[0]}').to_rep(to_rep='rotation_6d', seq='ZYX', degrees=False)
-        return action
-    
-    def _update_eef_tf(self, action, arm='left'):
-        """更新末端执行器的绝对位姿"""
-        if arm == 'both':
-            self.cur_eef_action_tf_l = Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=action[:9])
-            self.cur_eef_action_tf_r = Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=action[10:19])
-        else:
-            setattr(
-                self,
-                f'cur_eef_action_tf_{arm[0]}',
-                Transform.from_rep(from_rep='rotation_6d', seq='ZYX', tfs=action[:9])
-            )
-    
-    def _compute_ik(self,action, arm='both'):
-
-        if arm == 'left':
-            left_tf, right_tf = self.cur_eef_action_tf_l, self.cur_eef_tf_r
-            left_q, right_q = self.cur_joint_angles_action[:7], self.arm_init[7:14]
-        elif arm == 'right':
-            left_tf, right_tf = self.cur_eef_tf_l, self.cur_eef_action_tf_r
-            left_q, right_q = self.arm_init[:7], self.cur_joint_angles_action[7:14]
-        else:
-            left_tf, right_tf = self.cur_eef_action_tf_l, self.cur_eef_action_tf_r
-            left_q, right_q = self.cur_joint_angles_action[:7], self.cur_joint_angles_action[7:14]
-        ik_action = self._get_ik_action(
-            left_tf=left_tf,
-            right_tf=right_tf,
-            left_q=left_q,
-            right_q=right_q,
-        )
-        return ik_action
-
-
-    def _get_ik_action(self, left_tf, right_tf, left_q, right_q):
-        msg = twoArmHandPoseCmd()
-        msg.ik_param = self.ik_solve_param
-        msg.use_custom_ik_param = True
-        msg.joint_angles_as_q0 = True
-        msg.hand_poses.left_pose.quat_xyzw = left_tf.rotation.as_quat()
-        msg.hand_poses.left_pose.pos_xyz = left_tf.translation
-        msg.hand_poses.left_pose.joint_angles = left_q
-        msg.hand_poses.right_pose.quat_xyzw = right_tf.rotation.as_quat()
-        msg.hand_poses.right_pose.pos_xyz = right_tf.translation
-        msg.hand_poses.right_pose.joint_angles = right_q
-        ik_action = ik_compute_func(msg)
-        if np.max(ik_action)<1e-3:
-            ik_action = np.concatenate([left_q, right_q],axis=0)
-        return ik_action
     
     def _record_sleep_time(self, t_start):
         self.sleep_time = time.time() - t_start

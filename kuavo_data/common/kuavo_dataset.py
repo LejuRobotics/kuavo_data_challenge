@@ -52,7 +52,6 @@ def init_parameters(cfg):
     global ONLY_HALF_UP_BODY, USE_LEJU_CLAW, USE_QIANGNAO
     global USE_DEPTH, DEPTH_RANGE
     global TASK_DESCRIPTION
-    global CONTROL_MODE, STATE_TYPE, EEFPOSE_TYPE
 
     
     from .config_dataset import load_config
@@ -76,7 +75,6 @@ def init_parameters(cfg):
     IS_BINARY = config.is_binary
     DELTA_ACTION = config.delta_action
     RELATIVE_START = config.relative_start
-    EEFPOSE_TYPE = config.eefpose_type
 
     # 图像尺寸设置
     RESIZE_W = config.resize.width
@@ -89,9 +87,6 @@ def init_parameters(cfg):
 
     TASK_DESCRIPTION = config.task_description  # 任务描述
 
-    # 是否使用ee_pose_6d
-    CONTROL_MODE = config.control_mode
-    STATE_TYPE = config.state_type
 
 
 # ================ 数据处理函数定义 ==================
@@ -506,10 +501,10 @@ class KuavoRosbagReader:
             return gaps
         
         # 检查kuavo_arm_traj是否有断点，如果有则进行特殊处理
+        gaps = []
         if "action.kuavo_arm_traj" in data and len(data["action.kuavo_arm_traj"]) > 0:
             arm_traj_timestamps = [t['timestamp'] for t in data["action.kuavo_arm_traj"]]
             gaps = detect_timestamp_gaps(arm_traj_timestamps)
-            
             # 只有在检测到间隙时才进行特殊处理
             if len(gaps) > 0:
                 print(f"Detected {len(gaps)} gaps in action.kuavo_arm_traj, applying 999 flag processing")
@@ -556,7 +551,7 @@ class KuavoRosbagReader:
             stamp_sec = stamp
             for key, v in data.items():
                 # 跳过已经特殊处理的kuavo_arm_traj（只有在有间隙时才跳过）
-                if key == "action.kuavo_arm_traj" and "action.kuavo_arm_traj" in aligned_data:
+                if key == "action.kuavo_arm_traj" and len(gaps) > 0:
                     continue
 
                 if len(v) > 0:
@@ -569,6 +564,7 @@ class KuavoRosbagReader:
 
         print(f"Aligned {key}: {len((data[main_timeline]))} -> {len(next(iter(aligned_data.values())))}")
         for k, v in aligned_data.items():
+            print(k,v)
             if len(v) > 0:
                 print(v[0]['timestamp'], v[1]['timestamp'],"length", k,len(v))
         return aligned_data

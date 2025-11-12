@@ -29,13 +29,12 @@ training:
     ema_power: 0.75  # 如果使用ema移动指数平均方法可使用这个参数，目前测试使用ema会掉性能，所以代码中不再支持
 
     batch_size: 32  # 批次大小
-    num_workers: 4  # dataloader的num_workers
+    num_workers: 4  # dataloader的num_workers，请根据自己训练电脑的配置选择，否则可能会卡死
     drop_last: False  # 是否丢弃最后一个不完整的batch
 
     # 最大训练步数，用于控制学习率调整器，如果指定了 `max_training_step`，则它将优先生效，否则，该值将根据上述的 `max_epoch` 自动确定。
     # `max_epoch` 和 `max_training_step` 不会同时生效。
     max_training_step: null  
-    use_custom_sampler: False  # 是否使用自定义的采样器，默认true，使用自定义采样器可以让高差分点前后采样更密集
 
     # resume training，断点续训
     resume: true

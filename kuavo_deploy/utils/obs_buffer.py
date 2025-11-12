@@ -15,61 +15,17 @@ from kuavo_humanoid_sdk.msg.kuavo_msgs.msg import sensorsData,lejuClawState
 from kuavo_deploy.utils.signal_controller import ControlSignalManager
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.utils.ros_manager import ROSManager
-from kuavo_deploy.utils.kinetic_func import fk_compute_func
-from kuavo_data.common.R_Transform import Transform
+
+
 log_robot = setup_logger("robot")
 
-
-
-def process_eef_pose(eef_pose, which_arm='both'):
-    """
-    处理 FK service 返回的 eef_pose 数据
-    将其转换为适合存储的格式
-    
-    Args:
-        eef_pose: FK service 返回的 hand_poses
-        which_arm: 'left', 'right', 或 'both'
-        
-    Returns:
-        处理后的 eef pose 数据列表 [left_pos(3) + left_quat(4) + right_pos(3) + right_quat(4)]
-    """
-    if eef_pose is None:
-        return None
-    
-    eef_data = []
-    
-    if which_arm in ['left', 'both']:
-        # 左手位置和姿态
-        left_pos = list(eef_pose.left_pose.pos_xyz)  # [x, y, z]
-        left_quat = list(eef_pose.left_pose.quat_xyzw)  # [x, y, z, w]
-        left_rotation_6d = Transform.convert(tf=np.array(left_pos + left_quat), from_rep="quat", to_rep="rotation_6d")
-        eef_data.extend(list(left_rotation_6d))
-    
-    if which_arm in ['right', 'both']:
-        # 右手位置和姿态
-        right_pos = list(eef_pose.right_pose.pos_xyz)  # [x, y, z]
-        right_quat = list(eef_pose.right_pose.quat_xyzw)  # [x, y, z, w]
-        right_rotation_6d = Transform.convert(tf=np.array(right_pos + right_quat), from_rep="quat", to_rep="rotation_6d")
-        eef_data.extend(list(right_rotation_6d))
-    
-    return np.array(eef_data)
-
-
-# ================ 计算函数映射表 ================
-
-COMPUTE_FUNC_MAP = {
-    'eef_pose': lambda source_data, **kwargs: process_eef_pose(
-        fk_compute_func(source_data), 
-        which_arm=kwargs.get('which_arm', 'both')
-    ),
-}
 
 class ObsBuffer:
     def __init__(
         self, 
         config: KuavoConfig,  
         obs_key_map: Dict[str, Dict[str, Any]] = None,
-        compute_func_map: Dict[str, Callable] = COMPUTE_FUNC_MAP,
+        compute_func_map: Dict[str, Callable] = None,
     ) -> None:
         self.control_signal_manager = ControlSignalManager()
         self.ros_manager = ROSManager()

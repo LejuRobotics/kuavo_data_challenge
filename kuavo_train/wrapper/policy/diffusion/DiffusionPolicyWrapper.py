@@ -1,9 +1,5 @@
-from time import clock_settime
 from lerobot.policies.diffusion.modeling_diffusion import DiffusionPolicy
-from kuavo_train.utils.augmenter import (Augmenter,
-                                        DeterministicAugmenterColor,
-                                        DeterministicAugmenterGeo4Rgbds,
-                                        crop_image,
+from kuavo_train.utils.augmenter import (crop_image,
                                         resize_image)
 from torch import Tensor, nn
 import torch
