@@ -37,6 +37,7 @@ import torch
 from tqdm import tqdm
 
 from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
+from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
 from lerobot.policies.act.modeling_act import ACTPolicy
 from lerobot.utils.random_utils import set_seed
 import datetime
@@ -177,7 +178,7 @@ def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     if policy_type == 'diffusion':
         policy = CustomDiffusionPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     elif policy_type == 'act':
-        policy = ACTPolicy.from_pretrained(Path(pretrained_path),strict=True)
+        policy = CustomACTPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     elif policy_type == 'client':
         policy = PolicyClient()
     else:
@@ -447,9 +448,17 @@ def kuavo_eval_autotest(config: KuavoConfig):
                 log_robot.info("🛑 收到停止信号，退出机械臂运动")
                 return
             time.sleep(1)
-
-        result = run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory, json_file_path)
-        log_robot.info(f"Episode {episode+1} completed with return code: {result}")
+        try:
+            result = run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory, json_file_path)
+            log_robot.info(f"Episode {episode+1} completed with return code: {result}")
+        except Exception as e:
+            log_robot.error(f"Exception during episode {episode+1}: {e}")
+            log_robot.error(traceback.format_exc())
+            result = 0  # Treat as failure
+            safe_reset_service(reset_service)
+            init_evt.clear()
+            success_evt.clear()
+            break
 
         # 记录episode结果
         episode_end_time = datetime.datetime.now().isoformat()

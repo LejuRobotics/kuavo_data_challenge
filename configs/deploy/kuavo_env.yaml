@@ -29,9 +29,9 @@ env:
     head_cam_h: ["/cam_h/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 头部RGB相机话题，必选
     wrist_cam_l: ["/cam_l/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 左手腕RGB相机话题，请对应选择，与下至少选择一个
     wrist_cam_r: ["/cam_r/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 右手腕RGB相机话题，请对应选择，与上至少选择一个
-    # depth_h: ["/cam_h/depth/image_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 头部相机深度图话题，可与上述对应选
-    # depth_l: ["/cam_l/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 左手腕相机深度图话题，可与上述对应选
-    # depth_r: ["/cam_r/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 右手腕相机深度图话题，可与上述对应选
+    depth_h: ["/cam_h/depth/image_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 头部相机深度图话题，可与上述对应选
+    depth_l: ["/cam_l/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 左手腕相机深度图话题，可与上述对应选
+    depth_r: ["/cam_r/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 右手腕相机深度图话题，可与上述对应选
     joint_q: ["/sensors_data_raw", "sensorsData", 500]  # 关节角度话题，必选
     # qiangnao: ["/dexhand/state", "JointState", 500]  # 末端执行器的话题，灵巧手
     # leju_claw: ["/leju_claw_state", "lejuClawState", 500]  # 末端执行器的话题，夹爪
@@ -90,7 +90,7 @@ inference:
   start_seed: 42  # 回合开始时的随机种子，仿真中可用于固定各物体初始状态，便于复现  
   device: "cuda"  # or "cpu"
   task: "dev_task1"
-  method: "rgb_act"
-  timestamp: "run_20251111_190328" # 类似的运行时时间戳
-  epoch: 500  # 使用训练保存的哪一个epoch，可填50，100，best等，注意：代码将在outputs/train/<task>/<method>/<timestamp>/epoch<epoch>中load policy的模型参数
+  method: "rgb_depth_act"
+  timestamp: "run_20251112_221208" # 类似的运行时时间戳
+  epoch: best  # 使用训练保存的哪一个epoch，可填50，100，best等，注意：代码将在outputs/train/<task>/<method>/<timestamp>/epoch<epoch>中load policy的模型参数
   max_episode_steps: 200  # 最大回合步数，超过自动结束，可根据任务所需时长调整

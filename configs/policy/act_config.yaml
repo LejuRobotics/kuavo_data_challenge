@@ -27,7 +27,7 @@ training:
     accumulation_steps: 1  # 梯度累积步数，自定义
     ema_power: 0.75  # 如果使用ema移动指数平均方法可使用这个参数，目前测试使用ema会掉性能，所以代码中不再支持
 
-    batch_size: 64  # 批次大小，自行选择
+    batch_size: 32  # 批次大小，自行选择
     num_workers: 4  # dataloader的num_workers，请根据自己训练电脑的配置选择，否则可能会卡死
     drop_last: False  # 是否丢弃最后一个不完整的batch
 
@@ -36,7 +36,7 @@ training:
     max_training_step: null
 
     # resume training，断点续训
-    resume: True
+    resume: False
     resume_timestamp: "run_20251111_170234"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     scheduler_name: cosine  # 学习率调整器名称，仅在policy config中不包含该调度器时生效，否则会使用policy自带的调整器，相关参数也会在下方policy里
@@ -141,6 +141,7 @@ policy:
 
     custom:  # 一些自定义设置，是本代码仓库针对lerobot ACT policy的特色更改，包含深度数据支持等，可参考相关代码
       # support depth image
-      use_depth: True
+      use_depth: true
       depth_backbone: resnet18
+      pretrained_depth_backbone_weights: ResNet18_Weights.IMAGENET1K_V1
 

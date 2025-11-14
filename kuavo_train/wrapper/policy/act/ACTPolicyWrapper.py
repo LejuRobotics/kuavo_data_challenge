@@ -52,7 +52,7 @@ class CustomACTPolicyWrapper(ACTPolicy):
         
         if self.config.use_depth and self.config.depth_features:
             batch = dict(batch)  # shallow copy so that adding a key doesn't modify the original
-            batch[OBS_DEPTH] = [batch[key] for key in self.config.depth_features]
+            batch[OBS_DEPTH] = [batch[key].mean(dim=-3, keepdim=True) for key in self.config.depth_features]
 
         actions_hat, (mu_hat, log_sigma_x2_hat) = self.model(batch)
 

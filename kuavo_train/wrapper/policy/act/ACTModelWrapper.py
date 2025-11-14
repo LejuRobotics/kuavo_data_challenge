@@ -11,7 +11,7 @@ import torch.nn.functional as F  # noqa: N812
 import torchvision
 from torch import Tensor, nn
 
-from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGES, OBS_STATE
+from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGES, OBS_STATE, ACTION
 from lerobot.policies.utils import (
     get_device_from_parameters,
     get_dtype_from_parameters,
@@ -26,6 +26,39 @@ from lerobot.policies.act.modeling_act import (ACT,
 
 OBS_DEPTH = "observation.depth"
 
+class CrossModalAttentionFusion(nn.Module):
+    def __init__(self, embed_dim, num_heads):
+        super().__init__()
+        self.rgb_to_depth_attn = nn.MultiheadAttention(embed_dim, num_heads)
+        self.depth_to_rgb_attn = nn.MultiheadAttention(embed_dim, num_heads)
+        self.norm_rgb = nn.LayerNorm(embed_dim)
+        self.norm_depth = nn.LayerNorm(embed_dim)
+
+    def forward(self, rgb_tokens_list, depth_tokens_list):
+        """
+        rgb_tokens_list: list of tensors, each (H*W, B, C)
+        depth_tokens_list: list of tensors, each (H*W, B, C)
+        """
+        fused_rgb_list, fused_depth_list = [], []
+
+        for rgb_tokens, depth_tokens in zip(rgb_tokens_list, depth_tokens_list):
+            # 以 RGB 为 Query，Depth 为 Key/Value
+            rgb_q = rgb_tokens
+            depth_kv = depth_tokens
+            rgb_out, _ = self.rgb_to_depth_attn(query=rgb_q, key=depth_kv, value=depth_kv)
+            rgb_out = self.norm_rgb(rgb_out + rgb_tokens)   # 残差 + 归一化
+
+            # 以 Depth 为 Query，RGB 为 Key/Value
+            depth_q = depth_tokens
+            rgb_kv = rgb_tokens
+            depth_out, _ = self.depth_to_rgb_attn(query=depth_q, key=rgb_kv, value=rgb_kv)
+            depth_out = self.norm_depth(depth_out + depth_tokens)
+
+            fused_rgb_list.append(rgb_out)
+            fused_depth_list.append(depth_out)
+
+        return fused_rgb_list, fused_depth_list
+
 class CustomACTModelWrapper(ACT):
     def __init__(self, config: CustomACTConfigWrapper):
         # BERT style VAE encoder with input tokens [cls, robot_state, *action_sequence].
@@ -34,15 +67,10 @@ class CustomACTModelWrapper(ACT):
         
 
         if self.config.use_depth and self.config.depth_features:
-            self.modality_embed = nn.Parameter(torch.zeros(2, config.dim_model))
-            nn.init.normal_(self.modality_embed, std=0.02)
-            self.depth_gate_logit = nn.Parameter(torch.tensor(-2.0))
-            
-        if self.config.use_depth and self.config.depth_features:
-            depth_backbone_model = getattr(torchvision.models, config.vision_backbone)(
+            depth_backbone_model = getattr(torchvision.models, config.depth_backbone)(
                 replace_stride_with_dilation=[False, False, config.replace_final_stride_with_dilation],
-                weights=None,
-                # norm_layer=FrozenBatchNorm2d,
+                weights=config.pretrained_depth_backbone_weights,
+                norm_layer=FrozenBatchNorm2d,
             )
             if isinstance(depth_backbone_model.conv1, nn.Conv2d):
                 old_conv = depth_backbone_model.conv1
@@ -69,6 +97,8 @@ class CustomACTModelWrapper(ACT):
 
         if self.config.use_depth and self.config.depth_features:
             self.encoder_depth_feat_pos_embed = ACTSinusoidalPositionEmbedding2d(config.dim_model // 2)
+            self.cross_modal_fusion = CrossModalAttentionFusion(embed_dim=config.dim_model, num_heads=8)
+            self.cross_modal_fusion_proj = nn.Linear(config.dim_model * 2, config.dim_model)
 
 
     def forward(self, batch: dict[str, Tensor]) -> tuple[Tensor, tuple[Tensor, Tensor] | tuple[None, None]]:
@@ -93,25 +123,23 @@ class CustomACTModelWrapper(ACT):
             latent dimension.
         """
         if self.config.use_vae and self.training:
-            assert "action" in batch, (
+            assert ACTION in batch, (
                 "actions must be provided when using the variational objective in training mode."
             )
 
-        if "observation.images" in batch:
-            batch_size = batch["observation.images"][0].shape[0]
-        else:
-            batch_size = batch["observation.environment_state"].shape[0]
+        batch_size = batch[OBS_IMAGES][0].shape[0] if OBS_IMAGES in batch else batch[OBS_ENV_STATE].shape[0]
+        n_cam = len(batch[OBS_IMAGES]) if OBS_IMAGES in batch else 0
 
         # Prepare the latent for input to the transformer encoder.
-        if self.config.use_vae and "action" in batch and self.training:
+        if self.config.use_vae and ACTION in batch and self.training:
             # Prepare the input to the VAE encoder: [cls, *joint_space_configuration, *action_sequence].
             cls_embed = einops.repeat(
                 self.vae_encoder_cls_embed.weight, "1 d -> b 1 d", b=batch_size
             )  # (B, 1, D)
             if self.config.robot_state_feature:
-                robot_state_embed = self.vae_encoder_robot_state_input_proj(batch["observation.state"])
+                robot_state_embed = self.vae_encoder_robot_state_input_proj(batch[OBS_STATE])
                 robot_state_embed = robot_state_embed.unsqueeze(1)  # (B, 1, D)
-            action_embed = self.vae_encoder_action_input_proj(batch["action"])  # (B, S, D)
+            action_embed = self.vae_encoder_action_input_proj(batch[ACTION])  # (B, S, D)
 
             if self.config.robot_state_feature:
                 vae_encoder_input = [cls_embed, robot_state_embed, action_embed]  # (B, S+2, D)
@@ -129,7 +157,7 @@ class CustomACTModelWrapper(ACT):
             cls_joint_is_pad = torch.full(
                 (batch_size, 2 if self.config.robot_state_feature else 1),
                 False,
-                device=batch["observation.state"].device,
+                device=batch[OBS_STATE].device,
             )
             key_padding_mask = torch.cat(
                 [cls_joint_is_pad, batch["action_is_pad"]], axis=1
@@ -153,7 +181,7 @@ class CustomACTModelWrapper(ACT):
             mu = log_sigma_x2 = None
             # TODO(rcadene, alexander-soare): remove call to `.to` to speedup forward ; precompute and use buffer
             latent_sample = torch.zeros([batch_size, self.config.latent_dim], dtype=torch.float32).to(
-                batch["observation.state"].device
+                batch[OBS_STATE].device
             )
 
         # Prepare transformer encoder inputs.
@@ -161,56 +189,91 @@ class CustomACTModelWrapper(ACT):
         encoder_in_pos_embed = list(self.encoder_1d_feature_pos_embed.weight.unsqueeze(1))
         # Robot state token.
         if self.config.robot_state_feature:
-            encoder_in_tokens.append(self.encoder_robot_state_input_proj(batch["observation.state"]))
+            encoder_in_tokens.append(self.encoder_robot_state_input_proj(batch[OBS_STATE]))
         # Environment state token.
         if self.config.env_state_feature:
-            encoder_in_tokens.append(
-                self.encoder_env_state_input_proj(batch["observation.environment_state"])
-            )
-
+            encoder_in_tokens.append(self.encoder_env_state_input_proj(batch[OBS_ENV_STATE]))
+        
+        # encoder_in_tokens_campre = []
+        # encoder_in_pos_embed_campre = []
         if self.config.image_features:
             # For a list of images, the H and W may vary but H*W is constant.
             # NOTE: If modifying this section, verify on MPS devices that
             # gradients remain stable (no explosions or NaNs).
-            for img in batch["observation.images"]:
-                cam_features = self.backbone(img)["feature_map"]
-                cam_pos_embed = self.encoder_cam_feat_pos_embed(cam_features).to(dtype=cam_features.dtype)
-                cam_features = self.encoder_img_feat_input_proj(cam_features)
+            # for img in batch[OBS_IMAGES]:
+            #     cam_features = self.backbone(img)["feature_map"]
+            #     cam_pos_embed = self.encoder_cam_feat_pos_embed(cam_features).to(dtype=cam_features.dtype)
+            #     cam_features = self.encoder_img_feat_input_proj(cam_features)
 
-                # Rearrange features to (sequence, batch, dim).
-                cam_features = einops.rearrange(cam_features, "b c h w -> (h w) b c")
-                cam_pos_embed = einops.rearrange(cam_pos_embed, "b c h w -> (h w) b c")
-                if self.config.use_depth and self.config.depth_features:
-                    cam_features = cam_features + self.modality_embed[0].unsqueeze(0).unsqueeze(1)
-
-                # Extend immediately instead of accumulating and concatenating
-                # Convert to list to extend properly
-                encoder_in_tokens.extend(list(cam_features))
-                encoder_in_pos_embed.extend(list(cam_pos_embed))
-        
-        if self.config.use_depth and self.config.depth_features:
-            for depth in batch["observation.depth"]:
-                depth_features = self.depth_backbone(depth)["feature_map"]
-                depth_pos_embed = self.encoder_depth_feat_pos_embed(depth_features).to(dtype=depth_features.dtype)
-                depth_features = self.encoder_depth_feat_input_proj(depth_features)
-
-                depth_features = F.avg_pool2d(depth_features, kernel_size=2, stride=2)
-                depth_pos_embed = F.avg_pool2d(depth_pos_embed, kernel_size=2, stride=2)
-
-                depth_features = einops.rearrange(depth_features, "b c h w -> (h w) b c")
-                depth_pos_embed = einops.rearrange(depth_pos_embed, "b c h w -> (h w) b c")
-
-                depth_weight = torch.sigmoid(self.depth_gate_logit)
-                # print("depth_weight", depth_weight)
-                depth_features = depth_features * depth_weight
-                depth_pos_embed = depth_pos_embed * depth_weight
-                depth_features = depth_features + self.modality_embed[1].unsqueeze(0).unsqueeze(1)
-
-                encoder_in_tokens.extend(list(depth_features))
-                encoder_in_pos_embed.extend(list(depth_pos_embed))
+            #     # Rearrange features to (sequence, batch, dim).
+            #     cam_features = einops.rearrange(cam_features, "b c h w -> (h w) b c")
+            #     cam_pos_embed = einops.rearrange(cam_pos_embed, "b c h w -> (h w) b c")
                 
+            #     # Extend immediately instead of accumulating and concatenating
+            #     # Convert to list to extend properly
+            #     encoder_in_tokens_campre.extend(list(cam_features))
+            #     encoder_in_pos_embed_campre.extend(list(cam_pos_embed))
+            imgs = torch.cat(batch[OBS_IMAGES], dim=0)
 
+            cam_features = self.backbone(imgs)["feature_map"]              #  (n_cam*B, C', H', W')
+            cam_pos_embed = torch.cat([self.encoder_cam_feat_pos_embed(cam_features[i].unsqueeze(0)).to(dtype=cam_features.dtype) for i in range(n_cam)], dim=0)
+            cam_features = self.encoder_img_feat_input_proj(cam_features)
+
+            cam_features = cam_features.view(n_cam, batch_size, cam_features.size(1), cam_features.size(2), cam_features.size(3))
+            cam_pos_embed = cam_pos_embed.view(n_cam, batch_size, cam_pos_embed.size(1), cam_pos_embed.size(2), cam_pos_embed.size(3))
+
+            # rearrange 
+            cam_features = einops.rearrange(cam_features, "v b c h w -> v (h w) b c")
+            cam_pos_embed = einops.rearrange(cam_pos_embed, "v b c h w -> v (h w) b c")
+
+            # to list
+            encoder_in_tokens_campre = [cam_features[v] for v in range(n_cam)]
+            encoder_in_pos_embed_campre = [cam_pos_embed[v] for v in range(n_cam)]
+        else:
+            encoder_in_tokens_campre, encoder_in_pos_embed_campre = [], []
+
+        if self.config.use_depth and OBS_DEPTH in batch:
+            depths = torch.cat(batch[OBS_DEPTH], dim=0)  # (n_cam*B, 1, H, W)
+            depth_features = self.depth_backbone(depths)["feature_map"]
+            depth_pos_embed = torch.cat([self.encoder_depth_feat_pos_embed(depth_features[i].unsqueeze(0)).to(dtype=depth_features.dtype) for i in range(n_cam)], dim=0)
+            depth_features = self.encoder_depth_feat_input_proj(depth_features)
+
+            depth_features = depth_features.view(n_cam, batch_size, depth_features.size(1), depth_features.size(2), depth_features.size(3))
+            depth_pos_embed = depth_pos_embed.view(n_cam, batch_size, depth_pos_embed.size(1), depth_pos_embed.size(2), depth_pos_embed.size(3))
+
+            depth_features = einops.rearrange(depth_features, "v b c h w -> v (h w) b c")
+            depth_pos_embed = einops.rearrange(depth_pos_embed, "v b c h w -> v (h w) b c")
+
+            encoder_in_tokens_depthpre = [depth_features[v] for v in range(n_cam)]
+            encoder_in_pos_embed_depthpre = [depth_pos_embed[v] for v in range(n_cam)]
+        else:
+            encoder_in_tokens_depthpre, encoder_in_pos_embed_depthpre = [], []
+
+        if self.config.use_depth and self.config.depth_features:
+            fused_rgb_list, fused_depth_list = self.cross_modal_fusion(
+                encoder_in_tokens_campre, encoder_in_tokens_depthpre
+            )
+            for rgb_feat, depth_feat in zip(fused_rgb_list, fused_depth_list):
+                # 融合后的特征通过线性层进行降维
+                fused_feat = torch.cat([rgb_feat, depth_feat], dim=-1)  # (H*W, B, 2C)
+                fused_feat = self.cross_modal_fusion_proj(fused_feat)  # (H*W, B, C)
+                encoder_in_tokens.extend(list(fused_feat))
+
+            # fused_rgb_pos_list, fused_depth_pos_list = self.cross_modal_fusion(
+            #     encoder_in_pos_embed_campre, encoder_in_pos_embed_depthpre
+            # )
+            # encoder_in_pos_embed.extend(fused_rgb_pos_list)
+            # encoder_in_pos_embed.extend(fused_depth_pos_list)
+            # print("encoder_in_pos_embed_campre: ", [v.shape for v in encoder_in_pos_embed_campre])
+            for v in range(n_cam):
+                encoder_in_pos_embed.extend(list(encoder_in_pos_embed_campre[v]))
+            # encoder_in_pos_embed.extend(encoder_in_pos_embed_depthpre)
+        else:
+            for v in range(n_cam):
+                encoder_in_tokens.extend(list(encoder_in_tokens_campre[v]))
+                encoder_in_pos_embed.extend(list(encoder_in_pos_embed_campre[v]))
         # Stack all tokens along the sequence dimension.
+        # print("encoder token shape: ", [t.shape for t in encoder_in_tokens])
         encoder_in_tokens = torch.stack(encoder_in_tokens, axis=0)
         encoder_in_pos_embed = torch.stack(encoder_in_pos_embed, axis=0)
 
