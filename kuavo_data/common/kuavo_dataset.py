@@ -499,9 +499,10 @@ class KuavoRosbagReader:
                 if timestamps[i] - timestamps[i-1] > gap_threshold:
                     gaps.append(i)
             return gaps
-        
+
         # 检查kuavo_arm_traj是否有断点，如果有则进行特殊处理
         gaps = []
+
         if not ONLY_HALF_UP_BODY and "action.kuavo_arm_traj" in data and len(data["action.kuavo_arm_traj"]) > 0:
             arm_traj_timestamps = [t['timestamp'] for t in data["action.kuavo_arm_traj"]]
             gaps = detect_timestamp_gaps(arm_traj_timestamps)

@@ -12,7 +12,7 @@ timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
 # 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
 repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
 # root: "/media/yangzhou/Elements/lerobot_handover/lerobot"  # 你的本地转换好的lerobot数据的目录
-root: /media/yangzhou/80268D01268CFA04/data_test/task1_200test/lerobot/
+root: /media/yangzhou/80268D01268CFA04/datafactory/1104task4_lerobot_hb/lerobot/
 # root: null  # 如果不使用本地数据想使用huggingface官方数据，请在task中指定，例如pusht，aloha_sim_insertion_human，此处就设置为null空
 # 将去云端调用下载数据集
 
@@ -156,7 +156,7 @@ policy:
 
     custom:  # 一些自定义设置，是本代码仓库针对lerobot diffusion policy的特色更改，包含深度数据支持以及transformer模型等，可参考相关代码
       # support depth image
-      use_depth: false
+      use_depth: true
       depth_backbone: resnet18
       use_separate_depth_encoder_per_camera: False
 

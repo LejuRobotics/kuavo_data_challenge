@@ -334,12 +334,15 @@ pip --version # 查看pip对应的版本，看到确认输出为3.10的pip
 安装依赖：
 
 ```bash
+source /opt/ros/noetic/setup.bash  # 进入python环境先source好ros自带的python库，建议这行写入~/.bashrc
+
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple  # 建议首先换源，能加快下载安装速度
 
 pip install -r requirements_ilcode.txt   # 无需ROS Noetic，但只能使用kuavo_train模仿学习训练代码，kuavo_data（数转）及 kuavo_deploy（部署代码）均依赖ROS
 # 或
 pip install -r requirements_total.txt    # 需确保 ROS Noetic 已安装 (推荐)
 ```
+
 
 如果pip安装完毕但运行训练代码时报ffmpeg或torchcodec的错：
 

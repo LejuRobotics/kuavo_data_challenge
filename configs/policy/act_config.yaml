@@ -149,7 +149,7 @@ policy:
 
     custom:  # 一些自定义设置，是本代码仓库针对lerobot ACT policy的特色更改，包含深度数据支持等，可参考相关代码
       # support depth image
-      use_depth: False
+      use_depth: true
       depth_backbone: resnet18
       pretrained_depth_backbone_weights: ResNet18_Weights.IMAGENET1K_V1
 
