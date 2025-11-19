@@ -22,8 +22,6 @@ from kuavo_train.wrapper.policy.diffusion.transformer_diffusion import Transform
 # diffusers scheduler classes (factory expects these names)
 from diffusers.schedulers.scheduling_ddim import DDIMScheduler
 from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
-# from diffusers.schedulers.scheduling_flow_match_euler_discrete import FlowMatchEulerDiscreteScheduler
-from kuavo_train.wrapper.noise_scheduler.FlowMatchingWrapper import CustomFlowMatchEulerDiscreteSchedulerWrapper
 from diffusers import StableDiffusion3Pipeline
 OBS_DEPTH = "observation.depth"
 
@@ -36,8 +34,6 @@ def _make_noise_scheduler_factory(name: str, **kwargs: Dict[str, Any]):
         return DDPMScheduler(**kwargs)
     elif name == "DDIM":
         return DDIMScheduler(**kwargs)
-    elif name == "FlowMatch":
-        return CustomFlowMatchEulerDiscreteSchedulerWrapper(kwargs["num_train_timesteps"])
     else:
         raise ValueError(f"Unsupported noise scheduler type {name}")
 
@@ -115,10 +111,6 @@ class DiscreteStateEmbedding(nn.Module):
             return emb_flat.view(B, T, -1)
         return emb_flat  # (B, D * emb_dim)
 
-
-# ---------------------------
-# Vision / Depth encoders (ResNet and Dinov3 variants)
-# ---------------------------
 class ResnetRgbEncoder(nn.Module):
     def __init__(self, config: CustomDiffusionConfigWrapper):
         super().__init__()
@@ -210,40 +202,6 @@ class ResnetDepthEncoder(nn.Module):
         return x
 
 
-class Dinov3RgbEncoder(nn.Module):
-    def __init__(self, model_name: str = "dinov3_vits16"):
-        super().__init__()
-        REPO_DIR = "kuavo_train/wrapper/vision_backbones/dinov3"
-        dinov3_vits16 = torch.hub.load(REPO_DIR, 'dinov3_vits16', source='local',
-                                       weights="kuavo_train/wrapper/vision_backbones/dinov3/ckpts/dinov3_vits16_pretrain_lvd1689m-08c60483.pth")
-        self.model = dinov3_vits16
-        self.feature_dim = self.model.embed_dim
-    def forward(self, x: Tensor) -> Tensor:
-        return self.model(x)
-
-
-class Dinov3DepthEncoder(nn.Module):
-    def __init__(self, model_name: str = "dinov3_vits16"):
-        super().__init__()
-        REPO_DIR = "kuavo_train/wrapper/vision_backbones/dinov3"
-        dinov3_vits16 = torch.hub.load(REPO_DIR, 'dinov3_vits16', source='local',
-                                       weights="kuavo_train/wrapper/vision_backbones/dinov3/ckpts/dinov3_vits16_pretrain_lvd1689m-08c60483.pth")
-        if isinstance(dinov3_vits16.patch_embed.proj, nn.Conv2d):
-            old_conv = dinov3_vits16.patch_embed.proj
-            dinov3_vits16.patch_embed.proj = nn.Conv2d(
-                in_channels=1,
-                out_channels=old_conv.out_channels,
-                kernel_size=old_conv.kernel_size,
-                stride=old_conv.stride,
-                padding=old_conv.padding,
-                bias=old_conv.bias is not None
-            )
-            with torch.no_grad():
-                dinov3_vits16.patch_embed.proj.weight = nn.Parameter(old_conv.weight.mean(dim=1, keepdim=True))
-        self.model = dinov3_vits16
-        self.feature_dim = self.model.embed_dim
-    def forward(self, x: Tensor) -> Tensor:
-        return self.model(x)
 
 
 class DiffusionRgbEncoder(nn.Module):
@@ -252,8 +210,6 @@ class DiffusionRgbEncoder(nn.Module):
         self.config = config
         if "resnet" in config.vision_backbone:
             self.model = ResnetRgbEncoder(config)
-        elif "dinov3" in config.vision_backbone:
-            self.model = Dinov3RgbEncoder(model_name=config.vision_backbone)
         else:
             raise ValueError(f"Unknown vision backbone: {config.vision_backbone}")
         self.feature_dim = self.model.feature_dim
@@ -267,8 +223,6 @@ class DiffusionDepthEncoder(nn.Module):
         self.config = config
         if "resnet" in config.depth_backbone:
             self.model = ResnetDepthEncoder(config)
-        elif "dinov3" in config.depth_backbone:
-            self.model = Dinov3DepthEncoder(model_name=config.depth_backbone)
         else:
             raise ValueError(f"Unknown depth backbone: {config.depth_backbone}")
         self.feature_dim = self.model.feature_dim

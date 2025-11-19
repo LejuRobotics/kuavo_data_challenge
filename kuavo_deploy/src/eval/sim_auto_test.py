@@ -429,13 +429,18 @@ def kuavo_eval_autotest(config: KuavoConfig):
     reset_service = rospy.ServiceProxy('/simulator/reset', Trigger)
     # Ros service
     init_service = rospy.Service("/simulator/init", Trigger, env_init_service)
+
+
+    wait_times = 8
     while not init_evt.is_set():
         log_robot.info("Waiting for first env init...")
         if not check_control_signals():
             log_robot.info("🛑 收到停止信号，退出机械臂运动")
             return
         time.sleep(1)
-
+        wait_times -= 1
+        if wait_times <=0:
+            break
     safe_reset_service(reset_service)
     init_evt.clear()
 

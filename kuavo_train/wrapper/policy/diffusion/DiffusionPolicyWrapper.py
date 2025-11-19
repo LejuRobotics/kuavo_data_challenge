@@ -33,7 +33,7 @@ class CustomDiffusionPolicyWrapper(DiffusionPolicy):
         vision_backbone = config.vision_backbone
         config.vision_backbone = "resnet18"  # Change vision backbone to ResNet18
         # this is important to call the parent constructor to setup normalization and queues,
-        # to prevent original config not supported dinov3 vision backbone
+        # to prevent original config not supported other vision backbone
         # super().__init__(config, dataset_stats)
         noise_scheduler = config.noise_scheduler_type
         config.noise_scheduler_type = "DDPM"

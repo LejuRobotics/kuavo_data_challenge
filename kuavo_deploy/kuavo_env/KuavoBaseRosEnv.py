@@ -75,21 +75,21 @@ class KuavoBaseRosEnv(gym.Env):
         # -------- 构建 state 空间（joint_q + gripper） --------
         if 'joint_q' in self.obs_key_map:
             joint_min, joint_max = limits['joint_q']['min'], limits['joint_q']['max']
-            if self.which_arm in ['both', 'left']:
-                obs_low.extend(joint_min[:7])
-                obs_high.extend(joint_max[:7])
-            if self.which_arm in ['both', 'right']:
-                obs_low.extend(joint_min[7:14])
-                obs_high.extend(joint_max[7:14])
-
+        else:
+            joint_min, joint_max = [], []
         if 'gripper' in self.obs_key_map:
             grip_min, grip_max = limits['gripper']['min'], limits['gripper']['max']
-            if self.which_arm in ['both', 'left']:
-                obs_low.extend(grip_min[:1])
-                obs_high.extend(grip_max[:1])
-            if self.which_arm in ['both', 'right']:
-                obs_low.extend(grip_min[1:2])
-                obs_high.extend(grip_max[1:2])
+        else:
+            grip_min, grip_max = [], []
+        if self.which_arm == 'both':
+            obs_low.extend(joint_min[:7]+grip_min[:1]+joint_min[7:14]+grip_min[1:2])
+            obs_high.extend(joint_max[:7]+grip_max[:1]+joint_max[7:14]+grip_max[1:2])
+        if self.which_arm == 'left':
+            obs_low.extend(joint_min[:7]+grip_min[:1])
+            obs_high.extend(joint_max[:7]+grip_max[:1])
+        if self.which_arm == 'right':
+            obs_low.extend(joint_min[7:14]+grip_min[1:2])
+            obs_high.extend(joint_max[7:14]+grip_max[1:2])
 
         self.obs_low = np.array(obs_low)
         self.obs_high = np.array(obs_high)
@@ -140,8 +140,8 @@ class KuavoBaseRosEnv(gym.Env):
                     )
                 elif arm == 'both':
                     return (
-                        limits['joint_q']['min'] + limits['gripper']['min'],
-                        limits['joint_q']['max'] + limits['gripper']['max'],
+                        limits['joint_q']['min'][:7] + limits['gripper']['min'][:1]+limits['joint_q']['min'][7:14] + limits['gripper']['min'][1:2],
+                        limits['joint_q']['max'][:7] + limits['gripper']['max'][:1]+limits['joint_q']['max'][7:14] + limits['gripper']['max'][1:2],
                     )
 
             elif self.control_mode == 'eef':
@@ -359,10 +359,10 @@ class KuavoBaseRosEnv(gym.Env):
         
         self.rate.sleep()
         self._record_sleep_time(t2)
-
-        obs = self.get_obs()
         t3 = time.time()
-        log_robot.info(f"get obs time: {t3 - t2:.3f}s")
+        obs = self.get_obs()
+        t4 = time.time()
+        log_robot.info(f"get obs time: {t4 - t3:.3f}s")
 
         # === 6. 奖励与返回 ===
         reward = self.compute_reward()
@@ -473,10 +473,9 @@ class KuavoBaseRosEnv(gym.Env):
             self.arm_state['gripper'] = np.where(self.arm_state['gripper']>0.5, 1, 0)
 
         assert len(self.arm_state.keys()) >= 2, f"arm_state must have exactly 2 elements, but got {len(self.arm_state.keys())}"
-        
+
         state_keys = [k for k in self.arm_state_keys if k in self.arm_state]
-        # print(state_keys)
-        # raise ValueError
+
         arm_data = { "left": [], "right": [] }
 
         for key in state_keys:
@@ -498,8 +497,8 @@ class KuavoBaseRosEnv(gym.Env):
         obs["observation.state"] = np.concatenate(
             arm_data["left"] + arm_data["right"], axis=0
         )
-        log_robot.info(f"STATE: {obs['observation.state']}")
-        
+        log_robot.info(f"STATE: contained {state_keys}, concated value: {obs['observation.state']}")
+
         obs["observation.state"] = torch.from_numpy(obs["observation.state"]).float().unsqueeze(0)
         return obs    
 

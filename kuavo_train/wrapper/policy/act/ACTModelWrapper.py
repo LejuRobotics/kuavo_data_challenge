@@ -216,11 +216,12 @@ class CustomACTModelWrapper(ACT):
             imgs = torch.cat(batch[OBS_IMAGES], dim=0)
 
             cam_features = self.backbone(imgs)["feature_map"]              #  (n_cam*B, C', H', W')
-            cam_pos_embed = torch.cat([self.encoder_cam_feat_pos_embed(cam_features[i].unsqueeze(0)).to(dtype=cam_features.dtype) for i in range(n_cam)], dim=0)
+            pos_cam_input = einops.rearrange(cam_features, " (v b) c h w -> v b c h w", v=n_cam, b=batch_size)
+            cam_pos_embed = torch.cat([self.encoder_cam_feat_pos_embed(pos_cam_input[i]).to(dtype=cam_features.dtype) for i in range(n_cam)], dim=0)
             cam_features = self.encoder_img_feat_input_proj(cam_features)
 
             cam_features = cam_features.view(n_cam, batch_size, cam_features.size(1), cam_features.size(2), cam_features.size(3))
-            cam_pos_embed = cam_pos_embed.view(n_cam, batch_size, cam_pos_embed.size(1), cam_pos_embed.size(2), cam_pos_embed.size(3))
+            cam_pos_embed = cam_pos_embed.view(n_cam, 1, cam_pos_embed.size(1), cam_pos_embed.size(2), cam_pos_embed.size(3))
 
             # rearrange 
             cam_features = einops.rearrange(cam_features, "v b c h w -> v (h w) b c")
@@ -235,11 +236,12 @@ class CustomACTModelWrapper(ACT):
         if self.config.use_depth and OBS_DEPTH in batch:
             depths = torch.cat(batch[OBS_DEPTH], dim=0)  # (n_cam*B, 1, H, W)
             depth_features = self.depth_backbone(depths)["feature_map"]
-            depth_pos_embed = torch.cat([self.encoder_depth_feat_pos_embed(depth_features[i].unsqueeze(0)).to(dtype=depth_features.dtype) for i in range(n_cam)], dim=0)
+            pos_depth_input = einops.rearrange(depth_features, " (v b) c h w -> v b c h w", v=n_cam, b=batch_size)
+            depth_pos_embed = torch.cat([self.encoder_depth_feat_pos_embed(pos_depth_input[i]).to(dtype=depth_features.dtype) for i in range(n_cam)], dim=0)
             depth_features = self.encoder_depth_feat_input_proj(depth_features)
 
             depth_features = depth_features.view(n_cam, batch_size, depth_features.size(1), depth_features.size(2), depth_features.size(3))
-            depth_pos_embed = depth_pos_embed.view(n_cam, batch_size, depth_pos_embed.size(1), depth_pos_embed.size(2), depth_pos_embed.size(3))
+            depth_pos_embed = depth_pos_embed.view(n_cam, 1, depth_pos_embed.size(1), depth_pos_embed.size(2), depth_pos_embed.size(3))
 
             depth_features = einops.rearrange(depth_features, "v b c h w -> v (h w) b c")
             depth_pos_embed = einops.rearrange(depth_pos_embed, "v b c h w -> v (h w) b c")

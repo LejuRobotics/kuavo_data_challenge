@@ -27,8 +27,8 @@ class CustomACTConfigWrapper(ACTConfig):
         super().__post_init__()
         default_map = {
             "VISUAL": NormalizationMode.MEAN_STD,
-            "STATE": NormalizationMode.MIN_MAX,
-            "ACTION": NormalizationMode.MIN_MAX,
+            "STATE": NormalizationMode.MEAN_STD,
+            "ACTION": NormalizationMode.MEAN_STD,
         }
 
         # merge and update the normalization_mapping

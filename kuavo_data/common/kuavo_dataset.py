@@ -490,7 +490,7 @@ class KuavoRosbagReader:
         main_img_timestamps = [t for t in main_img_timestamps if t < min_end]
 
         # 特殊处理kuavo_arm_traj话题的时间戳连续性检测（可能有断点，需要999处理）在控制下肢时候
-        def detect_timestamp_gaps(timestamps, gap_threshold=0.15):
+        def detect_timestamp_gaps(timestamps, gap_threshold=0.15 * 10 / TRAIN_HZ): # gap_threshold可调
             """检测时间戳中的间隙，返回间隙位置"""
             if len(timestamps) < 2:
                 return []
@@ -502,7 +502,7 @@ class KuavoRosbagReader:
         
         # 检查kuavo_arm_traj是否有断点，如果有则进行特殊处理
         gaps = []
-        if "action.kuavo_arm_traj" in data and len(data["action.kuavo_arm_traj"]) > 0:
+        if not ONLY_HALF_UP_BODY and "action.kuavo_arm_traj" in data and len(data["action.kuavo_arm_traj"]) > 0:
             arm_traj_timestamps = [t['timestamp'] for t in data["action.kuavo_arm_traj"]]
             gaps = detect_timestamp_gaps(arm_traj_timestamps)
             # 只有在检测到间隙时才进行特殊处理

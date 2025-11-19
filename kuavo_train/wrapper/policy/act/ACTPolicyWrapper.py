@@ -39,7 +39,7 @@ class CustomACTPolicyWrapper(ACTPolicy):
             batch[OBS_IMAGES] = [batch[key] for key in self.config.image_features]
         if self.config.use_depth and self.config.depth_features:
             batch = dict(batch)  # shallow copy so that adding a key doesn't modify the original
-            batch[OBS_DEPTH] = [batch[key] for key in self.config.depth_features]
+            batch[OBS_DEPTH] = [batch[key].mean(dim=-3, keepdim=True) for key in self.config.depth_features]
 
         actions = self.model(batch)[0]
         return actions
@@ -149,8 +149,9 @@ class CustomACTPolicyWrapper(ACTPolicy):
                     p
                     for n, p in self.named_parameters()
                     if p.requires_grad
-                    and not (n.startswith("model.backbone") or n.startswith("model.depth_backbone") or n == "model.depth_gate_logit")
-                ]
+                    and not (n.startswith("model.backbone") or n.startswith("model.depth_backbone"))
+                ],
+                "lr": self.config.optimizer_lr,
             },
             {
                 "params": [
@@ -159,14 +160,5 @@ class CustomACTPolicyWrapper(ACTPolicy):
                     if p.requires_grad and (n.startswith("model.backbone") or n.startswith("model.depth_backbone"))
                 ],
                 "lr": self.config.optimizer_lr_backbone,
-            },
-            {
-                "params": [
-                    p
-                    for n, p in self.named_parameters()
-                    if p.requires_grad and n == "model.depth_gate_logit"
-                ],
-                "lr": self.config.optimizer_lr * 5.0,
-                "weight_decay": 0.0,
             },
         ]
