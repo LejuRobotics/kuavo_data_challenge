@@ -230,6 +230,7 @@ def main(cfg: DictConfig):
     accelerate.utils.set_seed(cfg.training.seed)
 
     # mkdir and output TensorBoard only in the main process
+    output_directory = None
     if accelerator.is_main_process:
         output_directory = Path(cfg.training.output_directory) / f"run_{cfg.timestamp}"
         output_directory.mkdir(parents=True, exist_ok=True)
@@ -247,26 +248,24 @@ def main(cfg: DictConfig):
     policy = build_policy(cfg.policy_name, policy_cfg)
     accelerator.wait_for_everyone()
     preprocessor, postprocessor = make_pre_post_processors(policy_cfg, dataset_stats=dataset_metadata.stats)
-    preprocessor.save_pretrained(output_directory)
-    postprocessor.save_pretrained(output_directory)
+    if accelerator.is_main_process:
+        preprocessor.save_pretrained(output_directory)
+        postprocessor.save_pretrained(output_directory)
     # Initialize optimizer and lr scheduler
     optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"], accelerator)
 
     # print only in main process
     if accelerator.is_main_process:
-        print("policy_cfg", policy_cfg)
-        print(f"Input features: {input_features}")
-        print(f"Output features: {output_features}")
-        print("camera_keys:", dataset_metadata.camera_keys)
-        print("Original dataset features:", dataset_metadata.features) 
+        print("\n---policy_cfg", policy_cfg)
+        print(f"\n---Input features: {input_features}")
+        print(f"\n---Output features: {output_features}")
+        print(f"\n---camera_keys:", dataset_metadata.camera_keys)
+        print(f"\n---Original dataset features:", dataset_metadata.features) 
         num_total_params = sum(p.numel() for p in policy.parameters())
         num_learnable_params = sum(p.numel() for p in policy.parameters() if p.requires_grad)
-        print(f"{num_learnable_params=} ({num_learnable_params})", f"{num_total_params=} ({num_total_params})")
+        print(f"num_learnable_params={num_learnable_params}", f"num_total_params={num_total_params}")
 
-    # Initialize training state variables
-    start_epoch = 0
-    steps = 0
-    best_loss = float('inf')
+
 
 
     # Build dataset and dataloader
@@ -312,6 +311,12 @@ def main(cfg: DictConfig):
         policy, optimizer, dataloader, lr_scheduler
     )
 
+
+    # Initialize training state variables
+    start_epoch = 0
+    steps = 0
+    best_loss = float('inf')
+
     # # ===== Resume logic (perfect resume for AMP & RNG) =====
     if cfg.training.resume and cfg.training.resume_timestamp:
         resume_path = Path(cfg.training.output_directory) / cfg.training.resume_timestamp
@@ -331,6 +336,8 @@ def main(cfg: DictConfig):
     else:
         print("Training from scratch!")
 
+
+    
     # Training loop
     for epoch in range(start_epoch, cfg.training.max_epoch):
         policy.train()

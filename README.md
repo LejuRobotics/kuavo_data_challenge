@@ -268,15 +268,17 @@ git clone git@github.com:LejuRobotics/kuavo_data_challenge.git
 # 或者
 # HTTPS
 git clone https://github.com/LejuRobotics/kuavo_data_challenge.git
-```
 
-更新third_party下的lerobot子模块：
-
-```bash
 cd kuavo-data-challenge
+# 切换分支
+git checkout origin/dev
+
+# 更新third_party下的lerobot子模块：
 git submodule init
 git submodule update --recursive --progress
+
 ```
+
 
 ---
 
@@ -336,7 +338,7 @@ pip --version # 查看pip对应的版本，看到确认输出为3.10的pip
 ```
 
 
-安装依赖：
+### 5. 安装依赖：
 
 ```bash
 source /opt/ros/noetic/setup.bash  # 进入python环境先source好ros自带的python库，建议这行写入~/.bashrc
@@ -348,6 +350,20 @@ pip install -r requirements_ilcode.txt   # 无需ROS Noetic，但只能使用kua
 pip install -r requirements_total.txt    # 需确保 ROS Noetic 已安装 (推荐)
 ```
 
+安装完打印下检查下lerobot版本：2025年11月20日为0.4.2版本
+```bash
+pip show | grep lerobot
+```
+
+若不是最新版 (0.4.2)：
+```bash
+cd third_party/lerobot
+git fetch
+git reset --hard origin/main
+cd ../../
+```
+
+重新pip install -r requirement即可。
 
 如果pip安装完毕但运行训练代码时报ffmpeg或torchcodec的错：
 
@@ -449,7 +465,7 @@ python kuavo_train/train_policy.py \
 安装accelerate库： pip install accelerate (一般安装lerobot时已经安装)
 
 ```bash
-accelerate launch --config_file configs/accelerate/accelerate_config.yaml ./kuavo_train/train_policy_with_accelerate.py  --config-path=./configs/policy --config-name=diffusion_config.yaml
+accelerate launch --config_file configs/accelerate/accelerate_config.yaml kuavo_train/train_policy_with_accelerate.py  --config-path=../configs/policy --config-name=diffusion_config.yaml
 ```
 
 说明：
