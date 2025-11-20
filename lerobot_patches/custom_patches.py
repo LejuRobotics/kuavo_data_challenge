@@ -116,7 +116,7 @@ lerobot_datasets_utils = importlib.import_module("lerobot.datasets.utils")
 
 def dataset_to_policy_features(features: dict[str, dict]) -> dict[str, PolicyFeature]:
     # TODO(aliberts): Implement "type" in dataset features and simplify this
-    print("~~~~~~~~~features from custom dataset_to_policy_features:~~~~~~~~")
+    # print("~~~~~~~~~features from custom dataset_to_policy_features:~~~~~~~~")
     policy_features = {}
     for key, ft in features.items():
         shape = ft["shape"]

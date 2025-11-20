@@ -8,6 +8,23 @@
 
 ---
 
+
+## ✨ 新特性！
+
+### 本分支为持续开发中的分支！目前支持了：
+
+- ACT / Diffusion policy的深度图像，分别提供了一种RGB、depth的融合方式，详见[ACT](kuavo_train/wrapper/policy/act/ACTModelWrapper.py), [Diffusion](kuavo_train/wrapper/policy/diffusion/DiffusionModelWrapper.py)
+- Accelerate 多卡并行加速！详见[多卡并行加速](#multigpu)
+- lerobot latest! version 0.4.2 ! [lerobot](https://github.com/huggingface/lerobot)
+- 帧对齐功能！详见[帧对齐](kuavo_deploy/utils/obs_buffer.py)
+- 目录文件结构重整！
+- ···
+
+### 敬请期待：
+- 末端增量式控制支持
+- 更多模仿学习模型！
+
+
 ## 🌟 项目简介
 本仓库基于 [Lerobot](https://github.com/huggingface/lerobot) 开发，结合乐聚 Kuavo（夸父）机器人，提供 **数据格式转换**（rosbag → parquet）、**模仿学习（IL）训练**、**仿真器测试**以及**真机部署验证**的完整示例代码。
 
@@ -215,7 +232,7 @@ sudo docker start ubuntu_ros_container
 sudo docker exec -it ubuntu_ros_container /bin/bash
 ```
 
-- 或者自定义启动加载文件，launch_docker.sh
+- 或者：自定义启动加载文件，launch_docker.sh, 注意，由于涉及挂载python环境，请在第4步完成后再使用这种sh方式！
 ```shell
 #!/bin/bash
 
@@ -239,7 +256,7 @@ docker run \
     -v $CODE_DIR:/code \
     -v $DATA_DIR:/data \
     -v $PYTHON_DIR:$PYTHON_DIR \
-    --env PATH=/path/to/python_venv/kdc/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    --env PATH=/path/to/python_venv/kdc_dev/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     $CONTAINER /bin/bash
 ```
 
@@ -268,15 +285,17 @@ git clone git@github.com:LejuRobotics/kuavo_data_challenge.git
 # 或者
 # HTTPS
 git clone https://github.com/LejuRobotics/kuavo_data_challenge.git
-```
 
-更新third_party下的lerobot子模块：
-
-```bash
 cd kuavo-data-challenge
+# 切换分支
+git checkout origin/dev
+
+# 更新third_party下的lerobot子模块：
 git submodule init
 git submodule update --recursive --progress
+
 ```
+
 
 ---
 
@@ -284,16 +303,18 @@ git submodule update --recursive --progress
 
 使用 conda （推荐）或 python venv 创建虚拟环境（推荐 python 3.10）：
 
+⚠️ 注意，本分支请新建一个独立于master分支的环境！例如: kdc_dev
+
 - ananconda配置：
 
 ```bash
-conda create -n kdc python=3.10
-conda activate kdc
+conda create -n kdc_dev python=3.10
+conda activate kdc_dev
 ```
 
 - 或，源码安装Python3.10.18，再用venv创建虚拟环境
 
-注意：```ppa:deadsnakes``` 在2025年6月后不能在ubuntu20.04上提供了
+⚠️ 注意：```ppa:deadsnakes``` 在2025年6月后不能在ubuntu20.04上提供了，下述安装方式不一定成功：
 
 ```bash
 sudo apt update
@@ -314,8 +335,11 @@ cd Python-3.10.18
 make -j$(nproc)
 sudo make install
 
-python3.10 -m venv kdc
-source kdc/bin/activate
+然后创建venv环境：
+
+```bash
+python3.10 -m venv kdc_dev
+source kdc_dev/bin/activate
 ```
 
 - 查看和确保安装正确：
@@ -331,7 +355,7 @@ pip --version # 查看pip对应的版本，看到确认输出为3.10的pip
 ```
 
 
-安装依赖：
+### 5. 安装依赖：
 
 ```bash
 source /opt/ros/noetic/setup.bash  # 进入python环境先source好ros自带的python库，建议这行写入~/.bashrc
@@ -343,6 +367,20 @@ pip install -r requirements_ilcode.txt   # 无需ROS Noetic，但只能使用kua
 pip install -r requirements_total.txt    # 需确保 ROS Noetic 已安装 (推荐)
 ```
 
+安装完打印下检查下lerobot版本：2025年11月20日为0.4.2版本
+```bash
+pip show | grep lerobot
+```
+
+若不是最新版 (0.4.2)：
+```bash
+cd third_party/lerobot
+git fetch
+git reset --hard origin/main
+cd ../../
+```
+
+重新pip install -r requirement即可。
 
 如果pip安装完毕但运行训练代码时报ffmpeg或torchcodec的错：
 
@@ -381,7 +419,7 @@ sudo ldconfig
 
 - 关于 kuavo_humanoid_sdk：
 
-有时会出现版本不匹配的问题，上述是通过pip install在pypi.org上找包安装的，若出现相关问题，可以手动至kuavo-ros-control或kuavo-ros-opensource源码安装，例如，激活Python环境后：
+⚠️ 有时会出现版本不匹配的问题，无法通信什么的，上述是通过pip install在pypi.org上找包安装的，若出现相关问题，可以手动至kuavo-ros-control或kuavo-ros-opensource源码安装，[kuavo-ros-opensource](https://github.com/LejuRobotics/kuavo-ros-opensource)，例如，激活Python环境后：
 ```bash
 cd /your/path/to/kuavo-ros-control/src/kuavo_humanoid_sdk
 # 或
@@ -439,15 +477,16 @@ python kuavo_train/train_policy.py \
 
 ---
 
+<a id="multigpu"></a>
 ### 2.1 模仿学习训练：单机多卡模式
 
-安装accelerate库： pip install accelerate
+安装accelerate库： pip install accelerate (一般安装lerobot时已经安装)
 
 ```bash
-accelerate launch --config_file ./configs/policy/accelerate_config.yaml \ 
-  ./kuavo_train/train_policy_with_accelerate.py  --  \ 
-  --config-path ./configs/policy \ 
-  --config-name diffusion_config.yaml
+# 配置好accelerate yaml文件，根据你自己的机器配置
+vim configs/accelerate/accelerate_config.yaml
+# 配置好后运行示例：
+accelerate launch --config_file configs/accelerate/accelerate_config.yaml kuavo_train/train_policy_with_accelerate.py  --config-path=../configs/policy --config-name=diffusion_config.yaml
 ```
 
 说明：

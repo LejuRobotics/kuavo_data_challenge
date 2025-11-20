@@ -96,10 +96,18 @@ def interactive_controller():
     while True:
         # 检查子进程状态
         if current_proc.poll() is not None:
-            print("\n✅ 任务已运行结束")
-            current_proc = None 
+            retcode = current_proc.returncode  # 获取退出码
+
+            if retcode == 0:
+                print("\n✅ 任务已正常结束")
+            else:
+                print(f"\n❌ 任务异常退出，错误码：{retcode}")
+                print("📄 请查看日志文件：log/kuavo_deploy/kuavo_deploy.log")
+
+            current_proc = None
             stop_event.set()
             break
+
 
         try:
             cmd = input_queue.get(timeout=0.5)

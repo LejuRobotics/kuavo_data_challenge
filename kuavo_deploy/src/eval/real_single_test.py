@@ -36,6 +36,7 @@ import torch
 from tqdm import tqdm
 
 from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
+from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
 from lerobot.policies.act.modeling_act import ACTPolicy
 from lerobot.utils.random_utils import set_seed
 import datetime
@@ -47,7 +48,7 @@ from std_msgs.msg import Bool
 import rospy
 import threading
 
-from configs.deploy.config_inference import load_inference_config
+from kuavo_deploy.config import KuavoConfig
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.kuavo_service.client import PolicyClient
 from lerobot.processor import PolicyAction, PolicyProcessorPipeline
@@ -91,7 +92,7 @@ def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     if policy_type == 'diffusion':
         policy = CustomDiffusionPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     elif policy_type == 'act':
-        policy = ACTPolicy.from_pretrained(Path(pretrained_path),strict=True)
+        policy = CustomACTPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     elif policy_type == 'client':
         policy = PolicyClient()
     else:
@@ -107,9 +108,9 @@ def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     
     return policy
 
-def main(config_path: str, env: gym.Env):
+def main(config: KuavoConfig, env: gym.Env):
     # load config
-    cfg = load_inference_config(config_path)
+    cfg = config.inference
 
     eval_episodes = cfg.eval_episodes
     seed = cfg.seed
@@ -120,7 +121,6 @@ def main(config_path: str, env: gym.Env):
     timestamp = cfg.timestamp
     epoch = cfg.epoch
     env_name = cfg.env_name
-    depth_range = cfg.depth_range
 
     pretrained_path = Path(f"outputs/train/{task}/{method}/{timestamp}/epoch{epoch}")
     output_directory = Path(f"outputs/eval/{task}/{method}/{timestamp}/epoch{epoch}")
@@ -136,7 +136,7 @@ def main(config_path: str, env: gym.Env):
     policy = setup_policy(pretrained_path, policy_type, device)
     # preprocessor = PolicyProcessorPipeline.from_pretrained(pretrained_path, config_filename="policy_preprocessor.json")
     # postprocessor = PolicyProcessorPipeline.from_pretrained(pretrained_path, config_filename="policy_postprocessor.json")
-    preprocessor, postprocessor = make_pre_post_processors(None,pretrained_path)
+    preprocessor, postprocessor = make_pre_post_processors(None, Path(str(pretrained_path).split("/epoch", 1)[0]))
 
     # Initialize evaluation environment to render two observation types:
     # an image of the scene and state/position of the agent.
@@ -212,7 +212,7 @@ def main(config_path: str, env: gym.Env):
 
                 rewards.append(reward)
 
-                # 相机帧记录
+                # 相机帧记录，真机请取消，否则会一直堆叠卡死
 
                 # for k in cam_keys:
                 #     frame_map[k].append(observation[k].squeeze(0).cpu().numpy().transpose(1, 2, 0))
@@ -250,10 +250,11 @@ def main(config_path: str, env: gym.Env):
         
         
         # Encode all frames into a mp4 video.
-        for cam in cam_keys:
-            frames = frame_map[cam]
-            output_path = output_directory / f"rollout_{episode}_{cam}.mp4"
-            imageio.mimsave(str(output_path), frames, fps=fps)
+        if len(frame_map.keys()) == 0:
+            for cam in cam_keys:
+                frames = frame_map[cam]
+                output_path = output_directory / f"rollout_{episode}_{cam}.mp4"
+                imageio.mimsave(str(output_path), frames, fps=fps)
 
         # print(f"Video of the evaluation is available in '{video_path}'.")
 

@@ -18,14 +18,16 @@ env:
   control_mode: joint # joint 或 eef （正在开发中）
   eef_type: rq2f85  # 末端执行器类型: 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
   which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
-  head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, task4 [0,0.087], 真机可根据需要调整，一般为null
+  head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, 真机可根据需要调整，一般为null！！！
   ros_rate: 10  # 推理控制频率，单位Hz
 
-  only_arm: true  # 默认true, 是否只使用手臂数据, 目前的模仿学习只用于手臂数据，选择true会自动屏蔽足关节数据
+  #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  only_arm: true  # 默认true, 是否只使用手臂数据, 选择true会自动屏蔽足关节数据
+  #!!!!!!!!!task4请设置为false,task4请设置为false,task4请设置为false!!!!!!!!!!!!!!
 
   image_size: &IMGSIZE [640, 480]  # 图像大小：宽，高
   depth_range: &DEPTHRANGE [0, 1500]  # 深度图范围设置，单位mm，default=[0,1500]
-  obs_key_map:  # 话题、消息类型、频率、图像尺寸、深度裁剪等配置，深度图范围设置，单位mm，default=[0,1500]
+  obs_key_map:  # 话题、消息类型、频率、图像尺寸、深度裁剪等配置，深度图范围设置，单位mm，default=[0,1500]，请注意需要与训练保持一致！
     head_cam_h: ["/cam_h/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 头部RGB相机话题，必选
     wrist_cam_l: ["/cam_l/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 左手腕RGB相机话题，请对应选择，与下至少选择一个
     wrist_cam_r: ["/cam_r/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 右手腕RGB相机话题，请对应选择，与上至少选择一个
@@ -38,7 +40,7 @@ env:
     rq2f85: ["/gripper/state", "JointState", 500]  # 末端执行器的话题，仿真中夹爪
   
   arm_state_keys: ["joint_q","gripper"]  # 默认不动，模型观测输入的手臂状态包含关节角度和夹爪开合状态
-  frame_alignment: false  # 是否启用帧对齐，default=true
+  frame_alignment: false  # 是否启用帧对齐，default=false
   ratio: 1.0 # 使用帧对齐时，获取最近观测占所有历史观测的比例，default=1.0
   
   # Limits关节及数值限制配置，即各个部分的上下限定义，目前不用改动
@@ -58,12 +60,12 @@ env:
       min: [-1, -1, -1, -3.14, -3.14, -3.14, -1, -1, -1, -3.14, -3.14, -3.14]
       max: [1, 1, 1, 3.14, 3.14, 3.14, 1, 1, 1, 3.14, 3.14, 3.14]
     
-    # 末端执行器相对动作限制 (用于增量控制)
+    # 末端执行器相对动作限制 (用于增量控制，正在开发中)
     eef_relative:
       min: [-0.005, -0.0075, -0.004, -0.03, -0.03, -0.05, -0.005, -0.0075, -0.004, -0.03, -0.03, -0.05]
       max: [0.005, 0.0075, 0.004, 0.03, 0.03, 0.05, 0.005, 0.0075, 0.004, 0.03, 0.03, 0.05]
     
-    # 基座移动限制 (x, y, yaw, move_flag)
+    # 机器人移动限制 (x, y, yaw, move_flag)
     base:
       min: [-2.0, -2.0, -3.14, 0]
       max: [2.0, 2.0, 3.14, 1]
@@ -83,14 +85,14 @@ env:
 # inference config，模型推理配置的修改
 # =====================================================
 inference:
-  go_bag_path: /home/yangzhou/data/pick_cu/rosbag_arminit/pick_and_place_rj_20250908133630.bag  # 比赛仿真器中暂时不用，推理时需要提供bag包的完整路径，如：到达预抓取姿态等，可直接拷贝一个训练的rosbag控制。
+  go_bag_path: /path/to/your/go.bag  # ！！！比赛仿真器中暂时不用！！！，真机推理时需要提供bag包的完整路径，如：到达预抓取姿态等，可直接拷贝一个训练的rosbag控制。
   policy_type: "act"  # 策略名字，支持diffusion，act等
   eval_episodes: 100  # 测试回合数，比赛仿真器默认为100次，用于打分
   seed: 42  # 随机种子，仿真中可用于固定各物体初始状态，便于复现
   start_seed: 42  # 回合开始时的随机种子，仿真中可用于固定各物体初始状态，便于复现  
   device: "cuda"  # or "cpu"
-  task: "dev_task1"
-  method: "rgb_depth_act"
-  timestamp: "run_20251119_094752" # 类似的运行时时间戳
-  epoch: 240  # 使用训练保存的哪一个epoch，可填50，100，best等，注意：代码将在outputs/train/<task>/<method>/<timestamp>/epoch<epoch>中load policy的模型参数
+  task: "your_task"
+  method: "your_method"
+  timestamp: "your_timestamp" # 类似的运行时时间戳
+  epoch: best  # 使用训练保存的哪一个epoch，可填50，100，best等，注意：代码将在outputs/train/<task>/<method>/<timestamp>/epoch<epoch>中load policy的模型参数
   max_episode_steps: 200  # 最大回合步数，超过自动结束，可根据任务所需时长调整

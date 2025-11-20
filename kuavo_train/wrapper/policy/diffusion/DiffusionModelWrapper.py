@@ -308,7 +308,7 @@ class CustomDiffusionModelWrapper(DiffusionModel):
         if getattr(self.config, "robot_state_feature", None) is not None:
             state_dim = self.config.robot_state_feature.shape[0]
             if getattr(self.config, "use_state_discrete", False):
-                print("~~~~~~~~~~~~~~~~~~~~~~~~~~use_state_discrete~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                # print("~~~~~~~~~~~~~~~~~~~~~~~~~~use_state_discrete~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 emb_dim = getattr(self.config, "state_emb_dim", 16)
                 bins = getattr(self.config, "state_discrete_bins", 36)
                 self.state_encoder = DiscreteStateEmbedding(state_dim, num_bins=bins, emb_dim=emb_dim)

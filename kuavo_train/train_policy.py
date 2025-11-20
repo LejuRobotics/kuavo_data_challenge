@@ -17,10 +17,10 @@ from diffusers.optimization import get_scheduler
 
 from lerobot.configs.types import FeatureType, NormalizationMode
 from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata, LeRobotDataset
+from lerobot.datasets.sampler import EpisodeAwareSampler
 from lerobot.datasets.utils import dataset_to_policy_features
 from lerobot.utils.random_utils import set_seed
 from lerobot.policies.factory import make_pre_post_processors
-
 from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
 from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
 from kuavo_train.wrapper.dataset.LeRobotDatasetWrapper import CustomLeRobotDataset
@@ -35,7 +35,7 @@ from contextlib import nullcontext
 from lerobot.processor import ProcessorStep, NormalizerProcessorStep
 from lerobot.processor.core import TransitionKey
 from lerobot.configs.types import PipelineFeatureType, PolicyFeature
-import ipdb
+# import ipdb
 
 
 def build_augmenter(cfg):
@@ -103,30 +103,6 @@ def build_optimizer_and_scheduler(policy, cfg, total_frames):
     # or you can set your optimizer and lr_scheduler here and replace it.
     return optimizer, lr_scheduler
 
-
-def build_policy_config(cfg, input_features, output_features):
-    def _normalize_feature_dict(d: Any) -> dict[str, PolicyFeature]:
-        if isinstance(d, DictConfig):
-            d = OmegaConf.to_container(d, resolve=True)
-        if not isinstance(d, dict):
-            raise TypeError(f"Expected dict or DictConfig, got {type(d)}")
-
-        return {
-            k: PolicyFeature(**v) if isinstance(v, dict) and not isinstance(v, PolicyFeature) else v
-            for k, v in d.items()
-        }
-
-    policy_cfg = instantiate(
-        cfg.policy,
-        input_features=input_features,
-        output_features=output_features,
-        device=cfg.training.device,
-    )
-                
-    policy_cfg.input_features = _normalize_feature_dict(policy_cfg.input_features)
-    policy_cfg.output_features = _normalize_feature_dict(policy_cfg.output_features)
-    return policy_cfg
-
 def build_policy(name, policy_cfg):
     policy = {
         "diffusion": CustomDiffusionPolicyWrapper,
@@ -156,7 +132,6 @@ def build_policy_config(cfg, input_features, output_features):
     policy_cfg.input_features = _normalize_feature_dict(policy_cfg.input_features)
     policy_cfg.output_features = _normalize_feature_dict(policy_cfg.output_features)
     return policy_cfg
-
 
 class AugmentationProcessorStep(ProcessorStep):
     def __init__(self, transform, cam_keys):
@@ -230,8 +205,6 @@ def remove_aug_step(pipeline, step_to_remove):
         print(f"Removed {step_to_remove.__class__.__name__}")
     else:
         print(f"Step {step_to_remove.__class__.__name__} not found in pipeline")
-
-
 
 @hydra.main(config_path="../configs/policy/", config_name="diffusion_config", version_base=None)
 def main(cfg: DictConfig):
@@ -353,18 +326,31 @@ def main(cfg: DictConfig):
         root=cfg.root,
         image_transforms=None,
     )
-
     # Training loop
     aug_step = insert_before_normalizer(preprocessor, AugmentationProcessorStep(image_transforms, dataset.meta.camera_keys))  # just for training
+    
+    if hasattr(cfg.policy, "drop_n_last_frames"):
+        shuffle = False
+        sampler = EpisodeAwareSampler(
+            dataset.meta.episodes["dataset_from_index"],
+            dataset.meta.episodes["dataset_to_index"],
+            drop_n_last_frames=cfg.policy.drop_n_last_frames,
+            shuffle=True,
+        )
+    else:
+        shuffle = True
+        sampler = None
+    
     for epoch in range(start_epoch, cfg.training.max_epoch):
         dataloader = DataLoader(
             dataset,
             num_workers=cfg.training.num_workers,
             batch_size=cfg.training.batch_size,
-            shuffle=True,
+            shuffle=shuffle,
+            sampler=sampler,
             pin_memory=(device.type != "cpu"),
             drop_last=cfg.training.drop_last,
-            prefetch_factor=1,
+            prefetch_factor=2 if cfg.training.num_workers > 0 else None,
         )
 
         epoch_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{cfg.training.max_epoch}")
@@ -372,44 +358,7 @@ def main(cfg: DictConfig):
         
         total_loss = 0.0
         for batch in epoch_bar:
-            
-            # batch = {k: (v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
-
             batch = preprocessor(batch)  # will normalize and put batch to device
-
-            # 假设 batch 是一个字典
-            # import matplotlib.pyplot as plt
-            # import einops
-            # batchsize = 32
-            # nrows, ncols = 4, 8  # 4行8列
-
-            # for k, v in batch.items():
-            #     if k == "observation.images.head_cam_h":
-            #         # v: (B, S, C, H, W)
-            #         v = v.detach().cpu()
-            #         B, S, C, H, W = v.shape
-
-            #         # 取第一个时间步
-            #         imgs = v[:, 0]  # (B, C, H, W)
-            #         fig, axes = plt.subplots(nrows, ncols, figsize=(16, 8))
-            #         axes = axes.flatten()
-
-            #         for i in range(batchsize):
-            #             img = einops.rearrange(imgs[i], "c h w -> h w c")
-            #             if C == 1:
-            #                 axes[i].imshow(img.squeeze(-1), cmap="gray")
-            #             else:
-            #                 axes[i].imshow(img)
-            #             axes[i].axis("off")
-            #             axes[i].set_title(f"{i}")
-
-            #         # 隐藏多余子图（如果 B < nrows*ncols）
-            #         for j in range(B, nrows*ncols):
-            #             axes[j].axis("off")
-
-            #         plt.tight_layout()
-            #         plt.show()
-            # raise ValueError("stop for debug")
             with make_autocast(amp_enabled):
                 loss, _ = policy.forward(batch)
             # Scale loss and backward with AMP if enabled
