@@ -211,4 +211,9 @@ outputs/
 log/
 .vscode/
 .claude/
-third_party/
+*.pth
+ana.py
+*.gz
+*.tar
+error.txt
+obs.png

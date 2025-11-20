@@ -32,7 +32,8 @@ kuavo_train/
 │ │ └── transformer_diffusion.py    # 基于transformer的diffusion扩散模型
 │ └── __init__.py
 ├── README.md
-└── train_policy.py # 策略训练入口
+├── train_policy.py                 # 策略训练入口
+└── train_policy_with_accelerate.py # 策略训练入口 (基于accelerate库 单机多卡训练)
 ```
 
 ## 使用说明
@@ -56,6 +57,52 @@ kuavo_train/
 - PyTorch
 - torchvision
 - 其他依赖请参考 `requirements_ilcode.txt`等, 以及项目整体[README.md](../README.md)
+
+---
+
+
+---
+
+### 模型训练
+
+使用转换好的数据进行模仿学习训练：
+
+```bash
+python kuavo_train/train_policy.py \
+  --config-path=../configs/policy/ \
+  --config-name=diffusion_config.yaml \
+  task=your_task_name \
+  method=your_method_name \
+  root=/path/to/lerobot_data/lerobot \
+  training.batch_size=128 \
+  policy_name=diffusion
+```
+
+说明：
+
+* `task`：自定义，任务名称（最好与数转中的task定义对应），如`pick and place`
+* `method`：自定义，方法名，用于区分不同的训练，如`diffusion_bs128_usedepth_nofuse`等
+* `root`：训练数据的本地路径，注意加上lerobot，与1中的数转保存路径需要对应，为：`/path/to/lerobot_data/lerobot`
+* `training.batch_size`：批大小，可根据 GPU 显存调整
+* `policy_name`：使用的策略，用于策略实例化的，目前支持`diffusion`和`act`
+* 其他参数可详见yaml文件说明，推荐直接修改yaml文件，避免命令行输入错误
+
+---
+
+### 模型训练：单机多卡模式
+
+安装accelerate库： pip install accelerate
+
+```bash
+accelerate launch --config_file ./configs/policy/accelerate_config.yaml \ 
+  ./kuavo_train/train_policy_with_accelerate.py  --  \ 
+  --config-path ./configs/policy \ 
+  --config-name diffusion_config.yaml
+```
+
+说明：
+
+* diffusion_config.yaml文件中配置参数设置参考上面《模型训练：参数说明 》
 
 ---
 

@@ -6,12 +6,12 @@ hydra: # Hydra 配置文件保存目录，仅供参数检查使用
     subdir: ${hydra:job.override_dirname}
 
 
-task: "your_task_name"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
-method: "your_method_name"  # 自定义方法名称
+task: "dev_task1"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
+method: "rgb_act"  # 自定义方法名称
 timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
 # 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
 repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
-root: "/your/path/to/your/lerobotdata/lerobot"  # 你的本地转换好的lerobot数据的目录
+root: "/media/yangzhou/80268D01268CFA04/data_test/task1_200test/lerobot"  # 你的本地转换好的lerobot数据的目录
 # root: null  # 如果不使用本地数据想使用huggingface官方数据，请在task中指定，例如pusht，aloha_sim_insertion_human，此处就设置为null空
 # 将去云端调用下载数据集
 
@@ -19,7 +19,7 @@ root: "/your/path/to/your/lerobotdata/lerobot"  # 你的本地转换好的lerobo
 training:
     output_directory: "outputs/train/${task}/${method}"  # 模型参数保存路径，默认这个结构，不要改动
     seed: 2025  # 数据增广、训练模型的随机种子，便于复现
-    max_epoch: 1000  # 最大训练轮次，用于控制学习率调整器，与下述max_training_step相关
+    max_epoch: 500  # 最大训练轮次，用于控制学习率调整器，与下述max_training_step相关
 
     save_freq_epoch: 10  # 模型参数保存频率，每10个epoch保存一次
     log_freq: 1  # 进度条刷新频率，每1个迭代step
@@ -27,17 +27,17 @@ training:
     accumulation_steps: 1  # 梯度累积步数，自定义
     ema_power: 0.75  # 如果使用ema移动指数平均方法可使用这个参数，目前测试使用ema会掉性能，所以代码中不再支持
 
-    batch_size: 64  # 批次大小
-    num_workers: 8  # dataloader的num_workers
+    batch_size: 32  # 批次大小，自行选择
+    num_workers: 8  # dataloader的num_workers，请根据自己训练电脑的配置选择，否则可能会卡死
     drop_last: False  # 是否丢弃最后一个不完整的batch
 
     # 最大训练步数，用于控制学习率调整器，如果指定了 `max_training_step`，则它将优先生效，否则，该值将根据上述的 `max_epoch` 自动确定。
     # `max_epoch` 和 `max_training_step` 不会同时生效。
-    max_training_step: null  
+    max_training_step: null
 
     # resume training，断点续训
-    resume: False
-    resume_timestamp: "run_20250826_181254"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    resume: false
+    resume_timestamp: "run_20251118_144927"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     scheduler_name: cosine  # 学习率调整器名称，仅在policy config中不包含该调度器时生效，否则会使用policy自带的调整器，相关参数也会在下方policy里
     scheduler_warmup_steps: 500  # 学习率预热warm up步数
@@ -50,7 +50,7 @@ training:
       random_order: True
       tfs:
         notransform:
-          weight: 2.0  # 占比权重
+          weight: 3.0  # 占比权重
           type: "Identity"
           kwargs: {}
         brightness:
@@ -99,10 +99,18 @@ policy_name: act  # 策略类型，支持diffusion和act
 
 # 策略相关
 policy:
-    _target_: lerobot.policies.act.configuration_act.ACTConfig  # 用于实例化
+    _target_: kuavo_train.wrapper.policy.act.ACTConfigWrapper.CustomACTConfigWrapper  # 用于实例化
     n_obs_steps: 1  # 观测步数
     chunk_size: 100  # 动作块大小
     n_action_steps: 1  # 动作步数
+
+    normalization_mapping: # RGB等同于VISUAL类型, diffusion策略另外支持了深度数据，这两个参数用于设置normalize方式
+      RGB: 
+        _target_: lerobot.configs.types.NormalizationMode
+        value: MEAN_STD
+      DEPTH: 
+        _target_: lerobot.configs.types.NormalizationMode
+        value: MIN_MAX
 
     use_amp: False  # 是否使用混合精度训练
 
@@ -138,3 +146,10 @@ policy:
     optimizer_lr: 1e-5
     optimizer_weight_decay: 1e-4
     optimizer_lr_backbone: 1e-5
+
+    custom:  # 一些自定义设置，是本代码仓库针对lerobot ACT policy的特色更改，包含深度数据支持等，可参考相关代码
+      # support depth image
+      use_depth: true
+      depth_backbone: resnet18
+      pretrained_depth_backbone_weights: ResNet18_Weights.IMAGENET1K_V1
+

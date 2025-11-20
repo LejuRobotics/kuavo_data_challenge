@@ -6,26 +6,29 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
     subdir: ${hydra:job.override_dirname}
 
 
-# kuavo rosbag数据转换成lerobot-parquet格式0配置文件
+# kuavo rosbag数据转换成lerobot-parquet格式的配置文件
+# 请注意！！！
+# 本分支的数转代码与lerobot版本同步更新，目前支持了lerobot0.4.1版本
+# 由于版本变更，数据转换代码、训练、推理代码都有较大改动，请务必安装使用lerobot0.4.1版本的代码进行数据转换
+# lerobot地址：https://github.com/huggingface/lerobot
+
 rosbag:
-  rosbag_dir: /path/to/your/rosbag  # rosbag文件所在目录
-  num_used: null # 使用的rosbag数量(若设置为任意数字，则会随机采样选择)
-  lerobot_dir: /path/to/your/lerobot/save/file  # 转换后的lerobot文件的保存目录
+  rosbag_dir: /media/yangzhou/80268D01268CFA04/datafactory/1105_task4 # rosbag文件存放的目录
+  num_used: 5 # 使用的rosbag数量(若设置为任意数字，则会随机采样选择)，null表示使用全部rosbag
+  lerobot_dir: /media/yangzhou/80268D01268CFA04/datafactory/1105_task4_lerobot  # 转换后的lerobot文件的保存目录，会在该目录下生成lerobot子目录，并存放对应数据
 
 dataset:
-  #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  only_arm: true  # 默认true, 是否只使用手臂数据,!!!!!!!!!task4请设置为false,task4请设置为false,task4请设置为false!!!!!!!!!
-  #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  eef_type: rq2f85 # 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
-  which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
-  use_depth: true  # 是否需要深度图像数据，与上面手臂保持一致的深度数据
-  depth_range: [0, 1000]  # 深度图的裁剪范围，单位：毫米
-
-  task_description: "Pick and Place" # 任务描述，自定义
+  only_arm: false  # 默认true, 是否只使用手臂数据, 选择true会自动屏蔽足关节数据，false会支持下肢的即本体所处位置及旋转x,y，yaw的数据
+  eef_type: rq2f85 # 末端执行器类型，仿真选择：rq2f85, 真机可选：leju_claw,（夹爪） qiangnao，（灵巧手）
+  which_arm: both  # 需要哪一只手臂的关节 + 图像数据，可选: left, right, both，注意图像数据会同时包含头部相机图像
+  use_depth: true  # 是否需要深度图像数据，与上面手臂对应的深度图像数据
+  depth_range: [0, 1500]  # 深度图的裁剪范围，单位：毫米，将用于做归一化
+ 
+  task_description: "ruichen_task1" # 任务描述，自定义
 
   train_hz: 10  # 训练数据的采样频率
-  main_timeline: head_cam_h #将哪个相机设为主相机，默认主相机来自：head_cam_h, 可选：wrist_cam_l, wrist_cam_r
-  main_timeline_fps: 30 # 主相机的帧率，必须稳定
+  main_timeline: head_cam_h # 将哪个相机设为主相机，默认主相机来自：head_cam_h, 可选：wrist_cam_l, wrist_cam_r
+  main_timeline_fps: 30 # 主相机的帧率，必须稳定，默认30帧
   sample_drop: 10 # 丢弃episode前后的10帧
 
   # dex_dof_needed是强脑手需要的自由度数目。强脑灵巧手有6个自由度。标准握拳状态[100] * 6, 张开状态[0] * 6。
@@ -35,12 +38,13 @@ dataset:
   dex_dof_needed: 1   # default=1
 
   is_binary: false  # 是否将开合二值化, default=false
-  delta_action: false # 是否使用增量动作，default=false
+  delta_action: false # 是否使用增量动作，default=false，正在开发测试中
   relative_start: false # 是否使用相对起始位置, default=false
 
+
   resize:
-    width: 640  # 图像缩放
-    height: 480  # 图像缩放
+    width: 640  # 图像缩放宽度，注意请先查看（推荐浏览器foxglove工具）rosbag中图像的原始尺寸，避免放大或缩小带来模糊或拉伸形变等问题
+    height: 480  # 图像缩放高度，注意请先查看（推荐浏览器foxglove工具）rosbag中图像的原始尺寸，避免放大或缩小带来模糊或拉伸形变等问题
 
 
 

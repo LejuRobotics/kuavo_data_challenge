@@ -16,6 +16,7 @@ import datetime
 import hydra
 from omegaconf import DictConfig, OmegaConf,ListConfig
 import random
+from lerobot.policies.factory import make_pre_post_processors
 
 @hydra.main(config_path="../configs/deploy/", config_name="others_env", version_base=None)
 def main(cfg: DictConfig):
@@ -28,12 +29,14 @@ def main(cfg: DictConfig):
     policy = CustomDiffusionPolicyWrapper.from_pretrained(pretrained_policy_path)
     policy.to(device)
     policy.eval()
+    preprocessor, postprocessor = make_pre_post_processors(None, Path(str(pretrained_policy_path).split("/epoch", 1)[0]))
+    print("Processor",Path(str(pretrained_policy_path).split("/epoch", 1)[0]))
 
     # Create a directory to store the video of the evaluation
     output_directory = Path("outputs/eval/") / cfg.task / cfg.method / cfg.timestamp / f"epoch{cfg.epoch}"
     output_directory.mkdir(parents=True, exist_ok=True)
     
-    env_obs_select = {"aloha":{"env": "gym_aloha/AlohaInsertion-v0",
+    env_obs_select = {"aloha":{"env": "gym_aloha/AlohaTransferCube-v0",  # gym_aloha/AlohaTransferCube-v0
                                "obs": "observation.images.top"},
                   "pusht": {"env": "gym_pusht/PushT-v0",
                                "obs": "observation.image"}
@@ -95,11 +98,13 @@ def main(cfg: DictConfig):
                     "observation.state": state,
                     env_obs_select["obs"]: image,
                 }
-
+                observation = preprocessor(observation)
+                # print(observation[env_obs_select["obs"]].max(), observation[env_obs_select["obs"]].min())
+                # raise ValueError("Stop here")
                 # Predict the next action with respect to the current observation
                 with torch.inference_mode():
                     action = policy.select_action(observation)
-
+                action = postprocessor(action)
                 # Prepare the action for the environment
                 numpy_action = action.squeeze(0).to("cpu").numpy()
                 if cfg.use_delta:

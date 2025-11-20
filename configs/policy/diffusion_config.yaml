@@ -6,12 +6,13 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
     subdir: ${hydra:job.override_dirname}
 
 
-task: "your_task_name"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
-method: "your_method_name"  # 自定义方法名称
+task: "ruichen_task4"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
+method: "test_dev"  # 自定义方法名称
 timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
 # 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
 repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
-root: "/your/path/to/your/lerobotdata/lerobot"  # 你的本地转换好的lerobot数据的目录
+# root: "/media/yangzhou/Elements/lerobot_handover/lerobot"  # 你的本地转换好的lerobot数据的目录
+root: /media/yangzhou/80268D01268CFA04/datafactory/1104task4_lerobot_hb/lerobot/
 # root: null  # 如果不使用本地数据想使用huggingface官方数据，请在task中指定，例如pusht，aloha_sim_insertion_human，此处就设置为null空
 # 将去云端调用下载数据集
 
@@ -27,8 +28,8 @@ training:
     accumulation_steps: 1  # 梯度累积步数，自定义
     ema_power: 0.75  # 如果使用ema移动指数平均方法可使用这个参数，目前测试使用ema会掉性能，所以代码中不再支持
 
-    batch_size: 64  # 批次大小
-    num_workers: 8  # dataloader的num_workers
+    batch_size: 32  # 批次大小
+    num_workers: 4  # dataloader的num_workers，请根据自己训练电脑的配置选择，否则可能会卡死
     drop_last: False  # 是否丢弃最后一个不完整的batch
 
     # 最大训练步数，用于控制学习率调整器，如果指定了 `max_training_step`，则它将优先生效，否则，该值将根据上述的 `max_epoch` 自动确定。
@@ -37,7 +38,7 @@ training:
 
     # resume training，断点续训
     resume: False
-    resume_timestamp: "run_20250902_150345"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    resume_timestamp: "run_20251110_104721"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
 
     # 数据增广相关的配置
     RGB_Augmenter:
@@ -46,7 +47,7 @@ training:
       random_order: True
       tfs:
         notransform:
-          weight: 2.0  # 占比权重
+          weight: 3.0  # 占比权重
           type: "Identity"
           kwargs: {}
         brightness:
@@ -73,7 +74,7 @@ training:
           weight: 1.0
           type: RandomMask
           kwargs:
-            mask_size: [0.1, 0.1]   # h_ratio, w_ratio
+            mask_size: [0.15, 0.15]   # h_ratio, w_ratio
         random_border_cutout:
           weight: 1.0
           type: RandomBorderCutout
@@ -84,7 +85,7 @@ training:
           type: GaussianNoise
           kwargs:
             mean: 0.0
-            std: 0.05
+            std: 0.1
         gamma_correction:
           weight: 1.0
           type: GammaCorrection
@@ -96,8 +97,9 @@ policy_name: diffusion   # 策略类型，支持diffusion和act
 
 policy:
     _target_: kuavo_train.wrapper.policy.diffusion.DiffusionConfigWrapper.CustomDiffusionConfigWrapper  # 实例化diffusion config
-    horizon: 16  # 预测步数
-    n_action_steps: 8  # 1,2,4,12 执行动作步数
+    n_obs_steps: 2
+    horizon: 16
+    n_action_steps: 8
     drop_n_last_frames: 7  # 丢弃最后n帧
 
     normalization_mapping: # RGB等同于VISUAL类型, diffusion策略另外支持了深度数据，这两个参数用于设置normalize方式
@@ -110,9 +112,9 @@ policy:
 
     # 图像裁剪，（lerobot内有的策略不支持）
     crop_is_random: True
-    crop_shape: [420, 560]  #  [84, 84]
+    crop_shape: [420, 560]  #  [84, 84] [420, 742]
 
-    use_amp: True  # 是否使用混合精度训练
+    use_amp: False  # 是否使用混合精度训练
 
     # 模型相关超参数设置
     vision_backbone: resnet18
@@ -154,22 +156,30 @@ policy:
 
     custom:  # 一些自定义设置，是本代码仓库针对lerobot diffusion policy的特色更改，包含深度数据支持以及transformer模型等，可参考相关代码
       # support depth image
-      use_depth: True
+      use_depth: true
       depth_backbone: resnet18
       use_separate_depth_encoder_per_camera: False
 
       # resize and augmentation
-      resize_shape: [210, 280] 
+      resize_shape: [210,280]  # [224, 368]
 
       # state encoder.
-      use_state_encoder: True
+      use_state_encoder: false
       state_feature_dim: 128
+
+      use_state_discrete: true
+      state_discrete_bins: 36
+      state_emb_dim: 16
 
       # Unet
       use_unet: False
       # transformer
       use_transformer: True
-      transformer_n_emb: 512
+      transformer_n_emb: 384
       transformer_n_head: 8
-      transformer_n_layer: 4
+      transformer_n_layer: 12
       transformer_dropout: 0.1
+
+      # eta for ddim
+      ddim_eta: 0.1
+      state_fuse: False  # 是否使用state融合模块

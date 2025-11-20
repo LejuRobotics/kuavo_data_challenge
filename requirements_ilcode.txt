@@ -11,4 +11,5 @@ scipy
 kuavo_humanoid_sdk
 pympler
 matplotlib
+ipdb
 -e .

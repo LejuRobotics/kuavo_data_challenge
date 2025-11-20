@@ -11,10 +11,10 @@ use_delta: false  # 是否使用增量动作，default=false（暂未支持）
 eval_episodes: 100  # 测试回合数，仿真默认为100，用于评测成功率
 seed: 42
 device: "cuda"  # or "cpu"
-task: "aloha_sim_insertion_human"
-method: "test"
-timestamp: "run_20250825_114605" # 类似的运行时时间戳
-epoch: 100  # 使用训练保存的哪一个epoch。注意：代码将在outputs/<task>/<method>/<timestamp>/epoch10中load policy的模型参数
-max_episode_steps: 600  # 最大回合步数，超过自动结束，根据任务所需时长调整
+task: "aloha_sim_transfer_cube_human"
+method: "your_method_name"
+timestamp: "run_20251017_095912" # 类似的运行时时间戳
+epoch: 300  # 使用训练保存的哪一个epoch。注意：代码将在outputs/<task>/<method>/<timestamp>/epoch10中load policy的模型参数
+max_episode_steps: 500  # 最大回合步数，超过自动结束，根据任务所需时长调整
 env: aloha  # gym官方提供的环境名称pusht or aloha
 

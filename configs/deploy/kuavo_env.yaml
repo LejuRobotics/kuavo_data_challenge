@@ -1,0 +1,96 @@
+# ==========================
+# Kuavo Unified Config File
+# ==========================
+
+hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
+  run:
+    dir: ./outputs/kuavo_deploy_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # 单次运行目录
+  sweep:
+    dir: ./outputs/kuavo_deploy_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep并行时的根目录
+    subdir: ${hydra:job.override_dirname}
+
+
+# =====================================================
+# env config，仿真器运行配置文件
+# =====================================================
+env:
+  env_name: Kuavo-Sim  # kuavo环境名称，仿真Kuavo-Sim，真机Kuavo-Real
+  control_mode: joint # joint 或 eef （正在开发中）
+  eef_type: rq2f85  # 末端执行器类型: 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
+  which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
+  head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, task4 [0,0.087], 真机可根据需要调整，一般为null
+  ros_rate: 10  # 推理控制频率，单位Hz
+
+  only_arm: true  # 默认true, 是否只使用手臂数据, 目前的模仿学习只用于手臂数据，选择true会自动屏蔽足关节数据
+
+  image_size: &IMGSIZE [640, 480]  # 图像大小：宽，高
+  depth_range: &DEPTHRANGE [0, 1500]  # 深度图范围设置，单位mm，default=[0,1500]
+  obs_key_map:  # 话题、消息类型、频率、图像尺寸、深度裁剪等配置，深度图范围设置，单位mm，default=[0,1500]
+    head_cam_h: ["/cam_h/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 头部RGB相机话题，必选
+    wrist_cam_l: ["/cam_l/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 左手腕RGB相机话题，请对应选择，与下至少选择一个
+    wrist_cam_r: ["/cam_r/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 右手腕RGB相机话题，请对应选择，与上至少选择一个
+    depth_h: ["/cam_h/depth/image_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 头部相机深度图话题，可与上述对应选
+    depth_l: ["/cam_l/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 左手腕相机深度图话题，可与上述对应选
+    depth_r: ["/cam_r/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 右手腕相机深度图话题，可与上述对应选
+    joint_q: ["/sensors_data_raw", "sensorsData", 500]  # 关节角度话题，必选
+    # qiangnao: ["/dexhand/state", "JointState", 500]  # 末端执行器的话题，灵巧手
+    # leju_claw: ["/leju_claw_state", "lejuClawState", 500]  # 末端执行器的话题，夹爪
+    rq2f85: ["/gripper/state", "JointState", 500]  # 末端执行器的话题，仿真中夹爪
+  
+  arm_state_keys: ["joint_q","gripper"]  # 默认不动，模型观测输入的手臂状态包含关节角度和夹爪开合状态
+  frame_alignment: false  # 是否启用帧对齐，default=true
+  ratio: 1.0 # 使用帧对齐时，获取最近观测占所有历史观测的比例，default=1.0
+  
+  # Limits关节及数值限制配置，即各个部分的上下限定义，目前不用改动
+  limits:
+    # 关节角度限制 (每只手臂7个关节)
+    joint_q:
+      min: [-3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14]
+      max: [3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14]
+    
+    # 夹爪限制 (每只手臂1个自由度)
+    gripper:
+      min: [0, 0]
+      max: [1, 1]
+    
+    # 末端执行器限制 (3位置+3旋转，左臂6个值 + 3位置+3旋转，右臂6个值)
+    eef:
+      min: [-1, -1, -1, -3.14, -3.14, -3.14, -1, -1, -1, -3.14, -3.14, -3.14]
+      max: [1, 1, 1, 3.14, 3.14, 3.14, 1, 1, 1, 3.14, 3.14, 3.14]
+    
+    # 末端执行器相对动作限制 (用于增量控制)
+    eef_relative:
+      min: [-0.005, -0.0075, -0.004, -0.03, -0.03, -0.05, -0.005, -0.0075, -0.004, -0.03, -0.03, -0.05]
+      max: [0.005, 0.0075, 0.004, 0.03, 0.03, 0.05, 0.005, 0.0075, 0.004, 0.03, 0.03, 0.05]
+    
+    # 基座移动限制 (x, y, yaw, move_flag)
+    base:
+      min: [-2.0, -2.0, -3.14, 0]
+      max: [2.0, 2.0, 3.14, 1]
+
+  # 以下环境配置为不建议改动配置
+
+  # qiangnao_dof_needed是强脑手需要的自由度数目。强脑灵巧手有6个自由度。标准握拳状态[100] * 6, 张开状态[0] * 6。
+  # 1: 不需要精细操作或者多指协同操作时，通常为设置为1，表示只需要第一个关节作为开合依据,此时需要用[0, 100, 0, 0, 0, 0]表示张开状态, [100] * 6表示握拳状态。
+  # 2(暂未测试): 或者设置为2，目前的手柄遥操作只有两个自由度。0,2,3,4,5自由度绑定为1个自由度。
+  # 6(暂未测试): 如果脱离手柄使用手指灵巧操作，可以设置为6，表示需要所有6个自由度。
+  qiangnao_dof_needed: 1   # default=1，保持默认不用改动
+
+  is_binary: false # 是否使用二值化夹爪，灵巧手，default=false，保持默认不用改动
+
+
+# =====================================================
+# inference config，模型推理配置的修改
+# =====================================================
+inference:
+  go_bag_path: /home/yangzhou/data/pick_cu/rosbag_arminit/pick_and_place_rj_20250908133630.bag  # 比赛仿真器中暂时不用，推理时需要提供bag包的完整路径，如：到达预抓取姿态等，可直接拷贝一个训练的rosbag控制。
+  policy_type: "act"  # 策略名字，支持diffusion，act等
+  eval_episodes: 100  # 测试回合数，比赛仿真器默认为100次，用于打分
+  seed: 42  # 随机种子，仿真中可用于固定各物体初始状态，便于复现
+  start_seed: 42  # 回合开始时的随机种子，仿真中可用于固定各物体初始状态，便于复现  
+  device: "cuda"  # or "cpu"
+  task: "dev_task1"
+  method: "rgb_depth_act"
+  timestamp: "run_20251119_094752" # 类似的运行时时间戳
+  epoch: 240  # 使用训练保存的哪一个epoch，可填50，100，best等，注意：代码将在outputs/train/<task>/<method>/<timestamp>/epoch<epoch>中load policy的模型参数
+  max_episode_steps: 200  # 最大回合步数，超过自动结束，可根据任务所需时长调整

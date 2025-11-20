@@ -2,7 +2,7 @@ from typing import Any, Dict
 from dataclasses import dataclass,fields,field
 import copy
 from lerobot.configs.policies import PreTrainedConfig
-from lerobot.policies.diffusion.configuration_diffusion import DiffusionConfig
+from lerobot.policies.act.configuration_act import ACTConfig
 from lerobot.configs.types import FeatureType, NormalizationMode, PolicyFeature
 from omegaconf import DictConfig, OmegaConf, ListConfig
 from copy import deepcopy
@@ -15,28 +15,20 @@ from typing import TypeVar
 from huggingface_hub import HfApi, ModelCard, ModelCardData, hf_hub_download
 from huggingface_hub.constants import SAFETENSORS_SINGLE_FILE
 from huggingface_hub.errors import HfHubHTTPError
-from lerobot.optim.optimizers import AdamConfig,AdamWConfig
 
-T = TypeVar("T", bound="CustomDiffusionConfigWrapper")
+T = TypeVar("T", bound="CustomACTConfigWrapper")
 
-@PreTrainedConfig.register_subclass("custom_diffusion")
+@PreTrainedConfig.register_subclass("custom_act")
 @dataclass
-class CustomDiffusionConfigWrapper(DiffusionConfig):
+class CustomACTConfigWrapper(ACTConfig):
     custom: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
-        vision_backbone = self.vision_backbone
-        self.vision_backbone = "resnet18"
-        noise_scheduler = self.noise_scheduler_type
-        self.noise_scheduler_type = "DDPM"
         super().__post_init__()
-        self.noise_scheduler_type = noise_scheduler
-        self.vision_backbone = vision_backbone
-
         default_map = {
             "VISUAL": NormalizationMode.MEAN_STD,
-            "STATE": NormalizationMode.MIN_MAX,
-            "ACTION": NormalizationMode.MIN_MAX,
+            "STATE": NormalizationMode.MEAN_STD,
+            "ACTION": NormalizationMode.MEAN_STD,
         }
 
         # merge and update the normalization_mapping
@@ -52,20 +44,7 @@ class CustomDiffusionConfigWrapper(DiffusionConfig):
                     setattr(self, k, v)
                 else:
                     raise ValueError(f"Custom setting '{k}: {v}' conflicts with the parent base configuration. Remove it from 'custom' and modify in the parent configuration instead.")
-        # self.input_features = self._normalize_feature_dict(self.input_features)
-        # self.output_features = self._normalize_feature_dict(self.output_features)
         self._convert_omegaconf_fields()
-
-    # def _normalize_feature_dict(self, d: Any) -> dict[str, PolicyFeature]:
-    #     if isinstance(d, DictConfig):
-    #         d = OmegaConf.to_container(d, resolve=True)
-    #     if not isinstance(d, dict):
-    #         raise TypeError(f"Expected dict or DictConfig, got {type(d)}")
-
-    #     return {
-    #         k: PolicyFeature(**v) if isinstance(v, dict) and not isinstance(v, PolicyFeature) else v
-    #         for k, v in d.items()
-    #     }
     
     def _convert_omegaconf_fields(self):
         for f in fields(self):
@@ -86,25 +65,6 @@ class CustomDiffusionConfigWrapper(DiffusionConfig):
     def validate_features(self) -> None:
         if len(self.image_features) == 0 and self.env_state_feature is None:
             raise ValueError("You must provide at least one image or the environment state among the inputs.")
-
-        if self.crop_shape is not None:
-            if isinstance(self.crop_shape[0],(list,tuple)):
-                (x_start, x_end), (y_start, y_end) = self.crop_shape
-                for key, image_ft in self.image_features.items():
-                    if x_start < 0 or x_end > image_ft.shape[1] or y_start<0 or y_end > image_ft.shape[2]:
-                        raise ValueError(
-                            f"`crop_shape` should fit within the images shapes. Got {self.crop_shape} "
-                            f"for `crop_shape` and {image_ft.shape} for "
-                            f"`{key}`."
-                        )
-            else:
-                for key, image_ft in self.image_features.items():
-                    if self.crop_shape[0] > image_ft.shape[1] or self.crop_shape[1] > image_ft.shape[2]:
-                        raise ValueError(
-                            f"`crop_shape` should fit within the images shapes. Got {self.crop_shape} "
-                            f"for `crop_shape` and {image_ft.shape} for "
-                            f"`{key}`."
-                        )
 
         # Check that all input images have the same shape.
         first_image_key, first_image_ft = next(iter(self.image_features.items()))
@@ -167,22 +127,4 @@ class CustomDiffusionConfigWrapper(DiffusionConfig):
             revision=revision,
             **policy_kwargs,
         )
-    
-    def get_optimizer_preset(self):
-        if self.use_unet:
-            print("~~~~~~~~~~~~~~~Use Adam~~~~~~~~~~~~~~~~")
-            return AdamConfig(
-                lr=self.optimizer_lr,
-                betas=self.optimizer_betas,
-                eps=self.optimizer_eps,
-                weight_decay=self.optimizer_weight_decay,
-            )
-        else:
-            print("~~~~~~~~~~~~~~~Use AdamW~~~~~~~~~~~~~~~~")
-            return AdamWConfig(
-                lr=self.optimizer_lr,
-                betas=self.optimizer_betas,
-                eps=self.optimizer_eps,
-                weight_decay=self.optimizer_weight_decay,
-            )
         
