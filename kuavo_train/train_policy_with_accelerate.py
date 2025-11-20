@@ -363,7 +363,11 @@ def main(cfg: DictConfig):
                     optimizer.step()
                     optimizer.zero_grad()
                     lr_scheduler.step()
-
+                    if accelerator.is_main_process:
+                        if steps % cfg.training.log_freq == 0:
+                            writer.add_scalar("train/loss", loss.item(), steps)
+                            writer.add_scalar("train/lr", lr_scheduler.get_last_lr()[0], steps)
+                            epoch_bar.set_postfix(loss=f"{loss.item():.3f}", step=steps, lr=lr_scheduler.get_last_lr()[0])
                     steps += 1
                     batch_count += 1
                     total_loss += accelerator.gather(loss).mean().item()
@@ -378,10 +382,6 @@ def main(cfg: DictConfig):
                 best_loss = total_loss
                 unwrapped_policy = accelerator.unwrap_model(policy)
                 unwrapped_policy.save_pretrained(output_directory / "epochbest")
-
-                writer.add_scalar("train/epoch: ", epoch, steps)
-                writer.add_scalar("train/loss: ", total_loss, steps)
-                writer.add_scalar("train/lr: ", lr_scheduler.get_last_lr()[0], steps)
 
             # Save checkpoint every N epochs
             if (epoch + 1) % cfg.training.save_freq_epoch == 0:
