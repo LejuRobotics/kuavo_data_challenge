@@ -323,7 +323,7 @@ def main(cfg: DictConfig):
         print("Resuming from:", resume_path)
         try:
             # Load state
-            accelerator.load_state(resume_path / "latest_epoch")
+            accelerator.load_state(resume_path / "epochlatest")
             if accelerator.is_main_process:
                 latest_training_state = torch.load(resume_path / "training_latest_state.pth", map_location='cpu')
                 steps = latest_training_state["steps"]
@@ -377,7 +377,7 @@ def main(cfg: DictConfig):
             if total_loss < best_loss:
                 best_loss = total_loss
                 unwrapped_policy = accelerator.unwrap_model(policy)
-                unwrapped_policy.save_pretrained(output_directory / "best")
+                unwrapped_policy.save_pretrained(output_directory / "epochbest")
 
                 writer.add_scalar("train/epoch: ", epoch, steps)
                 writer.add_scalar("train/loss: ", total_loss, steps)
@@ -389,14 +389,14 @@ def main(cfg: DictConfig):
                 unwrapped_policy.save_pretrained(output_directory / f"epoch{epoch+1}")
 
                 # save latest epoch training state based on accelerator save_state
-            accelerator.save_state(output_directory / "latest_epoch", safe_serialization=False)
+            accelerator.save_state(output_directory / "epochlatest", safe_serialization=False)
             training_state = {
                 "epoch": epoch+1, 
                 "steps": steps,
                 "best_loss": best_loss
             }
             torch.save(training_state, output_directory / "training_latest_state.pth")
-            accelerator.wait_for_everyone()
+        accelerator.wait_for_everyone()
 
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
