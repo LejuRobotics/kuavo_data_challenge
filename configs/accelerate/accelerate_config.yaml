@@ -1,6 +1,6 @@
 compute_environment: LOCAL_MACHINE
 distributed_type: MULTI_GPU     # 单机多卡模式
-fp16: false                     # 或者根据您的 amp 配置设置为 true
+fp16: true                     # 或者根据您的 amp 配置设置为 true
 machine_rank: 0
 main_process_ip: null
 main_process_port: null

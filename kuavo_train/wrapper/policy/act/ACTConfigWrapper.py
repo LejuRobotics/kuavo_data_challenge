@@ -112,10 +112,7 @@ class CustomACTConfigWrapper(ACTConfig):
         revision: str | None = None,
         **policy_kwargs,
     ) -> T:
-        # 用父类类型调用 from_pretrained，触发 Choice 机制识别子类
-        parent_cls = PreTrainedConfig  # 或者直接 DiffusionConfig
-
-        # 调用父类的 from_pretrained，注意传入所有参数和额外参数
+        parent_cls = PreTrainedConfig 
         return parent_cls.from_pretrained(
             pretrained_name_or_path,
             force_download=force_download,
