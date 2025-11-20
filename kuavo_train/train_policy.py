@@ -358,44 +358,7 @@ def main(cfg: DictConfig):
         
         total_loss = 0.0
         for batch in epoch_bar:
-            
-            # batch = {k: (v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
-
             batch = preprocessor(batch)  # will normalize and put batch to device
-
-            # 假设 batch 是一个字典
-            # import matplotlib.pyplot as plt
-            # import einops
-            # batchsize = 32
-            # nrows, ncols = 4, 8  # 4行8列
-
-            # for k, v in batch.items():
-            #     if k == "observation.images.head_cam_h":
-            #         # v: (B, S, C, H, W)
-            #         v = v.detach().cpu()
-            #         B, S, C, H, W = v.shape
-
-            #         # 取第一个时间步
-            #         imgs = v[:, 0]  # (B, C, H, W)
-            #         fig, axes = plt.subplots(nrows, ncols, figsize=(16, 8))
-            #         axes = axes.flatten()
-
-            #         for i in range(batchsize):
-            #             img = einops.rearrange(imgs[i], "c h w -> h w c")
-            #             if C == 1:
-            #                 axes[i].imshow(img.squeeze(-1), cmap="gray")
-            #             else:
-            #                 axes[i].imshow(img)
-            #             axes[i].axis("off")
-            #             axes[i].set_title(f"{i}")
-
-            #         # 隐藏多余子图（如果 B < nrows*ncols）
-            #         for j in range(B, nrows*ncols):
-            #             axes[j].axis("off")
-
-            #         plt.tight_layout()
-            #         plt.show()
-            # raise ValueError("stop for debug")
             with make_autocast(amp_enabled):
                 loss, _ = policy.forward(batch)
             # Scale loss and backward with AMP if enabled

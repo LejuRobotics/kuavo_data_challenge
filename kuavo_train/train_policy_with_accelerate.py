@@ -37,11 +37,11 @@ from contextlib import nullcontext
 from lerobot.processor import ProcessorStep, NormalizerProcessorStep
 from lerobot.processor.core import TransitionKey
 from lerobot.configs.types import PipelineFeatureType, PolicyFeature
+from accelerate.logging import get_logger
 import logging
 
-for name in logging.root.manager.loggerDict:
-    if name.startswith("accelerate"):
-        logging.getLogger(name).disabled = True  # disable accelerate logging, you can enable it for debugging if needed
+logger = get_logger(__name__)
+logger.setLevel(logging.ERROR) # disable accelerate logging, you can enable it for debugging if needed
 
 def build_augmenter(cfg):
     """Since operations such as cropping and resizing in LeRobot are implemented at the model level 
@@ -320,7 +320,6 @@ def main(cfg: DictConfig):
     best_loss = float('inf')
 
     # # ===== Resume logic (perfect resume for AMP & RNG) =====
-    accelerator.print("cfg.training.resume:", cfg.training.resume, "cfg.training.resume_timestamp:", cfg.training.resume_timestamp)
     if cfg.training.resume and cfg.training.resume_timestamp:
         resume_path = Path(cfg.training.output_directory) / cfg.training.resume_timestamp
         accelerator.print("Resuming from:", resume_path)
@@ -334,8 +333,7 @@ def main(cfg: DictConfig):
                 best_loss = latest_training_state["best_loss"]
                 accelerator.print(f"Resumed training from epoch {start_epoch}, step {steps}, best_loss {best_loss}")
         except Exception as e:
-            accelerator.print("Failed to load checkpoint:", e)
-            return
+            accelerator.print("Failed to load checkpoint:", e, " Starting training from scratch.")
     else:
         accelerator.print("Training from scratch!")
 
@@ -391,13 +389,15 @@ def main(cfg: DictConfig):
                 unwrapped_policy.save_pretrained(output_directory / f"epoch{epoch+1}")
 
                 # save latest epoch training state based on accelerator save_state
-            accelerator.save_state(output_directory / "epochlatest", safe_serialization=False)
+            accelerator.print("!!!!!!Saving latest epoch training state...,DON'T CTRL+C EXIT!!!!!!")
+            accelerator.save_state(output_directory / "epochlatest")
             training_state = {
                 "epoch": epoch+1, 
                 "steps": steps,
                 "best_loss": best_loss
             }
             torch.save(training_state, output_directory / "training_latest_state.pth")
+            accelerator.print(f"Epoch {epoch+1} completed. Avg Loss: {total_loss:.4f}. Best Loss: {best_loss:.4f}")
         accelerator.wait_for_everyone()
 
     accelerator.wait_for_everyone()

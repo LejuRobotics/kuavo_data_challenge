@@ -465,6 +465,9 @@ python kuavo_train/train_policy.py \
 安装accelerate库： pip install accelerate (一般安装lerobot时已经安装)
 
 ```bash
+# 配置好accelerate yaml文件，根据你自己的机器配置
+vim configs/accelerate/accelerate_config.yaml
+# 配置好后运行示例：
 accelerate launch --config_file configs/accelerate/accelerate_config.yaml kuavo_train/train_policy_with_accelerate.py  --config-path=../configs/policy --config-name=diffusion_config.yaml
 ```
 
