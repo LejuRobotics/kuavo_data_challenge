@@ -449,10 +449,7 @@ python kuavo_train/train_policy.py \
 安装accelerate库： pip install accelerate (一般安装lerobot时已经安装)
 
 ```bash
-accelerate launch --config_file ./configs/policy/accelerate_config.yaml \ 
-  ./kuavo_train/train_policy_with_accelerate.py  --  \ 
-  --config-path ./configs/policy \ 
-  --config-name diffusion_config.yaml
+accelerate launch --config_file configs/accelerate/accelerate_config.yaml ./kuavo_train/train_policy_with_accelerate.py  --config-path=./configs/policy --config-name=diffusion_config.yaml
 ```
 
 说明：
