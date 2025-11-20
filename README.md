@@ -8,6 +8,23 @@
 
 ---
 
+
+## ✨ 新特性！
+
+### 本分支为持续开发中的分支！目前支持了：
+
+- ACT / Diffusion policy的深度图像，分别提供了一种RGB、depth的融合方式，详见[ACT](kuavo_train/wrapper/policy/act/ACTModelWrapper.py), [Diffusion](kuavo_train/wrapper/policy/diffusion/DiffusionModelWrapper.py)
+- Accelerate 多卡并行加速！详见[多卡并行加速](#multigpu)
+- lerobot latest! version 0.4.2 ! [lerobot](https://github.com/huggingface/lerobot)
+- 帧对齐功能！详见[帧对齐](kuavo_deploy/utils/obs_buffer.py)
+- 目录文件结构重整！
+- ···
+
+### 敬请期待：
+- 末端增量式控制支持
+- 更多模仿学习模型！
+
+
 ## 🌟 项目简介
 本仓库基于 [Lerobot](https://github.com/huggingface/lerobot) 开发，结合乐聚 Kuavo（夸父）机器人，提供 **数据格式转换**（rosbag → parquet）、**模仿学习（IL）训练**、**仿真器测试**以及**真机部署验证**的完整示例代码。
 
@@ -460,6 +477,7 @@ python kuavo_train/train_policy.py \
 
 ---
 
+<a id="multigpu"></a>
 ### 2.1 模仿学习训练：单机多卡模式
 
 安装accelerate库： pip install accelerate (一般安装lerobot时已经安装)
