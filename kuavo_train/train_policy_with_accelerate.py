@@ -38,7 +38,10 @@ from lerobot.processor import ProcessorStep, NormalizerProcessorStep
 from lerobot.processor.core import TransitionKey
 from lerobot.configs.types import PipelineFeatureType, PolicyFeature
 import logging
-logging.getLogger("accelerate").disabled = True  # disable accelerate logging, you can enable it for debugging if needed
+
+for name in logging.root.manager.loggerDict:
+    if name.startswith("accelerate"):
+        logging.getLogger(name).disabled = True  # disable accelerate logging, you can enable it for debugging if needed
 
 def build_augmenter(cfg):
     """Since operations such as cropping and resizing in LeRobot are implemented at the model level 
