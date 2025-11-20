@@ -264,9 +264,9 @@ def main(cfg: DictConfig):
     accelerator.print(f"\n---Output features: {output_features}")
     accelerator.print(f"\n---camera_keys:", dataset_metadata.camera_keys)
     accelerator.print(f"\n---Original dataset features:", dataset_metadata.features) 
-    if accelerator.is_main_process:
-        num_total_params = sum(p.numel() for p in policy.parameters())
-        num_learnable_params = sum(p.numel() for p in policy.parameters() if p.requires_grad)
+
+    num_total_params = sum(p.numel() for p in policy.parameters())
+    num_learnable_params = sum(p.numel() for p in policy.parameters() if p.requires_grad)
     accelerator.print(f"num_learnable_params={num_learnable_params}", f"num_total_params={num_total_params}")
 
 
