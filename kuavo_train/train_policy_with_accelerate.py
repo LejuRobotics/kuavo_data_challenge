@@ -259,17 +259,15 @@ def main(cfg: DictConfig):
     optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"], accelerator)
 
     # print only in main process
+    accelerator.print("\n---policy_cfg", policy_cfg)
+    accelerator.print(f"\n---Input features: {input_features}")
+    accelerator.print(f"\n---Output features: {output_features}")
+    accelerator.print(f"\n---camera_keys:", dataset_metadata.camera_keys)
+    accelerator.print(f"\n---Original dataset features:", dataset_metadata.features) 
     if accelerator.is_main_process:
-        print("\n---policy_cfg", policy_cfg)
-        print(f"\n---Input features: {input_features}")
-        print(f"\n---Output features: {output_features}")
-        print(f"\n---camera_keys:", dataset_metadata.camera_keys)
-        print(f"\n---Original dataset features:", dataset_metadata.features) 
         num_total_params = sum(p.numel() for p in policy.parameters())
         num_learnable_params = sum(p.numel() for p in policy.parameters() if p.requires_grad)
-        print(f"num_learnable_params={num_learnable_params}", f"num_total_params={num_total_params}")
-
-
+    accelerator.print(f"num_learnable_params={num_learnable_params}", f"num_total_params={num_total_params}")
 
 
     # Build dataset and dataloader
@@ -322,9 +320,10 @@ def main(cfg: DictConfig):
     best_loss = float('inf')
 
     # # ===== Resume logic (perfect resume for AMP & RNG) =====
+    accelerator.print("cfg.training.resume:", cfg.training.resume, "cfg.training.resume_timestamp:", cfg.training.resume_timestamp)
     if cfg.training.resume and cfg.training.resume_timestamp:
         resume_path = Path(cfg.training.output_directory) / cfg.training.resume_timestamp
-        print("Resuming from:", resume_path)
+        accelerator.print("Resuming from:", resume_path)
         try:
             # Load state
             accelerator.load_state(resume_path / "epochlatest")
@@ -333,13 +332,12 @@ def main(cfg: DictConfig):
                 steps = latest_training_state["steps"]
                 start_epoch = latest_training_state["epoch"]
                 best_loss = latest_training_state["best_loss"]
-                print(f"Resumed training from epoch {start_epoch}, step {steps}, best_loss {best_loss}")
+                accelerator.print(f"Resumed training from epoch {start_epoch}, step {steps}, best_loss {best_loss}")
         except Exception as e:
-            print("Failed to load checkpoint:", e)
+            accelerator.print("Failed to load checkpoint:", e)
             return
     else:
-        print("Training from scratch!")
-
+        accelerator.print("Training from scratch!")
 
     
     # Training loop
