@@ -446,7 +446,7 @@ python kuavo_train/train_policy.py \
 
 ### 2.1 模仿学习训练：单机多卡模式
 
-安装accelerate库： pip install accelerate
+安装accelerate库： pip install accelerate (一般安装lerobot时已经安装)
 
 ```bash
 accelerate launch --config_file ./configs/policy/accelerate_config.yaml \ 
