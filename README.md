@@ -215,7 +215,7 @@ sudo docker start ubuntu_ros_container
 sudo docker exec -it ubuntu_ros_container /bin/bash
 ```
 
-- 或者自定义启动加载文件，launch_docker.sh
+- 或者：自定义启动加载文件，launch_docker.sh, 注意，由于涉及挂载python环境，请在第4步完成后再使用这种sh方式！
 ```shell
 #!/bin/bash
 
@@ -239,7 +239,7 @@ docker run \
     -v $CODE_DIR:/code \
     -v $DATA_DIR:/data \
     -v $PYTHON_DIR:$PYTHON_DIR \
-    --env PATH=/path/to/python_venv/kdc/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    --env PATH=/path/to/python_venv/kdc_dev/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     $CONTAINER /bin/bash
 ```
 
@@ -284,16 +284,18 @@ git submodule update --recursive --progress
 
 使用 conda （推荐）或 python venv 创建虚拟环境（推荐 python 3.10）：
 
+⚠️ 注意，本分支请新建一个独立于master分支的环境！例如: kdc_dev
+
 - ananconda配置：
 
 ```bash
-conda create -n kdc python=3.10
-conda activate kdc
+conda create -n kdc_dev python=3.10
+conda activate kdc_dev
 ```
 
 - 或，源码安装Python3.10.18，再用venv创建虚拟环境
 
-注意：```ppa:deadsnakes``` 在2025年6月后不能在ubuntu20.04上提供了
+⚠️ 注意：```ppa:deadsnakes``` 在2025年6月后不能在ubuntu20.04上提供了，下述安装方式不一定成功：
 
 ```bash
 sudo apt update
@@ -314,8 +316,11 @@ cd Python-3.10.18
 make -j$(nproc)
 sudo make install
 
-python3.10 -m venv kdc
-source kdc/bin/activate
+然后创建venv环境：
+
+```bash
+python3.10 -m venv kdc_dev
+source kdc_dev/bin/activate
 ```
 
 - 查看和确保安装正确：
@@ -381,7 +386,7 @@ sudo ldconfig
 
 - 关于 kuavo_humanoid_sdk：
 
-有时会出现版本不匹配的问题，上述是通过pip install在pypi.org上找包安装的，若出现相关问题，可以手动至kuavo-ros-control或kuavo-ros-opensource源码安装，例如，激活Python环境后：
+⚠️ 有时会出现版本不匹配的问题，无法通信什么的，上述是通过pip install在pypi.org上找包安装的，若出现相关问题，可以手动至kuavo-ros-control或kuavo-ros-opensource源码安装，[kuavo-ros-opensource](https://github.com/LejuRobotics/kuavo-ros-opensource)，例如，激活Python环境后：
 ```bash
 cd /your/path/to/kuavo-ros-control/src/kuavo_humanoid_sdk
 # 或

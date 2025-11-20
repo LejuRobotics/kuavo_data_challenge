@@ -18,7 +18,7 @@ env:
   control_mode: joint # joint 或 eef （正在开发中）
   eef_type: rq2f85  # 末端执行器类型: 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
   which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
-  head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, task4 [0,0.087], 真机可根据需要调整，一般为null
+  head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, task4 请使用 [0,0.087], 真机可根据需要调整，一般为null
   ros_rate: 10  # 推理控制频率，单位Hz
 
   only_arm: true  # 默认true, 是否只使用手臂数据, 目前的模仿学习只用于手臂数据，选择true会自动屏蔽足关节数据
