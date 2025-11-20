@@ -19,6 +19,7 @@ from hydra.utils import instantiate
 
 from lerobot.configs.types import FeatureType, NormalizationMode
 from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata, LeRobotDataset
+from lerobot.datasets.sampler import EpisodeAwareSampler
 from lerobot.datasets.utils import dataset_to_policy_features
 from lerobot.utils.random_utils import set_seed
 from lerobot.policies.factory import make_pre_post_processors
@@ -281,19 +282,32 @@ def main(cfg: DictConfig):
     accelerator.wait_for_everyone()
     # Training loop
     aug_step = insert_before_normalizer(preprocessor, AugmentationProcessorStep(image_transforms, dataset.meta.camera_keys))  # just for training
+    
+    if hasattr(cfg.policy, "drop_n_last_frames"):
+        shuffle = False
+        sampler = EpisodeAwareSampler(
+            dataset.meta.episodes["dataset_from_index"],
+            dataset.meta.episodes["dataset_to_index"],
+            drop_n_last_frames=cfg.policy.drop_n_last_frames,
+            shuffle=True,
+        )
+    else:
+        shuffle = True
+        sampler = None
+
     dataloader = DataLoader(
         dataset,
         num_workers=cfg.training.num_workers,
         batch_size=cfg.training.batch_size,
-        shuffle=True,
+        shuffle=shuffle,
+        sampler=sampler,
         pin_memory=(device.type != "cpu"),
         drop_last=cfg.training.drop_last,
-        prefetch_factor=1,
+        prefetch_factor=2 if cfg.training.num_workers > 0 else None,
     )
-
     # Use accelerator to prepare data, model, and optimizer
     accelerator.wait_for_everyone()
-    
+
     policy, optimizer, dataloader, lr_scheduler = accelerator.prepare(
         policy, optimizer, dataloader, lr_scheduler
     )
