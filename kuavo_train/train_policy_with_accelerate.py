@@ -37,11 +37,7 @@ from contextlib import nullcontext
 from lerobot.processor import ProcessorStep, NormalizerProcessorStep
 from lerobot.processor.core import TransitionKey
 from lerobot.configs.types import PipelineFeatureType, PolicyFeature
-from accelerate.logging import get_logger
-import logging
 
-logger = get_logger(__name__)
-logger.setLevel(logging.ERROR) # disable accelerate logging, you can enable it for debugging if needed
 
 def build_augmenter(cfg):
     """Since operations such as cropping and resizing in LeRobot are implemented at the model level 
