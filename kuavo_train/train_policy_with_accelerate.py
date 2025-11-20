@@ -21,8 +21,9 @@ from lerobot.configs.types import FeatureType, NormalizationMode
 from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata, LeRobotDataset
 from lerobot.datasets.utils import dataset_to_policy_features
 from lerobot.utils.random_utils import set_seed
-
+from lerobot.policies.factory import make_pre_post_processors
 from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
+from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
 from kuavo_train.wrapper.dataset.LeRobotDatasetWrapper import CustomLeRobotDataset
 from kuavo_train.utils.augmenter import crop_image, resize_image, DeterministicAugmenterColor
 from kuavo_train.utils.utils import save_rng_state, load_rng_state
@@ -32,6 +33,9 @@ from utils.transforms import ImageTransforms, ImageTransformsConfig, ImageTransf
 
 from functools import partial
 from contextlib import nullcontext
+from lerobot.processor import ProcessorStep, NormalizerProcessorStep
+from lerobot.processor.core import TransitionKey
+from lerobot.configs.types import PipelineFeatureType, PolicyFeature
 
 
 def build_augmenter(cfg):
@@ -101,13 +105,12 @@ def build_optimizer_and_scheduler(policy, cfg, total_frames, accelerator):
     # or you can set your optimizer and lr_scheduler here and replace it.
     return optimizer, lr_scheduler
 
-def build_policy(name, policy_cfg, dataset_stats):
+def build_policy(name, policy_cfg):
     policy = {
         "diffusion": CustomDiffusionPolicyWrapper,
-        "act": ACTPolicy,
-    }[name](policy_cfg, dataset_stats)
+        "act": CustomACTPolicyWrapper,
+    }[name](policy_cfg)
     return policy
-
 
 def build_policy_config(cfg, input_features, output_features):
     def _normalize_feature_dict(d: Any) -> dict[str, PolicyFeature]:
@@ -132,6 +135,78 @@ def build_policy_config(cfg, input_features, output_features):
     policy_cfg.output_features = _normalize_feature_dict(policy_cfg.output_features)
     return policy_cfg
 
+class AugmentationProcessorStep(ProcessorStep):
+    def __init__(self, transform, cam_keys):
+        super().__init__()
+        self.transform = transform
+        self.cam_keys = [k for k in cam_keys if "depth" not in k]  # list of keys in the transition dict to augment
+
+    def __call__(self, transition):
+        # Store the current transition (required by ProcessorStep)
+        new_transition = transition.copy()
+
+        # Apply transform to each camera key
+        data_dict = new_transition.get(TransitionKey.OBSERVATION)
+        if data_dict is not None:
+            # new_data_dict = {
+            #     k: self.transform(v) if k in self.cam_keys else v
+            #     for k, v in data_dict.items()
+            # }
+            new_data_dict = {}
+            for k, v in data_dict.items():
+                
+                if k in self.cam_keys:
+                    # print(k)
+                    new_data_dict[k] = self.transform(v)
+                else:
+                    new_data_dict[k] = v
+            # print(new_data_dict['observation.images.head_cam_h'].device)
+            new_transition[TransitionKey.OBSERVATION] = new_data_dict
+            return new_transition
+        else:
+            return new_transition
+        
+
+    def transform_features(
+        self, features: dict[PipelineFeatureType, dict[str, PolicyFeature]]
+    ) -> dict[PipelineFeatureType, dict[str, PolicyFeature]]:
+        """
+        Returns the input features unchanged.
+
+        Device and dtype transformations do not alter the fundamental definition of the features (e.g., shape).
+
+        Args:
+            features: A dictionary of policy features.
+
+        Returns:
+            The original dictionary of policy features.
+        """
+        return features
+    
+
+def insert_before_normalizer(pipeline, new_step):
+    """
+    Insert a processor step before the first NormalizerProcessorStep.
+    If no NormalizerProcessorStep is found, append at the end.
+    """
+    for i, step in enumerate(pipeline.steps):
+        if isinstance(step, NormalizerProcessorStep):
+            pipeline.steps.insert(i, new_step)
+            print(f"Inserted {new_step.__class__.__name__} before NormalizerProcessorStep", {i})
+            return new_step
+    pipeline.steps.append(new_step)
+    print(f"No NormalizerProcessorStep found, appended {new_step.__class__.__name__} at the end")
+    return new_step
+
+def remove_aug_step(pipeline, step_to_remove):
+    """
+    Remove the given step from the pipeline if it exists.
+    """
+    if step_to_remove in pipeline.steps:
+        pipeline.steps.remove(step_to_remove)
+        print(f"Removed {step_to_remove.__class__.__name__}")
+    else:
+        print(f"Step {step_to_remove.__class__.__name__} not found in pipeline")
 
 @hydra.main(config_path="../configs/policy/", config_name="diffusion_config", version_base=None)
 def main(cfg: DictConfig):
@@ -167,8 +242,12 @@ def main(cfg: DictConfig):
 
     # instantiate the policy
     policy_cfg = build_policy_config(cfg, input_features, output_features)
-    policy = build_policy(cfg.policy_name, policy_cfg, dataset_stats=dataset_metadata.stats)
-
+    # Build policy
+    policy = build_policy(cfg.policy_name, policy_cfg)
+    accelerator.wait_for_everyone()
+    preprocessor, postprocessor = make_pre_post_processors(policy_cfg, dataset_stats=dataset_metadata.stats)
+    preprocessor.save_pretrained(output_directory)
+    postprocessor.save_pretrained(output_directory)
     # Initialize optimizer and lr scheduler
     optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"], accelerator)
 
@@ -182,45 +261,26 @@ def main(cfg: DictConfig):
         num_total_params = sum(p.numel() for p in policy.parameters())
         num_learnable_params = sum(p.numel() for p in policy.parameters() if p.requires_grad)
         print(f"{num_learnable_params=} ({num_learnable_params})", f"{num_total_params=} ({num_total_params})")
-    accelerator.wait_for_everyone()
 
     # Initialize training state variables
     start_epoch = 0
     steps = 0
     best_loss = float('inf')
 
-    # # ===== Resume logic (perfect resume for AMP & RNG) =====
-    if cfg.training.resume and cfg.training.resume_timestamp:
-        resume_path = Path(cfg.training.output_directory) / cfg.training.resume_timestamp
-        print("Resuming from:", resume_path)
-        try:
-            # Load state
-            accelerator.load_state(resume_path / "latest_epoch")
-            if accelerator.is_main_process:
-                best_training_state = torch.load(resume_path / "training_latest_state.pth", map_location='cpu')
-                steps = best_training_state["steps"]
-                start_epoch = best_training_state["epoch"]
-                best_loss = best_training_state["best_loss"]
-                print(f"Resumed training from epoch {start_epoch}, step {steps}, best_loss {best_loss}") 
-        except Exception as e:
-            print("Failed to load checkpoint:", e)
-            return
-    else:
-        print("Training from scratch!")
-
 
     # Build dataset and dataloader
     delta_timestamps = build_delta_timestamps(dataset_metadata, policy_cfg)
 
-    image_transforms = build_augmenter(cfg.training.RGB_Augmenter)                 # TODO  add angle tranforms
+    image_transforms = build_augmenter(cfg.training.RGB_Augmenter)
     dataset = LeRobotDataset(
         cfg.repoid,
         delta_timestamps=delta_timestamps,
         root=cfg.root,
-        image_transforms=image_transforms,
+        image_transforms=None,
     )
-
-
+    accelerator.wait_for_everyone()
+    # Training loop
+    aug_step = insert_before_normalizer(preprocessor, AugmentationProcessorStep(image_transforms, dataset.meta.camera_keys))  # just for training
     dataloader = DataLoader(
         dataset,
         num_workers=cfg.training.num_workers,
@@ -232,9 +292,30 @@ def main(cfg: DictConfig):
     )
 
     # Use accelerator to prepare data, model, and optimizer
+    accelerator.wait_for_everyone()
+    
     policy, optimizer, dataloader, lr_scheduler = accelerator.prepare(
         policy, optimizer, dataloader, lr_scheduler
     )
+
+    # # ===== Resume logic (perfect resume for AMP & RNG) =====
+    if cfg.training.resume and cfg.training.resume_timestamp:
+        resume_path = Path(cfg.training.output_directory) / cfg.training.resume_timestamp
+        print("Resuming from:", resume_path)
+        try:
+            # Load state
+            accelerator.load_state(resume_path / "latest_epoch")
+            if accelerator.is_main_process:
+                latest_training_state = torch.load(resume_path / "training_latest_state.pth", map_location='cpu')
+                steps = latest_training_state["steps"]
+                start_epoch = latest_training_state["epoch"]
+                best_loss = latest_training_state["best_loss"]
+                print(f"Resumed training from epoch {start_epoch}, step {steps}, best_loss {best_loss}")
+        except Exception as e:
+            print("Failed to load checkpoint:", e)
+            return
+    else:
+        print("Training from scratch!")
 
     # Training loop
     for epoch in range(start_epoch, cfg.training.max_epoch):
@@ -249,10 +330,11 @@ def main(cfg: DictConfig):
         total_loss = 0.0
         batch_count = 0
         for batch in epoch_bar:
+            batch = preprocessor(batch)
             with accelerator.accumulate(policy):
-                batch = {k: (v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
-
-                loss, _ = policy.forward(batch)
+                # batch = {k: (v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
+                with accelerator.autocast():
+                    loss, _ = policy.forward(batch)
                 accelerator.backward(loss)
 
                 if accelerator.sync_gradients:
@@ -286,14 +368,14 @@ def main(cfg: DictConfig):
                 unwrapped_policy.save_pretrained(output_directory / f"epoch{epoch+1}")
 
                 # save latest epoch training state based on accelerator save_state
-                accelerator.save_state(output_directory / "latest_epoch", safe_serialization=False)
-                training_state = {
-                    "epoch": epoch+1, 
-                    "steps": steps,
-                    "best_loss": best_loss
-                }
-                torch.save(training_state, output_directory / "training_latest_state.pth")
-
+            accelerator.save_state(output_directory / "latest_epoch", safe_serialization=False)
+            training_state = {
+                "epoch": epoch+1, 
+                "steps": steps,
+                "best_loss": best_loss
+            }
+            torch.save(training_state, output_directory / "training_latest_state.pth")
+            accelerator.wait_for_everyone()
 
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
