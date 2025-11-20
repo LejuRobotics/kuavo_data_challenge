@@ -25,7 +25,7 @@ head_init: null # 机器人头部初始位置，default=None
 #                 "right":['head_cam_h','depth_h','wrist_cam_r','depth_r'],
 #                 "both":['head_cam_h','depth_h','wrist_cam_l','depth_l','wrist_cam_r','depth_r']
 #                 }][int(self.use_depth)][self.which_arm]
-input_images: ["head_cam_h", "wrist_cam_r"]
+input_images: ["head_cam_h", "wrist_cam_r"]  # 目前本分支只有diffusion policy支持了深度，ACT policy暂不支持深度图像，但在dev分支中已经支持
 depth_range: [0, 1000]  # 深度图的裁剪范围，单位：毫米，没有深度图时不起作用
 image_size: [480, 848] # 图像大小（高，宽），default=(480, 640)
 ros_rate: 10  # 推理频率，单位Hz

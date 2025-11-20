@@ -18,7 +18,7 @@ dataset:
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   eef_type: rq2f85 # 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
   which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
-  use_depth: true  # 是否需要深度图像数据，与上面手臂保持一致的深度数据
+  use_depth: true  # 是否需要深度图像数据，与上面手臂保持一致的深度数据，目前本分支只有diffusion policy支持了深度，ACT policy暂不支持深度图像，但在dev分支中已经支持
   depth_range: [0, 1000]  # 深度图的裁剪范围，单位：毫米
 
   task_description: "Pick and Place" # 任务描述，自定义
