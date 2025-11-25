@@ -206,6 +206,7 @@ def main(config: KuavoConfig, env: gym.Env):
 
                 # 执行动作
                 observation, reward, terminated, truncated, info = env.step(numpy_action)
+                observation = preprocessor(observation)
                 exec_time = time.time()
                 log_model.debug(f"exec time: {exec_time - action_infer_time:.3f}s")
                 average_exec_time += exec_time - action_infer_time
@@ -275,8 +276,8 @@ def main(config: KuavoConfig, env: gym.Env):
     print(f"📁 Videos and logs saved to: {output_directory}")
     print("="*50)
 
-def kuavo_eval(config_path: Path, env: gym.Env):
-    main(config_path, env)
+def kuavo_eval(config: KuavoConfig, env: gym.Env):
+    main(config, env)
 
 if __name__ == "__main__":
     config_path = Path("test.yaml")

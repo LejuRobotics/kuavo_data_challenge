@@ -8,6 +8,7 @@ import gymnasium as gym
 import time
 import sys
 from kuavo_humanoid_sdk import KuavoSDK, KuavoRobot, KuavoRobotState, DexterousHand
+from kuavo_humanoid_sdk.msg.kuavo_msgs.msg import lejuClawCommand
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.config import KuavoConfig
 from kuavo_deploy.utils.ros_manager import ROSManager
@@ -428,7 +429,7 @@ class KuavoBaseRosEnv(gym.Env):
         elif self.eef_type == 'leju_claw':
             eef_msg = JointState()
             eef_msg.position = np.array([left_eef * 100, right_eef * 100])
-            self.lejuclaw.control(eef_msg)
+            self.lejuclaw.control(target_positions=eef_msg.position)
 
         elif self.eef_type == 'qiangnao':
             if self.qiangnao_dof_needed != 1:

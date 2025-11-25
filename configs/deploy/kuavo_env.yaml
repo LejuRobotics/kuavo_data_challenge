@@ -35,8 +35,8 @@ env:
     depth_l: ["/cam_l/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 左手腕相机深度图话题，可与上述对应选
     depth_r: ["/cam_r/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # 右手腕相机深度图话题，可与上述对应选
     joint_q: ["/sensors_data_raw", "sensorsData", 500]  # 关节角度话题，必选
-    # qiangnao: ["/dexhand/state", "JointState", 500]  # 末端执行器的话题，灵巧手
-    # leju_claw: ["/leju_claw_state", "lejuClawState", 500]  # 末端执行器的话题，夹爪
+    qiangnao: ["/dexhand/state", "JointState", 500]  # 末端执行器的话题，灵巧手
+    leju_claw: ["/leju_claw_state", "lejuClawState", 500]  # 末端执行器的话题，夹爪
     rq2f85: ["/gripper/state", "JointState", 500]  # 末端执行器的话题，仿真中夹爪
   
   arm_state_keys: ["joint_q","gripper"]  # 默认不动，模型观测输入的手臂状态包含关节角度和夹爪开合状态
