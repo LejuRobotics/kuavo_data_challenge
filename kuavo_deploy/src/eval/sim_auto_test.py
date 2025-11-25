@@ -226,7 +226,7 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     task = cfg.task
     # Initialize environment
     env = gym.make(
-        cfg.env_name,
+        config.env.env_name,
         max_episode_steps=cfg.max_episode_steps,
         config=config,
     )
