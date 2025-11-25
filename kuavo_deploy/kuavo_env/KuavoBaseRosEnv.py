@@ -84,8 +84,9 @@ class KuavoBaseRosEnv(gym.Env):
         self.arm_max = np.array(self.arm_max)/180*np.pi
         self.eef_min = config_kuavo_env.eef_min
         self.eef_max = config_kuavo_env.eef_max
-        self.base_min = config_kuavo_env.base_min
-        self.base_max = config_kuavo_env.base_max
+        if not self.only_arm:
+            self.base_min = config_kuavo_env.base_min
+            self.base_max = config_kuavo_env.base_max
         self.input_images = config_kuavo_env.input_images
 
         self.bridge = CvBridge()
