@@ -100,6 +100,11 @@ def setup_signal_handlers():
     log_robot.info("  SIGUSR1 (kill -USR1): 暂停/恢复机械臂运动")
     log_robot.info("  SIGUSR2 (kill -USR2): 停止机械臂运动")
 
+def unwrap_env(env):
+    while hasattr(env, "env"):
+        env = env.env
+    return env
+
 class ArmMove:
     """机械臂运动控制类"""
     
@@ -133,10 +138,11 @@ class ArmMove:
 
         rospy.init_node('kuavo_deploy', anonymous=True)
         self.env = gym.make(
-            self.inference_config.env_name,
+            self.config.env.env_name,
             max_episode_steps=self.inference_config.max_episode_steps,
             config=self.config,
         )
+        self.env = unwrap_env(self.env)
 
 
     def _check_control_signals(self):
@@ -198,9 +204,9 @@ class ArmMove:
         if self.env.which_arm=="both":
             target_positions = msg.data.position
         elif self.env.which_arm=="left":
-            target_positions = np.concatenate([msg.data.position[:self.env.leju_claw_dof_needed],[0]],axis=0)
+            target_positions = np.concatenate([msg.data.position[:1],[0]],axis=0)
         elif self.env.which_arm=="right":
-            target_positions = np.concatenate([[0],msg.data.position[self.env.leju_claw_dof_needed:]],axis=0)
+            target_positions = np.concatenate([[0],msg.data.position[1:]],axis=0)
         else:
             raise ValueError(f"Invalid which_arm: {self.env.which_arm}, must be 'left', 'right', or 'both'")
         self.env.lejuclaw.control(target_positions)

@@ -226,7 +226,7 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     task = cfg.task
     # Initialize environment
     env = gym.make(
-        cfg.env_name,
+        config.env.env_name,
         max_episode_steps=cfg.max_episode_steps,
         config=config,
     )
@@ -260,11 +260,11 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     # Reset the policy and environments to prepare for rollout
     policy.reset()
     observation, info = env.reset(seed=seed)
-    first_img =  (observation["observation.images.head_cam_h"].squeeze().permute(1,2,0).numpy()*255).astype(np.uint8)
+    # first_img =  (observation["observation.images.head_cam_h"].squeeze().permute(1,2,0).numpy()*255).astype(np.uint8)
     
-    import cv2
-    first_img = cv2.cvtColor(first_img,cv2.COLOR_RGB2BGR)
-    cv2.imwrite( "obs.png", first_img)
+    # import cv2
+    # first_img = cv2.cvtColor(first_img,cv2.COLOR_RGB2BGR)
+    # cv2.imwrite( "obs.png", first_img)
     # raise ValueError("stop for debug!")
     start_service(TriggerRequest())
 
