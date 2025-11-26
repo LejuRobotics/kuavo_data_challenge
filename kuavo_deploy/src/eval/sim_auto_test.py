@@ -122,42 +122,6 @@ def check_control_signals():
     return True  # 正常继续
 
 
-def check_rostopics(task):
-    topics = {}
-    if "task1" in task:
-        topics.update({
-            "/mujoco/box_grab/pose": "geometry_msgs/PoseStamped",
-            "/mujoco/marker1/pose": "geometry_msgs/PoseStamped",
-            "/mujoco/marker2/pose": "geometry_msgs/PoseStamped"
-        })
-
-    log_robot.info(f"检查ROS话题 ({len(topics)}个):")
-    log_robot.info("=" * 50)
-        
-    available = 0
-    for topic, msg_type in topics.items():
-        try:
-            # 动态导入消息类型
-            if msg_type == "geometry_msgs/PoseStamped":
-                from geometry_msgs.msg import PoseStamped
-                msg_class = PoseStamped
-            else:
-                raise ValueError(f"Unsupported message type: {msg_type}")
-            
-            # 检查话题
-            start_time = time.time()
-            rospy.wait_for_message(topic, msg_class, timeout=1.0)
-            response_time = time.time() - start_time
-            
-            log_robot.info(f"✅ {topic} ({response_time:.3f}s)")
-            available += 1
-            
-        except Exception as e:
-            log_robot.warning(f"❌ {topic}: {str(e)[:50]}...")
-    
-    log_robot.info("=" * 50)
-    log_robot.info(f"结果: {available}/{len(topics)} 个话题可用")
-    return available == len(topics)
     
 def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     """
@@ -194,32 +158,7 @@ def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     
     return policy
 
-# Globals to store latest tracked positions
-latest_object_position = None
-latest_marker1_position = None
-latest_marker2_position = None
-latest_object_orientation = None
-
-def box_grab_callback(msg):
-    global latest_object_position, latest_object_orientation
-    p = msg.pose.position
-    latest_object_position = [p.x, p.y, p.z]
-    latest_object_orientation = [msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w]
-
-def marker1_callback(msg):
-    global latest_marker1_position
-    p = msg.pose.position
-    latest_marker1_position = [p.x, p.y, p.z]
-
-def marker2_callback(msg):
-    global latest_marker2_position
-    p = msg.pose.position
-    latest_marker2_position = [p.x, p.y, p.z]
-
-
-
-
-def run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory, json_file_path):
+def run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory):
     """运行单个episode"""
     cfg = config.inference
     seed = cfg.seed
@@ -234,22 +173,11 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     run_single_ros_manager = ROSManager()
     # Setup ROS subscribers and services
     run_single_ros_manager.register_subscriber("/simulator/success", Bool, env_success_callback)
-    if "task1" in task:
-        run_single_ros_manager.register_subscriber("/mujoco/box_grab/pose", PoseStamped, box_grab_callback)
-        run_single_ros_manager.register_subscriber("/mujoco/marker1/pose", PoseStamped, marker1_callback)
-        run_single_ros_manager.register_subscriber("/mujoco/marker2/pose", PoseStamped, marker2_callback)
 
-    check_rostopics(task)
     # max_episode_steps = cfg.max_episode_steps
 
     start_service = rospy.ServiceProxy('/simulator/start', Trigger)
-    
-    episode_record = {
-        "episode_index": episode,
-        "marker1_position": latest_marker1_position,
-        "marker2_position": latest_marker2_position,
-        "timestamp": datetime.datetime.now().isoformat(),
-    }
+
 
     if cfg.policy_type != 'client':
         log_model.info(f"policy.config.input_features: {policy.config.input_features}")
@@ -274,7 +202,6 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     cam_keys = [k for k in observation.keys() if "images" in k or "depth" in k]
     frame_map = {k: [] for k in cam_keys}
 
-    steps_records = []
 
     average_exec_time = 0
     average_action_infer_time = 0
@@ -309,15 +236,6 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
         average_exec_time += exec_time - action_infer_time
         
         rewards.append(reward)
-
-        # Record step data
-        js = observation.get("observation.state", None)
-        joint_list = js.tolist() if isinstance(js, np.ndarray) else None
-        steps_records.append({
-            "object_position": latest_object_position,
-            "object_orientation": latest_object_orientation,
-            "joint_state": joint_list,
-        })
 
         # 相机帧记录
         for k in cam_keys:
@@ -355,30 +273,6 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
 
     # Build and append episode record
     success = success_evt.is_set()
-
-    episode_record.update({
-        "success": bool(success),
-        "step_count": len(steps_records),
-        "steps": steps_records,
-    })
-
-    # Load existing file, append, and save
-    data = {}
-    if json_file_path.exists():
-        try:
-            with open(json_file_path, "r") as f:
-                data = json.load(f)
-        except Exception:
-            data = {}
-
-    if "episodes" not in data:
-        data = {"task": task, "episode_num": 0, "episodes": []}
-
-    data["episodes"].append(episode_record)
-    data["episode_num"] = len(data["episodes"])
-
-    with open(json_file_path, "w") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
     
     env.close()
     run_single_ros_manager.close()
@@ -403,20 +297,10 @@ def kuavo_eval_autotest(config: KuavoConfig):
 
     # Log evaluation results
     log_file_path = output_directory / "evaluation_autotest.log"
-    json_file_path = output_directory / "evaluation_autotest.json"
     
     with log_file_path.open("w") as log_file:
         log_file.write(f"Evaluation Timestamp: {datetime.datetime.now()}\n")
         log_file.write(f"Total Episodes: {eval_episodes}\n")
-
-    # Initialize JSON data file
-    episode_data = {
-        "task": task,
-        "episode_num": 0,
-        "episodes": [],
-    }
-    with json_file_path.open("w", encoding="utf-8") as json_file:
-        json.dump(episode_data, json_file, indent=2, ensure_ascii=False)
     
     
     # Setup policy and environment (只加载一次)
@@ -454,7 +338,7 @@ def kuavo_eval_autotest(config: KuavoConfig):
                 return
             time.sleep(1)
         try:
-            result = run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory, json_file_path)
+            result = run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory)
             log_robot.info(f"Episode {episode+1} completed with return code: {result}")
         except Exception as e:
             log_robot.error(f"Exception during episode {episode+1}: {e}")
@@ -491,7 +375,6 @@ def kuavo_eval_autotest(config: KuavoConfig):
     log_model.info(f"📊 Success count: {success_count}/{eval_episodes}")
     log_model.info(f"📈 Success rate: {success_count / eval_episodes:.2%}")
     log_model.info(f"📁 Videos and logs saved to: {output_directory}")
-    log_model.info(f"📁 JSON results saved to: {json_file_path}")
     log_model.info("="*50)
     init_service.shutdown()
     pause_sub.unregister()

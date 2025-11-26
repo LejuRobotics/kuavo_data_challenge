@@ -64,53 +64,6 @@ class FeatureEncoder(nn.Module):
         else:
             raise ValueError("FeatureEncoder expects 2D or 3D tensor.")
 
-
-class DiscreteStateEmbedding(nn.Module):
-    """
-    Discretize continuous state vector along each dimension into bins and embed.
-    Returns flattened embedding vector per sample or per timestep.
-    """
-    def __init__(self, state_dim: int, num_bins: int = 36, emb_dim: int = 16):
-        super().__init__()
-        self.state_dim = state_dim
-        self.num_bins = num_bins
-        self.emb_dim = emb_dim
-        # embed each bin index (we will offset indices per-dim for a single embedding table)
-        self.emb_table = nn.Embedding(num_bins * state_dim, emb_dim)
-
-    def forward(self, x: Tensor) -> Optional[Tensor]:
-        """
-        x: (B, state_dim) or (B, T, state_dim)
-        returns: (B, state_dim * emb_dim) or (B, T, state_dim * emb_dim)
-        """
-        if x is None:
-            return None
-
-        is_seq = x.dim() == 3
-        if is_seq:
-            B, T, D = x.shape
-            x_flat = x.view(B * T, D)
-        else:
-            x_flat = x
-            B = x.shape[0]
-            D = x_flat.shape[-1]
-
-        # per-sample min-max normalize to [0,1]
-        minv = x_flat.min(dim=-1, keepdim=True)[0]
-        maxv = x_flat.max(dim=-1, keepdim=True)[0]
-        denom = (maxv - minv).clamp(min=1e-6)
-        x_norm = (x_flat - minv) / denom  # (B[*T], D)
-
-        idx = (x_norm * (self.num_bins - 1)).long().clamp(0, self.num_bins - 1)  # (B[*T], D)
-        # convert per-dim idx to unique indices in [0, num_bins*D)
-        offset = (torch.arange(D, device=x.device).unsqueeze(0) * self.num_bins)  # (1, D)
-        indices = idx + offset  # broadcast (B[*T], D)
-        emb = self.emb_table(indices)  # (B[*T], D, emb_dim)
-        emb_flat = emb.view(B, -1) if not is_seq else emb.view(B * T, -1)
-        if is_seq:
-            return emb_flat.view(B, T, -1)
-        return emb_flat  # (B, D * emb_dim)
-
 class ResnetRgbEncoder(nn.Module):
     def __init__(self, config: CustomDiffusionConfigWrapper):
         super().__init__()
@@ -307,14 +260,7 @@ class CustomDiffusionModelWrapper(DiffusionModel):
         final_state_dim = None
         if getattr(self.config, "robot_state_feature", None) is not None:
             state_dim = self.config.robot_state_feature.shape[0]
-            if getattr(self.config, "use_state_discrete", False):
-                # print("~~~~~~~~~~~~~~~~~~~~~~~~~~use_state_discrete~~~~~~~~~~~~~~~~~~~~~~~~~~")
-                emb_dim = getattr(self.config, "state_emb_dim", 16)
-                bins = getattr(self.config, "state_discrete_bins", 36)
-                self.state_encoder = DiscreteStateEmbedding(state_dim, num_bins=bins, emb_dim=emb_dim)
-                final_state_dim = state_dim * emb_dim
-                global_cond_dim += final_state_dim
-            elif getattr(self.config, "use_state_encoder", False):
+            if getattr(self.config, "use_state_encoder", False):
                 out_dim = getattr(self.config, "state_feature_dim", 128)
                 self.state_encoder = FeatureEncoder(state_dim, out_dim)
                 final_state_dim = out_dim
