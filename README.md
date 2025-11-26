@@ -416,17 +416,6 @@ sudo ldconfig
 # ffmpeg -version验证
 ```
 
-
-- 关于 kuavo_humanoid_sdk：
-
-⚠️ 有时会出现版本不匹配的问题，无法通信什么的，上述是通过pip install在pypi.org上找包安装的，若出现相关问题，可以手动至kuavo-ros-control或kuavo-ros-opensource源码安装，[kuavo-ros-opensource](https://github.com/LejuRobotics/kuavo-ros-opensource)，例如，激活Python环境后：
-```bash
-cd /your/path/to/kuavo-ros-control/src/kuavo_humanoid_sdk
-# 或
-# cd /your/path/to/kuavo-ros-opensource/src/kuavo_humanoid_sdk
-
-./install.sh
-```
 ---
 
 ## 📨 使用方法
@@ -521,8 +510,46 @@ b. 调用部署代码
 
 ### 4. 真机测试
 
-步骤同3中a部分，更换指定配置文件为 `kuavo_real_env.yaml`，即可在真机上部署测试。
+- 步骤同3中a部分，更换指定配置文件为 `kuavo_real_env.yaml`，即可在真机上部署测试。边侧机推理请见：上位机orin推理请见：
 
+- 推理运行时的日志在log/kuavo_deploy/kuavo_deploy.log，请查看。
+
+- 关于 kuavo_humanoid_sdk：
+
+⚠️ 有时会出现版本不匹配的问题，无法通信什么的，会报错：机械臂初始化失败！解决方案，若出现相关问题：
+
+（a）进入机器人下位机，
+
+```bash
+  ssh lab@192.168.26.1 # 密码三个空格
+  cd ~/kuavo-ros-opensource
+  git describe --tag # 查看opensource版本
+  # 显示xxx
+```
+  - 返回边侧机，或上位机，
+```bash
+# 进入环境
+conda activate kdc_dev
+# 或
+source kdc_dev/bin/activate
+pip install kuavo-humanoid-sdk==xxx #安装对应版本的sdk
+```
+
+
+（b）（时间较久，较复杂，不推荐）可以拷贝机器人下位机的kuavo-ros-opensource的内容安装，[kuavo-ros-opensource](https://github.com/LejuRobotics/kuavo-ros-opensource)，例如，
+
+```bash
+scp -r lab@192.168.26.1:~/kuavo-ros-opensource /your/path/
+cd /your/path/kuavo-ros-opensource/src/kuavo_humanoid_sdk
+# 或
+# cd /your/path/to/kuavo-ros-opensource/src/kuavo_humanoid_sdk
+# 进入环境
+conda activate kdc_dev
+# 或
+source kdc_dev/bin/activate
+
+./install.sh
+```
 ---
 
 ## 📡 ROS 话题说明
