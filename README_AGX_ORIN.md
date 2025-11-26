@@ -131,7 +131,7 @@ python kuavo_deploy/eval_kuavo.py
 
 ## 附录：
 
-python3.10安装：
+### python3.10安装：
 
 ⚠️ 注意：```ppa:deadsnakes``` 在2025年6月后不能在ubuntu20.04上提供了，下述安装方式不一定成功：
 
@@ -154,4 +154,42 @@ cd Python-3.10.18
 ./configure --prefix=$HOME/python3.10 --enable-optimizations
 make -j$(nproc)
 sudo make install
+```
+
+---
+### 关于 kuavo_humanoid_sdk：
+
+⚠️ 有时会出现版本不匹配的问题，无法通信什么的，会报错：机械臂初始化失败！解决方案，若出现相关问题：
+
+（a）进入机器人下位机，
+
+```bash
+  ssh lab@192.168.26.1 # 密码三个空格
+  cd ~/kuavo-ros-opensource
+  git describe --tag # 查看opensource版本
+  # 显示xxx
+```
+  - 返回边侧机，或上位机，
+```bash
+# 进入环境
+conda activate kdc_dev
+# 或
+source kdc_dev/bin/activate
+pip install kuavo-humanoid-sdk==xxx #安装对应版本的sdk
+```
+
+
+（b）（时间较久，较复杂，不推荐）可以拷贝机器人下位机的kuavo-ros-opensource的内容安装，[kuavo-ros-opensource](https://github.com/LejuRobotics/kuavo-ros-opensource)，例如，
+
+```bash
+scp -r lab@192.168.26.1:~/kuavo-ros-opensource /your/path/
+cd /your/path/kuavo-ros-opensource/src/kuavo_humanoid_sdk
+# 或
+# cd /your/path/to/kuavo-ros-opensource/src/kuavo_humanoid_sdk
+# 进入环境
+conda activate kdc_dev
+# 或
+source kdc_dev/bin/activate
+
+./install.sh
 ```
