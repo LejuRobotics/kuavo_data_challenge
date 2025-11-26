@@ -164,12 +164,8 @@ policy:
       resize_shape: [210,280]  # [224, 368]
 
       # state encoder.
-      use_state_encoder: false
+      use_state_encoder: true
       state_feature_dim: 128
-
-      use_state_discrete: true
-      state_discrete_bins: 36
-      state_emb_dim: 16
 
       # Unet
       use_unet: False
