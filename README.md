@@ -493,28 +493,28 @@ a. 启动mujoco仿真器：详情请见[readme for simulator](https://github.com
 b. 调用部署代码
 
 - 配置文件位于 `./configs/deploy/`：
-  * `kuavo_sim_env.yaml`：仿真器运行配置
-  * `kuavo_real_env.yaml`：真机运行配置
+  * `kuavo_env.yaml`：夸父机器人运行环境配置，`env_name`为`Kuavo-Sim`，其他如`obs_key_map`观测按需修改
 
+- 请查看yaml文件说明，并修改其中的`# env`，`# inference`相关的参数（需要的信息、模型的加载）等。
 
-- 请查看yaml文件，并修改下面的`# inference configs`相关的参数（模型加载）等。
-
-- 启动自动化推理部署：
+- 启动自动化推理部署：（注意与main分支不同）
   ```bash
-  bash kuavo_deploy/eval_kuavo.sh
+  python kuavo_deploy/eval_kuavo.py
   ```
-- 按照指引操作，一般最后请选择`"8. 仿真中自动测试模型，执行eval_episodes次:`，这步操作详见[kuavo deploy](kuavo_deploy/readme/inference.md)
+- 按照指引操作，一般先选择`3`，然后给到`kuavo_env.yaml`的路径（`configs/deploy/kuavo_env.yaml`），最后仿真运行请选择`"8. auto_test       : 自动测试任务：仿真中自动测试模型，执行 eval_episodes 次`，这步操作详见[kuavo deploy](kuavo_deploy/readme/inference.md)
 ---
 
 
 
 ### 4. 真机测试
 
-- 步骤同3中a部分，更换指定配置文件为 `kuavo_real_env.yaml`，即可在真机上部署测试。边侧机推理请见：上位机orin推理请见：
+- 步骤同3中b部分，修改配置文件 `kuavo_env.yaml`，`env_name`为`Kuavo-Real`，其他如`eef_type`，`obs_key_map`等按需修改，即可在真机上部署测试。
+
+- 边侧机推理请见（待更新），上位机orin推理请见：[README_AGX_ORIN.md](README_AGX_ORIN.md)
 
 - 推理运行时的日志在log/kuavo_deploy/kuavo_deploy.log，请查看。
 
-- 关于 kuavo_humanoid_sdk：
+### 5. 关于 kuavo_humanoid_sdk：
 
 ⚠️ 有时会出现版本不匹配的问题，无法通信什么的，会报错：机械臂初始化失败！解决方案，若出现相关问题：
 
