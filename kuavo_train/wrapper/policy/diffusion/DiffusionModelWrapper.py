@@ -480,7 +480,10 @@ class CustomDiffusionModelWrapper(DiffusionModel):
         # Final concat -> (B, S, cond_dim)
         if len(feats) == 0:
             return torch.zeros((B, S, 0), device=next(self.parameters()).device)
-        return torch.cat(feats, dim=-1)
+        if self.config.use_unet:
+            return torch.cat(feats, dim=-1).flatten(start_dim=1)
+        else:
+            return torch.cat(feats, dim=-1)
 
     # ---------------------------
     # Inference sampling
