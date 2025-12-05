@@ -14,4 +14,3 @@ sync_to_github:
 
   only:
     - master
-    - dev

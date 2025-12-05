@@ -119,6 +119,84 @@ remove_large_files() {
   fi
 }
 
+# Function to sync submodules from source repository
+sync_submodules() {
+  echo "Syncing submodules from source repository..."
+  
+  # Save current directory (TEMP_REPO_PATH)
+  local temp_repo_dir="$TEMP_REPO_PATH/git_repo"
+  
+  # Go back to the original CI repository
+  cd "$PROJECT_DIR"
+  
+  # Get submodule information for the current commit
+  if [ -f .gitmodules ]; then
+    echo "Found .gitmodules in source repository"
+
+    # Using .gitmodules and gitlinks to get submodule info without cloning
+    
+    # Get list of submodules with their paths and URLs
+    git config --file .gitmodules --get-regexp path | while read -r key path; do
+      # Extract module name from the key
+      module_name=$(echo "$key" | sed 's/^submodule\.\(.*\)\.path$/\1/')
+      
+      # Get the URL for this submodule from .gitmodules
+      url=$(git config --file .gitmodules --get "submodule.${module_name}.url")
+      
+      # Get the commit hash for this submodule using gitlink (without cloning)
+      # git ls-tree shows the gitlink which contains the exact commit SHA
+      commit_hash=$(git ls-tree HEAD "$path" | awk '{print $3}')
+      
+      echo "Processing submodule: $module_name"
+      echo "  Path: $path"
+      echo "  URL: $url"
+      echo "  Commit: $commit_hash"
+      
+      # Switch to temp repository
+      cd "$temp_repo_dir"
+      
+      # Check if the path already exists (could be a file, directory, or submodule)
+      if [ -e "$path" ] || [ -d "$path" ]; then
+        echo "  Path $path already exists, cleaning it up..."
+        # Remove from git index if it's tracked
+        git rm -rf --cached "$path" 2>/dev/null || true
+        # Remove physical files/directories
+        rm -rf "$path"
+      fi
+      
+      # Check if submodule is already registered in .gitmodules
+      if git config --file .gitmodules --get "submodule.${module_name}.url" >/dev/null 2>&1; then
+        echo "  Submodule $module_name already registered, removing from config..."
+        git config --file .gitmodules --remove-section "submodule.${module_name}" 2>/dev/null || true
+        git config --remove-section "submodule.${module_name}" 2>/dev/null || true
+      fi
+      
+      # Add the submodule
+      echo "  Adding submodule to target repository..."
+      git submodule add -f "$url" "$path"
+      
+      # Checkout the specific commit
+      if [ -n "$commit_hash" ]; then
+        cd "$path"
+        git checkout "$commit_hash"
+        cd "$temp_repo_dir"
+      fi
+      
+      # Go back to source repository for next iteration
+      cd "$PROJECT_DIR"
+    done
+    
+    # Return to temp repository
+    cd "$temp_repo_dir"
+    echo "Submodules synchronization completed"
+  else
+    echo "No .gitmodules file found in source repository"
+    cd "$temp_repo_dir"
+  fi
+  
+  return 0
+}
+
 # Function to commit and push changes
 commit_and_push() {
   echo "Committing and pushing changes..."
@@ -186,6 +264,12 @@ main() {
   # Remove large files
   if ! remove_large_files; then
     send_failure_notification "Failed to remove large files"
+    exit 1
+  fi
+  
+  # Sync submodules from source repository
+  if ! sync_submodules; then
+    send_failure_notification "Failed to sync submodules"
     exit 1
   fi
   
