@@ -122,78 +122,126 @@ remove_large_files() {
 # Function to sync submodules from source repository
 sync_submodules() {
   echo "Syncing submodules from source repository..."
-  
-  # Save current directory (TEMP_REPO_PATH)
-  local temp_repo_dir="$TEMP_REPO_PATH/git_repo"
-  
-  # Go back to the original CI repository
-  cd "$PROJECT_DIR"
-  
-  # Get submodule information for the current commit
-  if [ -f .gitmodules ]; then
-    echo "Found .gitmodules in source repository"
 
-    # Using .gitmodules and gitlinks to get submodule info without cloning
-    
-    # Get list of submodules with their paths and URLs
-    git config --file .gitmodules --get-regexp path | while read -r key path; do
-      # Extract module name from the key
-      module_name=$(echo "$key" | sed 's/^submodule\.\(.*\)\.path$/\1/')
-      
-      # Get the URL for this submodule from .gitmodules
-      url=$(git config --file .gitmodules --get "submodule.${module_name}.url")
-      
-      # Get the commit hash for this submodule using gitlink (without cloning)
-      # git ls-tree shows the gitlink which contains the exact commit SHA
-      commit_hash=$(git ls-tree HEAD "$path" | awk '{print $3}')
-      
-      echo "Processing submodule: $module_name"
+  local temp_repo_dir="$TEMP_REPO_PATH/git_repo"
+
+  cd "$PROJECT_DIR"
+
+  if [ ! -f .gitmodules ]; then
+    echo "No .gitmodules file found in source repository"
+    cd "$temp_repo_dir"
+    return 0
+  fi
+
+  echo "Found .gitmodules in source repository"
+
+  # Collect all submodule information first to avoid subshell issues with pipe
+  # Using arrays to store submodule info
+  local -a submodule_names=()
+  local -a submodule_paths=()
+  local -a submodule_urls=()
+  local -a submodule_commits=()
+
+  # Use process substitution instead of pipe to avoid subshell
+  while IFS= read -r line; do
+    if [[ "$line" =~ submodule\.(.+)\.path\ (.+) ]]; then
+      local module_name="${BASH_REMATCH[1]}"
+      local path="${BASH_REMATCH[2]}"
+      local url=$(git config --file .gitmodules --get "submodule.${module_name}.url")
+      local commit_hash=$(git ls-tree HEAD "$path" 2>/dev/null | awk '{print $3}')
+
+      submodule_names+=("$module_name")
+      submodule_paths+=("$path")
+      submodule_urls+=("$url")
+      submodule_commits+=("$commit_hash")
+
+      echo "Found submodule: $module_name"
       echo "  Path: $path"
       echo "  URL: $url"
       echo "  Commit: $commit_hash"
-      
-      # Switch to temp repository
-      cd "$temp_repo_dir"
-      
-      # Check if the path already exists (could be a file, directory, or submodule)
-      if [ -e "$path" ] || [ -d "$path" ]; then
-        echo "  Path $path already exists, cleaning it up..."
-        # Remove from git index if it's tracked
-        git rm -rf --cached "$path" 2>/dev/null || true
-        # Remove physical files/directories
-        rm -rf "$path"
-      fi
-      
-      # Check if submodule is already registered in .gitmodules
-      if git config --file .gitmodules --get "submodule.${module_name}.url" >/dev/null 2>&1; then
-        echo "  Submodule $module_name already registered, removing from config..."
-        git config --file .gitmodules --remove-section "submodule.${module_name}" 2>/dev/null || true
-        git config --remove-section "submodule.${module_name}" 2>/dev/null || true
-      fi
-      
-      # Add the submodule
-      echo "  Adding submodule to target repository..."
-      git submodule add -f "$url" "$path"
-      
-      # Checkout the specific commit
-      if [ -n "$commit_hash" ]; then
-        cd "$path"
-        git checkout "$commit_hash"
-        cd "$temp_repo_dir"
-      fi
-      
-      # Go back to source repository for next iteration
-      cd "$PROJECT_DIR"
-    done
-    
-    # Return to temp repository
+    fi
+  done < <(git config --file .gitmodules --get-regexp path)
+
+  # Check if we found any submodules
+  if [ ${#submodule_names[@]} -eq 0 ]; then
+    echo "No submodules found in .gitmodules"
     cd "$temp_repo_dir"
-    echo "Submodules synchronization completed"
-  else
-    echo "No .gitmodules file found in source repository"
-    cd "$temp_repo_dir"
+    return 0
   fi
-  
+
+  echo "Found ${#submodule_names[@]} submodule(s) to process"
+
+  # Now process each submodule
+  for i in "${!submodule_names[@]}"; do
+    local module_name="${submodule_names[$i]}"
+    local path="${submodule_paths[$i]}"
+    local url="${submodule_urls[$i]}"
+    local commit_hash="${submodule_commits[$i]}"
+
+    echo ""
+    echo "Processing submodule [$((i+1))/${#submodule_names[@]}]: $module_name"
+    echo "  Path: $path"
+    echo "  URL: $url"
+    echo "  Target commit: $commit_hash"
+
+    # Switch to temp repository
+    cd "$temp_repo_dir"
+
+    # Clean up existing path (could be file, directory, or submodule from rsync)
+    if [ -e "$path" ] || [ -d "$path" ]; then
+      echo "  Cleaning up existing path: $path"
+      git rm -rf --cached "$path" 2>/dev/null || true
+      rm -rf "$path"
+    fi
+
+    # Clean up submodule config if already registered
+    if git config --file .gitmodules --get "submodule.${module_name}.url" >/dev/null 2>&1; then
+      echo "  Removing existing submodule config for: $module_name"
+      git config --file .gitmodules --remove-section "submodule.${module_name}" 2>/dev/null || true
+      git config --remove-section "submodule.${module_name}" 2>/dev/null || true
+    fi
+
+    # Also check .git/config for stale submodule entries
+    if git config --get "submodule.${module_name}.url" >/dev/null 2>&1; then
+      echo "  Removing stale submodule entry from .git/config: $module_name"
+      git config --remove-section "submodule.${module_name}" 2>/dev/null || true
+    fi
+
+    # Add the submodule
+    echo "  Adding submodule: $url -> $path"
+    if ! git submodule add -f "$url" "$path"; then
+      echo "  ERROR: Failed to add submodule $module_name"
+      continue
+    fi
+
+    # Checkout the specific commit
+    if [ -n "$commit_hash" ]; then
+      echo "  Checking out specific commit: $commit_hash"
+      cd "$path"
+
+      # Fetch to ensure we have the commit (in case of shallow clone)
+      git fetch origin 2>/dev/null || echo "  Warning: fetch failed, trying checkout anyway"
+
+      if git checkout "$commit_hash"; then
+        echo "  Successfully checked out commit: $commit_hash"
+      else
+        echo "  ERROR: Failed to checkout commit $commit_hash for $module_name"
+        echo "  Current HEAD: $(git rev-parse HEAD)"
+      fi
+
+      cd "$temp_repo_dir"
+    else
+      echo "  WARNING: No commit hash found for $module_name, using default branch"
+    fi
+
+    # Stage the submodule changes
+    git add "$path"
+    git add .gitmodules
+  done
+
+  cd "$temp_repo_dir"
+  echo ""
+  echo "Submodules synchronization completed"
   return 0
 }
 
