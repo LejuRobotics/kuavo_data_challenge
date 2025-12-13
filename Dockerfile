@@ -27,7 +27,7 @@ ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
 # 配置国内镜像并安装 mamba
-RUN conda config --add channels conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/ \
+RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/ \
     && conda config --set show_channel_urls yes \
     && conda install -y mamba -c conda-forge
 
