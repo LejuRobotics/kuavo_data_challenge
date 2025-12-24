@@ -507,6 +507,18 @@ class KuavoBaseRosEnv(gym.Env):
         """关闭环境，释放资源"""
         log_robot.info("Closing KuavoBaseRosEnv...")
         try:
+            if hasattr(self, 'obs_buffer'):
+                self.obs_buffer.stop_subscribers()
+                if hasattr(self.obs_buffer, 'obs_buffer_data'):
+                    for k in self.obs_buffer.obs_buffer_data:
+                        self.obs_buffer.obs_buffer_data[k]["data"].clear()
+                        self.obs_buffer.obs_buffer_data[k]["timestamp"].clear()
+                if hasattr(self.obs_buffer, 'ros_manager'):
+                    self.obs_buffer.ros_manager = None
+                if hasattr(self.obs_buffer, 'control_signal_manager'):
+                    self.obs_buffer.control_signal_manager = None
+                del self.obs_buffer
+            
             if hasattr(self, 'ros_manager'):
                 self.ros_manager.close()
             if hasattr(self, 'control_signal_manager'):
