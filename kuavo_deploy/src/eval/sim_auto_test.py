@@ -22,6 +22,7 @@ pip install -e ".[pusht]"
 ```
 """
 import sys,os
+import gc
 from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 from lerobot_patches import custom_patches
 
@@ -200,7 +201,12 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     # from initial state to final state.
     rewards = []
     cam_keys = [k for k in observation.keys() if "images" in k or "depth" in k]
-    frame_map = {k: [] for k in cam_keys}
+
+    frame_temp_dirs = {}
+    for k in cam_keys:
+        temp_dir = output_directory / f"temp_frames_{episode}_{k}"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        frame_temp_dirs[k] = temp_dir
 
 
     average_exec_time = 0
@@ -237,16 +243,15 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
         
         rewards.append(reward)
 
-        # 相机帧记录
         for k in cam_keys:
-            frame_map[k].append(observation[k].squeeze(0).cpu().numpy().transpose(1, 2, 0))
-            # os.makedirs(output_directory / f"frames_{k}" / f"episode_{episode}", exist_ok=True)
-            # output_path = output_directory / f"frames_{k}" / f"episode_{episode}" / f"step_{step:04d}.png"
-            # img = (observation[k].squeeze(0).cpu().numpy().transpose(1, 2, 0) * 255).astype(np.uint8)
-            # if img.shape[-1] == 1:
-            #     img = img.squeeze(-1)
-            # imageio.imwrite(str(output_path), img)
-
+            frame_path = frame_temp_dirs[k] / f"frame_{step:04d}.png"
+            img = (observation[k].squeeze(0).cpu().numpy().transpose(1, 2, 0) * 255).astype(np.uint8)
+            if img.shape[-1] == 1:
+                img = img.squeeze(-1)
+            imageio.imwrite(str(frame_path), img)
+    
+        if step % 10 == 0:
+            torch.cuda.empty_cache()
 
         # The rollout is considered done when the success state is reached (i.e. terminated is True),
         # or the maximum number of iterations is reached (i.e. truncated is True)
@@ -267,15 +272,33 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     log_model.info(f"average sleep time: {env.unwrapped.average_sleep_time / step:.3f}s")
     
     for cam in cam_keys:
-        frames = frame_map[cam]
+        temp_dir = frame_temp_dirs[cam]
+        frame_files = sorted(temp_dir.glob("frame_*.png"))
+        frames = [imageio.imread(str(f)) for f in frame_files]
         output_path = output_directory / f"rollout_{episode}_{cam}.mp4"
         imageio.mimsave(str(output_path), frames, fps=fps)
+        
 
-    # Build and append episode record
+        for f in frame_files:
+            f.unlink()
+        temp_dir.rmdir()
+        
+        del frames
+
     success = success_evt.is_set()
     
     env.close()
     run_single_ros_manager.close()
+    
+    del rewards
+    del observation
+    del env
+    del run_single_ros_manager
+    del frames
+    
+    gc.collect()
+    torch.cuda.empty_cache()
+    
     return 1 if success else 0  # 返回是否成功
 
 
@@ -340,6 +363,14 @@ def kuavo_eval_autotest(config: KuavoConfig):
         try:
             result = run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory)
             log_robot.info(f"Episode {episode+1} completed with return code: {result}")
+            
+            # 重置policy状态，清理缓存
+            policy.reset()
+            
+            # 强制垃圾回收和GPU缓存清理
+            gc.collect()
+            torch.cuda.empty_cache()
+            
         except Exception as e:
             log_robot.error(f"Exception during episode {episode+1}: {e}")
             log_robot.error(traceback.format_exc())
@@ -347,6 +378,10 @@ def kuavo_eval_autotest(config: KuavoConfig):
             safe_reset_service(reset_service)
             init_evt.clear()
             success_evt.clear()
+            
+            # 异常情况下也要清理内存
+            gc.collect()
+            torch.cuda.empty_cache()
             break
 
         # 记录episode结果
