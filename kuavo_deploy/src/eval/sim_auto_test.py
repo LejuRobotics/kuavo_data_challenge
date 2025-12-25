@@ -249,9 +249,6 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
             if img.shape[-1] == 1:
                 img = img.squeeze(-1)
             imageio.imwrite(str(frame_path), img)
-    
-        if step % 10 == 0:
-            torch.cuda.empty_cache()
 
         # The rollout is considered done when the success state is reached (i.e. terminated is True),
         # or the maximum number of iterations is reached (i.e. truncated is True)
