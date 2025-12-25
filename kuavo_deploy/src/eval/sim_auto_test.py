@@ -291,7 +291,6 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     del observation
     del env
     del run_single_ros_manager
-    del frames
     
     gc.collect()
     torch.cuda.empty_cache()
