@@ -41,6 +41,11 @@ cd kuavo_data_challenge
 git checkout origin/dev
 git submodule init
 git submodule update --recursive --progress
+
+# 如果这一步骤由于网络原因下载失败或很慢：请
+# cd third_party
+# git clone https://githubproxy.cc/https://github.com/huggingface/lerobot.git
+# cd ../ # 回到上一级目录
 ```
 
 ---
@@ -61,6 +66,9 @@ pip list
 
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -r requirements_agxorin.txt
+
+# 如果因pip版本问题导致依赖冲突：
+pip install -r requirements_agxorin.txt --use-deprecated=legacy-resolver
 ```
 
 ---
