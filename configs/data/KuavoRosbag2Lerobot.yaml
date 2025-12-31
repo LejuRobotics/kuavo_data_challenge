@@ -1,46 +1,56 @@
-hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
+hydra:  # Hydra config directory, for parameter checking only
   run:
-    dir: ./outputs/data_cvt_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # 单次运行目录
+    dir: ./outputs/data_cvt_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # Single run root dir
   sweep:
-    dir: ./outputs/data_cvt_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep 时的根目录
+    dir: ./outputs/data_cvt_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep root dir
     subdir: ${hydra:job.override_dirname}
 
 
-# kuavo rosbag数据转换成lerobot-parquet格式0配置文件
+# kuavo rosbag to lerobot-parquet data conversion
+# Important!!!
+# This branch syncs with lerobot version, with the expected lerobot version being 0.4.1 right now
+# Due to the version changes, the data conversion, training as well as inference codes have major revisions! Please use lerobot0.4.1 based data conversion scripts!
+# lerobot repository: https://github.com/huggingface/lerobot
+
 rosbag:
-  rosbag_dir: /path/to/your/rosbag  # rosbag文件所在目录
-  num_used: null # 使用的rosbag数量(若设置为任意数字，则会随机采样选择)
-  lerobot_dir: /path/to/your/lerobot/save/file  # 转换后的lerobot文件的保存目录
+  rosbag_dir: /path/to/your/rosbag # rosbag file directory
+  num_used: null # Quantities of rosbag used (will randomly choose the selected amount of files). null denotes all rosbags
+  lerobot_dir: /your/path/to/your/lerobotdata/  # Lerobot output directory after conversion. The lerobot folder will be created and all converted data will be saved here
 
 dataset:
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  only_arm: true  # 默认true, 是否只使用手臂数据,!!!!!!!!!task4请设置为false,task4请设置为false,task4请设置为false!!!!!!!!!
+  only_arm: true  # Default is true, whether to use only arm data. Setting this to true automatically ignores all lower limb data.
+  #!!!!!!!!!!!!Should be true for all tasks in this competition!!!!!!!!!!!!!!!
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  eef_type: rq2f85 # 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
-  which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
-  use_depth: true  # 是否需要深度图像数据，与上面手臂保持一致的深度数据，目前本分支只有diffusion policy支持了深度，ACT policy暂不支持深度图像，但在dev分支中已经支持
-  depth_range: [0, 1000]  # 深度图的裁剪范围，单位：毫米
+  eef_type: rq2f85 # End-effector type. rq2f85 for simulation. Real-device options being leju_claw (claw, used in this competition) or qiangnao (dexhand)
+  which_arm: both  # Which arm joint + image data to use. Available options:left, right, both. Head cam data will be included regardless
+  use_depth: true  # Whether to enable depth, according to which cameras to be used from above. The act and dp policies in this branch all have depth support.
+  depth_range: [0, 1500]  # Depth image crop area, in mm. Used for normalisation.
+ 
+  task_description: "Pick and Place" # Task description, change if desired
 
-  task_description: "Pick and Place" # 任务描述，自定义
+  train_hz: 10  # Training data sampling rate
+  main_timeline: head_cam_h # Which cam is your main cam. Default is head_cam_h. Could be changed to wrist_cam_l, wrist_cam_r wrist cam if desired.
+  main_timeline_fps: 30 # Main cam frame rate, must be stable. Default is 30fps.
+  sample_drop: 10 # Drop 10 frames in the beginning and end of each episode.
 
-  train_hz: 10  # 训练数据的采样频率
-  main_timeline: head_cam_h #将哪个相机设为主相机，默认主相机来自：head_cam_h, 可选：wrist_cam_l, wrist_cam_r
-  main_timeline_fps: 30 # 主相机的帧率，必须稳定
-  sample_drop: 10 # 丢弃episode前后的10帧
-
-  # dex_dof_needed是强脑手需要的自由度数目。强脑灵巧手有6个自由度。标准握拳状态[100] * 6, 张开状态[0] * 6。
-  # 1: 不需要精细操作或者多指协同操作时，通常为设置为1，表示只需要第一个关节作为开合依据,此时需要用[0, 100, 0, 0, 0, 0]表示张开状态, [100] * 6表示握拳状态。
-  # 2(暂未测试): 或者设置为2，目前的手柄遥操作只有两个自由度。0,2,3,4,5自由度绑定为1个自由度。
-  # 6(暂未测试): 如果脱离手柄使用手指灵巧操作，可以设置为6，表示需要所有6个自由度。
+  # dex_dof_needed is the dof needed for dex hand. The qiangnao dexhand has 6 dof, with fully closed being [100] * 6, fully open being [0] * 6.
+  # 1: When precise operation or multi-finger coordinated operation is not required, it is usually set to 1, which means that only the first joint is needed as the basis for opening and closing.
+  #    In this case, [0, 100, 0, 0, 0, 0] is used to represent the open state, and [100] * 6 represents the clenched fist state.
+  # 2(Untested): 0,2,3,4,5 dof becomes a single dof.
+  # 6(Untested): All 6 dof are available.
   dex_dof_needed: 1   # default=1
 
-  is_binary: false  # 是否将开合二值化, default=false
-  delta_action: false # 是否使用增量动作，default=false
-  relative_start: false # 是否使用相对起始位置, default=false
+  is_binary: false  # Is open and close binary? default=false
+  delta_action: false # Whether to use delta for action. default=false. Still under development
+  relative_start: false # Whether to use relative start position. default=false
+
 
   resize:
-    width: 640  # 图像缩放
-    height: 480  # 图像缩放
+    width: 640  # Image width scaling. Please check the original dimensions of the image in ROSBAG first (using tools like FoxGlove)
+    # to avoid blurring or stretching distortion caused by enlarging or shrinking.
+    height: 480  # Image height scaling. Please check the original dimensions of the image in ROSBAG first (using tools like FoxGlove)
+    # to avoid blurring or stretching distortion caused by enlarging or shrinking.
 
 
 

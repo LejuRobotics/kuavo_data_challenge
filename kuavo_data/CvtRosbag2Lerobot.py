@@ -27,6 +27,30 @@ logging.basicConfig(
 from pympler import asizeof
 import matplotlib.pyplot as plt
 
+
+
+# 临时测试使用：
+# -------------------------------------------------
+DEFAULT_ARM_JOINT_RANGE = [
+    [-3.14159, 1.5708], 
+    [-0.349066, 2.0944], 
+    [-1.5708, 1.5708],
+    [-2.61799, 0],
+    [-1.5708, 1.5708], 
+    [-1.309, 0.698132], 
+    [-0.698132, 0.698132],
+    [-1, 1],
+    [-3.14159, 1.5708], 
+    [-2.0944, 0.349066], 
+    [-1.5708, 1.5708], 
+    [-2.61799, 0], 
+    [-1.5708, 1.5708], 
+    [-0.698132, 1.309], 
+    [-0.698132, 0.698132],
+    [-1, 1]
+] 
+# -------------------------------------------------
+
 def get_attr_sizes(obj, prefix=""):
     """递归获取对象每个属性及嵌套属性的内存占用"""
     sizes = {}
@@ -97,8 +121,8 @@ import torch
 import tqdm
 import json
 
-import common.kuavo_dataset as kuavo
-
+import kuavo_data.common.kuavo_dataset as kuavo
+import rospy
 
 @dataclasses.dataclass(frozen=True)
 class DatasetConfig:
@@ -127,7 +151,7 @@ def get_cameras(bag_data: dict) -> list[str]:
 def create_empty_dataset(
     repo_id: str,
     robot_type: str,
-    mode: Literal["video", "image"] = "image",
+    mode: Literal["video", "image"] = "video",
     *,
     has_velocity: bool = False,
     has_effort: bool = False,
@@ -140,23 +164,24 @@ def create_empty_dataset(
     # TODO: auto detect cameras
     cameras = kuavo.DEFAULT_CAMERA_NAMES
 
+
     action_dim = (len(motors),)
+
     # set action name/dim, state name/dim,
     action_name =  motors
-    state_dim = (len(motors),)
-    state_name = kuavo.DEFAULT_ARM_JOINT_NAMES[:len(kuavo.DEFAULT_ARM_JOINT_NAMES)//2] + ["gripper_l"] + kuavo.DEFAULT_ARM_JOINT_NAMES[len(kuavo.DEFAULT_ARM_JOINT_NAMES)//2:] + ["gripper_r"]
 
+    state_dim = (len(motors),)
+
+
+    state_name = kuavo.DEFAULT_ARM_JOINT_NAMES[:len(kuavo.DEFAULT_ARM_JOINT_NAMES)//2] + ["gripper_l"] + kuavo.DEFAULT_ARM_JOINT_NAMES[len(kuavo.DEFAULT_ARM_JOINT_NAMES)//2:] + ["gripper_r"]
+    
     if not kuavo.ONLY_HALF_UP_BODY:
         action_dim = (action_dim[0] + 3 + 1,)  # cmd_pos_world3+断点标志1
         action_name += ["cmd_pos_x", "cmd_pos_y", "cmd_pos_yaw", "ctrl_change_cmd"]
         state_dim = (state_dim[0] + 0,)  # 机器人base_pos_world3+断点标志1
-        state_name += [] # 如上 ["base_pos_x", "base_pos_y", "base_pos_yaw", "ctrl_change_flag"]
+        state_name += []  # 如上 ["base_pos_x", "base_pos_y", "base_pos_yaw", "ctrl_change_flag"]
 
-    # 根据config的参数决定是否为半身和末端的关节类型
-    motors = DEFAULT_JOINT_NAMES_LIST
-    # TODO: auto detect cameras
-    cameras = kuavo.DEFAULT_CAMERA_NAMES
-
+    # create corresponding features
     features = {
         "observation.state": {
             "dtype": "float32",
@@ -173,7 +198,6 @@ def create_empty_dataset(
             }
         },
     }
-
 
     if has_velocity:
         features["observation.velocity"] = {
@@ -196,8 +220,8 @@ def create_empty_dataset(
     for cam in cameras:
         if 'depth' in cam:
             features[f"observation.{cam}"] = {
-                "dtype": "uint16", 
-                "shape": (1, kuavo.RESIZE_H, kuavo.RESIZE_W),  # Attention: for datasets.features "image" and "video", it must be c,h,w style! 
+                "dtype": mode, 
+                "shape": (3, kuavo.RESIZE_H, kuavo.RESIZE_W),  # Attention: for datasets.features "image" and "video", it must be c,h,w style! 
                 "names": [
                     "channels",
                     "height",
@@ -235,14 +259,14 @@ def load_raw_images_per_camera(bag_data: dict) -> dict[str, np.ndarray]:
     imgs_per_cam = {}
     for camera in get_cameras(bag_data):
         imgs_per_cam[camera] = np.array([msg['data'] for msg in bag_data[camera]])
-        # print(f"camera {camera} image", imgs_per_cam[camera].shape)
+        print(f"camera {camera} image", imgs_per_cam[camera].shape)
     
     return imgs_per_cam
 
 
 def load_raw_episode_data(
     ep_path: Path,
-) -> tuple[dict[str, np.ndarray], torch.Tensor, torch.Tensor, torch.Tensor | None, torch.Tensor | None,torch.Tensor,torch.Tensor,torch.Tensor,torch.Tensor,torch.Tensor,torch.Tensor,torch.Tensor,torch.Tensor,torch.Tensor]:
+) -> tuple[dict[str, np.ndarray], torch.Tensor, torch.Tensor, torch.Tensor | None, torch.Tensor | None,torch.Tensor,torch.Tensor,torch.Tensor,torch.Tensor]:
 
     bag_reader = kuavo.KuavoRosbagReader()
     bag_data = bag_reader.process_rosbag(ep_path)
@@ -259,14 +283,14 @@ def load_raw_episode_data(
     cmd_pos_world_action = np.array([msg['data'] for msg in bag_data['action.cmd_pos_world']], dtype=np.float32)
     action_kuavo_arm_traj_alt = np.array([msg['data'] for msg in bag_data['action.kuavo_arm_traj_alt']], dtype=np.float32)
     # print("eef_type shape: ",claw_action.shape,qiangnao_action.shape, rq2f85_action.shape)
-    action[:, 12:26] = action_kuavo_arm_traj if len(action_kuavo_arm_traj_alt) == 0 else action_kuavo_arm_traj_alt    
+    action[:, 12:26] = action_kuavo_arm_traj if len(action_kuavo_arm_traj_alt) == 0 else action_kuavo_arm_traj_alt
 
     velocity = None
     effort = None
     
     imgs_per_cam = load_raw_images_per_camera(bag_data)
     
-    return imgs_per_cam, state, action, velocity, effort ,claw_state ,claw_action,qiangnao_state,qiangnao_action, rq2f85_state, rq2f85_action, cmd_pos_world_action, action_kuavo_arm_traj_alt, action_kuavo_arm_traj
+    return imgs_per_cam, state, action, velocity, effort ,claw_state ,claw_action,qiangnao_state,qiangnao_action, rq2f85_state, rq2f85_action, cmd_pos_world_action, action_kuavo_arm_traj,
 
 
 def diagnose_frame_data(data):
@@ -287,17 +311,19 @@ def populate_dataset(
     if episodes is None:
         episodes = range(len(bag_files))
     failed_bags = []
+    print( f"Total episodes to process: {len(episodes)}")
+
     for ep_idx in tqdm.tqdm(episodes):
         ep_path = bag_files[ep_idx]
         from termcolor import colored
         print(colored(f"Processing {ep_path}", "yellow", attrs=["bold"]))
         # 默认读取所有的数据如果话题不存在相应的数值应该是一个空的数据
-        try:
-            imgs_per_cam, state, action, velocity, effort ,claw_state, claw_action,qiangnao_state,qiangnao_action, rq2f85_state, rq2f85_action, cmd_pos_world_action, action_kuavo_arm_traj_alt, action_kuavo_arm_traj = load_raw_episode_data(ep_path)
-        except Exception as e:
-            print(f"❌ Error processing {ep_path}: {e}")
-            failed_bags.append(str(ep_path))
-            continue
+        # try:
+        imgs_per_cam, state, action, velocity, effort ,claw_state, claw_action,qiangnao_state,qiangnao_action, rq2f85_state, rq2f85_action, cmd_pos_world_action, action_kuavo_arm_traj = load_raw_episode_data(ep_path)
+        # except Exception as e:
+        #     print(f"❌ Error processing {ep_path}: {e}")
+        #     failed_bags.append(str(ep_path))
+        #     continue
         # 对手部进行二值化处理
         if kuavo.IS_BINARY:
             qiangnao_state = np.where(qiangnao_state > 50, 1, 0)
@@ -306,6 +332,9 @@ def populate_dataset(
             claw_action = np.where(claw_action > 50, 1, 0)
             rq2f85_state = np.where(rq2f85_state > 0.4, 1, 0)
             rq2f85_action = np.where(rq2f85_action > 70, 1, 0)
+
+            # rq2f85_state = np.where(rq2f85_state > 0.1, 1, 0)
+            # rq2f85_action = np.where(rq2f85_action > 128, 1, 0)
         else:
             # 进行数据归一化处理
             claw_state = claw_state / 100
@@ -313,124 +342,22 @@ def populate_dataset(
             qiangnao_state = qiangnao_state / 100
             qiangnao_action = qiangnao_action / 100
             rq2f85_state = rq2f85_state / 0.8
-            rq2f85_action = rq2f85_action / 140
-        print("eef_type shape: ",claw_action.shape,qiangnao_action.shape, rq2f85_action.shape)
+            rq2f85_action = rq2f85_action / 255
+
+            # rq2f85_state = rq2f85_state / 0.8
+            # rq2f85_action = rq2f85_action / 255
+        print(f"eef_action shape, leju_claw: {claw_action.shape},qiangnao: {qiangnao_action.shape}, rq2f85: {rq2f85_action.shape}")
         if len(claw_action)==0 and len(qiangnao_action) == 0:
             claw_action = rq2f85_action
             claw_state = rq2f85_state
-        ########################
-        # delta 处理
-        ########################
+
         # =====================
         # 为了解决零点问题，将每帧与第一帧相减
         if kuavo.RELATIVE_START:
             # 每个state, action与他们的第一帧相减
             state = state - state[0]
             action = action - action[0]
-            
-        # ===只处理delta action
-        if kuavo.DELTA_ACTION:
-            # delta_action = action[1:] - state[:-1]
-            # trim = lambda x: x[1:] if (x is not None) and (len(x) > 0) else x
-            # state, action, velocity, effort, claw_state, claw_action, qiangnao_state, qiangnao_action = \
-            #     map(
-            #         trim, 
-            #         [state, action, velocity, effort, claw_state, claw_action, qiangnao_state, qiangnao_action]
-            #         )
-            # for camera, img_array in imgs_per_cam.items():
-            #     imgs_per_cam[camera] = img_array[1:]
-            # action = delta_action
-
-            # delta_action = np.concatenate(([action[0]-state[0]], action[1:] - action[:-1]), axis=0)
-            # action = delta_action
-
-            delta_action = action-state
-            action = delta_action
         
-        # num_frames = state.shape[0]
-        # for i in range(num_frames):
-        #     if kuavo.ONLY_HALF_UP_BODY:
-        #         if kuavo.USE_LEJU_CLAW:
-        #             # 使用lejuclaw进行上半身关节数据转换
-        #             if kuavo.CONTROL_HAND_SIDE == "left" or kuavo.CONTROL_HAND_SIDE == "both":
-        #                 output_state = state[i, kuavo.SLICE_ROBOT[0][0]:kuavo.SLICE_ROBOT[0][-1]]
-        #                 output_state = np.concatenate((output_state, claw_state[i, kuavo.SLICE_CLAW[0][0]:kuavo.SLICE_CLAW[0][-1]].astype(np.float32)), axis=0)
-        #                 output_action = action[i, kuavo.SLICE_ROBOT[0][0]:kuavo.SLICE_ROBOT[0][-1]]
-        #                 output_action = np.concatenate((output_action, claw_action[i, kuavo.SLICE_CLAW[0][0]:kuavo.SLICE_CLAW[0][-1]].astype(np.float32)), axis=0)
-        #             if kuavo.CONTROL_HAND_SIDE == "right" or kuavo.CONTROL_HAND_SIDE == "both":
-        #                 if kuavo.CONTROL_HAND_SIDE == "both":
-        #                     output_state = np.concatenate((output_state, state[i, kuavo.SLICE_ROBOT[1][0]:kuavo.SLICE_ROBOT[1][-1]]), axis=0)
-        #                     output_state = np.concatenate((output_state, claw_state[i, kuavo.SLICE_CLAW[1][0]:kuavo.SLICE_CLAW[1][-1]].astype(np.float32)), axis=0)
-        #                     output_action = np.concatenate((output_action, action[i, kuavo.SLICE_ROBOT[1][0]:kuavo.SLICE_ROBOT[1][-1]]), axis=0)
-        #                     output_action = np.concatenate((output_action, claw_action[i, kuavo.SLICE_CLAW[1][0]:kuavo.SLICE_CLAW[1][-1]].astype(np.float32)), axis=0)
-        #                 else:
-        #                     output_state = state[i, kuavo.SLICE_ROBOT[1][0]:kuavo.SLICE_ROBOT[1][-1]]
-        #                     output_state = np.concatenate((output_state, claw_state[i, kuavo.SLICE_CLAW[1][0]:kuavo.SLICE_CLAW[1][-1]].astype(np.float32)), axis=0)
-        #                     output_action = action[i, kuavo.SLICE_ROBOT[1][0]:kuavo.SLICE_ROBOT[1][-1]]
-        #                     output_action = np.concatenate((output_action, claw_action[i, kuavo.SLICE_CLAW[1][0]:kuavo.SLICE_CLAW[1][-1]].astype(np.float32)), axis=0)
-
-        #         elif kuavo.USE_QIANGNAO:
-        #             # 类型: kuavo_sdk/robotHandPosition
-        #             # left_hand_position (list of float): 左手位置，包含6个元素，每个元素的取值范围为[0, 100], 0 为张开，100 为闭合。
-        #             # right_hand_position (list of float): 右手位置，包含6个元素，每个元素的取值范围为[0, 100], 0 为张开，100 为闭合。
-        #             # 构造qiangnao类型的output_state的数据结构的长度应该为26
-        #             if kuavo.CONTROL_HAND_SIDE == "left" or kuavo.CONTROL_HAND_SIDE == "both":
-        #                 output_state = state[i, kuavo.SLICE_ROBOT[0][0]:kuavo.SLICE_ROBOT[0][-1]]
-        #                 output_state = np.concatenate((output_state, qiangnao_state[i, kuavo.SLICE_DEX[0][0]:kuavo.SLICE_DEX[0][-1]].astype(np.float32)), axis=0)
-
-        #                 output_action = action[i, kuavo.SLICE_ROBOT[0][0]:kuavo.SLICE_ROBOT[0][-1]]
-        #                 output_action = np.concatenate((output_action, qiangnao_action[i, kuavo.SLICE_DEX[0][0]:kuavo.SLICE_DEX[0][-1]].astype(np.float32)), axis=0)
-        #             if kuavo.CONTROL_HAND_SIDE == "right" or kuavo.CONTROL_HAND_SIDE == "both":
-        #                 if kuavo.CONTROL_HAND_SIDE == "both":
-        #                     output_state = np.concatenate((output_state, state[i, kuavo.SLICE_ROBOT[1][0]:kuavo.SLICE_ROBOT[1][-1]]), axis=0)
-        #                     output_state = np.concatenate((output_state, qiangnao_state[i, kuavo.SLICE_DEX[1][0]:kuavo.SLICE_DEX[1][-1]].astype(np.float32)), axis=0)
-        #                     output_action = np.concatenate((output_action, action[i, kuavo.SLICE_ROBOT[1][0]:kuavo.SLICE_ROBOT[1][-1]]), axis=0)
-        #                     output_action = np.concatenate((output_action, qiangnao_action[i, kuavo.SLICE_DEX[1][0]:kuavo.SLICE_DEX[1][-1]].astype(np.float32)), axis=0)
-        #                 else:
-        #                     output_state = state[i, kuavo.SLICE_ROBOT[1][0]:kuavo.SLICE_ROBOT[1][-1]]
-        #                     output_state = np.concatenate((output_state, qiangnao_state[i, kuavo.SLICE_DEX[1][0]:kuavo.SLICE_DEX[1][-1]].astype(np.float32)), axis=0)
-        #                     output_action = action[i, kuavo.SLICE_ROBOT[1][0]:kuavo.SLICE_ROBOT[1][-1]]
-        #                     output_action = np.concatenate((output_action, qiangnao_action[i, kuavo.SLICE_DEX[1][0]:kuavo.SLICE_DEX[1][-1]].astype(np.float32)), axis=0)
-        #             # output_action = np.concatenate((output_action, action[i, 26:28]), axis=0)
-        #     else:
-        #         if kuavo.USE_LEJU_CLAW:
-        #             # # 使用lejuclaw进行全身关节数据转换
-        #             # # 原始的数据是28个关节的数据对应原始的state和action数据的长度为28
-        #             # # 数据顺序:
-        #             # # 前 12 个数据为下肢电机数据:
-        #             # #     0~5 为左下肢数据 (l_leg_roll, l_leg_yaw, l_leg_pitch, l_knee, l_foot_pitch, l_foot_roll)
-        #             # #     6~11 为右下肢数据 (r_leg_roll, r_leg_yaw, r_leg_pitch, r_knee, r_foot_pitch, r_foot_roll)
-        #             # # 接着 14 个数据为手臂电机数据:
-        #             # #     12~18 左臂电机数据 ("l_arm_pitch", "l_arm_roll", "l_arm_yaw", "l_forearm_pitch", "l_hand_yaw", "l_hand_pitch", "l_hand_roll")
-        #             # #     19~25 为右臂电机数据 ("r_arm_pitch", "r_arm_roll", "r_arm_yaw", "r_forearm_pitch", "r_hand_yaw", "r_hand_pitch", "r_hand_roll")
-        #             # # 最后 2 个为头部电机数据: head_yaw 和 head_pitch
-                    
-        #             # # TODO：构造目标切片
-        #             # output_state = state[i, 0:19]
-        #             # output_state = np.insert(output_state, 19, claw_state[i, 0].astype(np.float32))
-        #             # output_state = np.concatenate((output_state, state[i, 19:26]), axis=0)
-        #             # output_state = np.insert(output_state, 19, claw_state[i, 1].astype(np.float32))
-        #             # output_state = np.concatenate((output_state, state[i, 26:28]), axis=0)
-
-        #             # output_action = action[i, 0:19]
-        #             # output_action = np.insert(output_action, 19, claw_action[i, 0].astype(np.float32))
-        #             # output_action = np.concatenate((output_action, action[i, 19:26]), axis=0)
-        #             # output_action = np.insert(output_action, 19, claw_action[i, 1].astype(np.float32))
-        #             # output_action = np.concatenate((output_action, action[i, 26:28]), axis=0)
-
-        #         elif kuavo.USE_QIANGNAO:
-        #             output_state = state[i, 0:19]
-        #             output_state = np.concatenate((output_state, qiangnao_state[i, 0:6].astype(np.float32)), axis=0)
-        #             output_state = np.concatenate((output_state, state[i, 19:26]), axis=0)
-        #             output_state = np.concatenate((output_state, qiangnao_state[i, 6:12].astype(np.float32)), axis=0)
-        #             output_state = np.concatenate((output_state, state[i, 26:28]), axis=0)
-
-        #             output_action = action[i, 0:19]
-        #             output_action = np.concatenate((output_action, qiangnao_action[i, 0:6].astype(np.float32)),axis=0)
-        #             output_action = np.concatenate((output_action, action[i, 19:26]), axis=0)
-        #             output_action = np.concatenate((output_action, qiangnao_action[i, 6:12].astype(np.float32)), axis=0)
-        #             output_action = np.concatenate((output_action, action[i, 26:28]), axis=0)  
-
 
         def get_hand_data(i, hand_side, hand_type):
             if hand_type == "LEJU":
@@ -460,31 +387,31 @@ def populate_dataset(
                 output_state = np.concatenate(s_list).astype(np.float32)
                 output_action = np.concatenate(a_list).astype(np.float32)
 
-            # # ~~~~~~~~~~~~~~~~~~~~~~~~~手臂关节角度范围限制，防止有数据超限 ~~~~~~~~~~~~~~~~~~~~~~~~~
-            # assert len(DEFAULT_ARM_JOINT_RANGE) >= 16, "DEFAULT_ARM_JOINT_RANGE should have at least 16 joint ranges"
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~手臂关节角度范围限制，防止有数据超限 ~~~~~~~~~~~~~~~~~~~~~~~~~
+            assert len(DEFAULT_ARM_JOINT_RANGE) >= 16, "DEFAULT_ARM_JOINT_RANGE should have at least 16 joint ranges"
 
-            # if kuavo.CONTROL_HAND_SIDE == "left":
-            #     joint_indices = range(0, 8)
-            # elif kuavo.CONTROL_HAND_SIDE == "right":
-            #     joint_indices = range(8, 16)
-            # elif kuavo.CONTROL_HAND_SIDE == "both":
-            #     joint_indices = range(0, 16)
-            # else:
-            #     raise ValueError(f"Invalid CONTROL_HAND_SIDE: {kuavo.CONTROL_HAND_SIDE}")
+            if kuavo.CONTROL_HAND_SIDE == "left":
+                joint_indices = range(0, 8)
+            elif kuavo.CONTROL_HAND_SIDE == "right":
+                joint_indices = range(8, 16)
+            elif kuavo.CONTROL_HAND_SIDE == "both":
+                joint_indices = range(0, 16)
+            else:
+                raise ValueError(f"Invalid CONTROL_HAND_SIDE: {kuavo.CONTROL_HAND_SIDE}")
 
-            # # 保证 output_action 长度匹配选中的手臂
-            # assert len(joint_indices) == output_action.shape[0], (
-            #     f"Expected output_action of length {len(joint_indices)}, "
-            #     f"but got {output_action.shape[0]}"
-            # )
+            # 保证 output_action 长度匹配选中的手臂
+            assert len(joint_indices) == output_action.shape[0], (
+                f"Expected output_action of length {len(joint_indices)}, "
+                f"but got {output_action.shape[0]}"
+            )
 
-            # for enu_i, jidx_k in enumerate(joint_indices):
-            #     low, high = DEFAULT_ARM_JOINT_RANGE[jidx_k]
-            #     if output_action[enu_i] < low:
-            #         output_action[enu_i] = low
-            #     elif output_action[enu_i] > high:
-            #         output_action[enu_i] = high
-            # # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            for enu_i, jidx_k in enumerate(joint_indices):
+                low, high = DEFAULT_ARM_JOINT_RANGE[jidx_k]
+                if output_action[enu_i] < low:
+                    output_action[enu_i] = low
+                elif output_action[enu_i] > high:
+                    output_action[enu_i] = high
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 
             final_action = output_action
@@ -508,17 +435,18 @@ def populate_dataset(
                 "action": torch.from_numpy(final_action).type(torch.float32),                # left+right: pos+rot6d+gripper;  dim: 2*10                  
             }
 
-            # frame = {
-            #     "observation.state": torch.from_numpy(output_state).type(torch.float32),
-            #     "action": torch.from_numpy(output_action).type(torch.float32),
-            # }
-            
-            for camera, img_array in imgs_per_cam.items():
+            for idx, (camera, img_array) in enumerate(imgs_per_cam.items()):
                 if "depth" in camera:
-                    # frame[f"observation.{camera}"] = img_array[i]
-                    min_depth, max_dpeth = kuavo.DEPTH_RANGE[0], kuavo.DEPTH_RANGE[1]
-                    frame[f"observation.{camera}"] = np.clip(img_array[i], min_depth, max_dpeth)
-                    print("[info]: Clip depth in range %d ~ %d"%(min_depth, max_dpeth))
+                    min_depth, max_depth = kuavo.DEPTH_RANGE[0], kuavo.DEPTH_RANGE[1]
+                    depth_uint16 = np.clip(img_array[i], min_depth, max_depth)
+                    max_depth = depth_uint16.max()
+                    min_depth = depth_uint16.min()
+                    depth_normalized = (depth_uint16 - min_depth) / (max_depth - min_depth + 1e-9)
+                    depth_normalized = (depth_normalized * 255).astype(np.uint8)
+                    frame[f"observation.{camera}"] = depth_normalized[..., np.newaxis].repeat(3, axis=-1)
+                    if i % 50 == 0:
+                        print("[info]: Clip depth in range %d ~ %d, camera: %s" % (min_depth, max_depth, camera))
+
                 else:
                     frame[f"observation.images.{camera}"] = img_array[i]
             
@@ -527,9 +455,9 @@ def populate_dataset(
             if effort is not None:
                 frame["observation.effort"] = effort[i]
 
-            # frame["task"] = task
+            frame["task"] = task
             # diagnose_frame_data(frame)
-            dataset.add_frame(frame, task=task)
+            dataset.add_frame(frame)
         # dataset.save_episode(task="Pick the black workpiece from the white conveyor belt on your left and place it onto the white box in front of you",)
         # raise ValueError("stop!")
 
@@ -569,7 +497,7 @@ def port_kuavo_rosbag(
     episodes: list[int] | None = None,
     push_to_hub: bool = False,
     is_mobile: bool = False,
-    mode: Literal["video", "image"] = "image",
+    mode: Literal["video", "image"] = "video",
     dataset_config: DatasetConfig = DEFAULT_DATASET_CONFIG,
     root: str,
     n: int | None = None,
@@ -654,6 +582,8 @@ def main(cfg: DictConfig):
     #     DEFAULT_JOINT_NAMES_LIST = kuavo.DEFAULT_LEG_JOINT_NAMES + DEFAULT_ARM_JOINT_NAMES + kuavo.DEFAULT_HEAD_JOINT_NAMES
 
     port_kuavo_rosbag(raw_dir, repo_id, root=lerobot_dir,n = n, task=kuavo.TASK_DESCRIPTION)
+
+
 
 if __name__ == "__main__":
     

@@ -12,8 +12,10 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import shutil
+import accelerate
+from accelerate.utils import DistributedDataParallelKwargs
 from hydra.utils import instantiate
-from diffusers.optimization import get_scheduler
+# from diffusers.optimization import get_scheduler
 
 from lerobot.configs.types import FeatureType, NormalizationMode
 from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata, LeRobotDataset
@@ -35,7 +37,6 @@ from contextlib import nullcontext
 from lerobot.processor import ProcessorStep, NormalizerProcessorStep
 from lerobot.processor.core import TransitionKey
 from lerobot.configs.types import PipelineFeatureType, PolicyFeature
-# import ipdb
 
 
 def build_augmenter(cfg):
@@ -79,13 +80,15 @@ def build_delta_timestamps(dataset_metadata, policy_cfg):
     return delta_timestamps if delta_timestamps else None
 
 
-def build_optimizer_and_scheduler(policy, cfg, total_frames):
+def build_optimizer_and_scheduler(policy, cfg, total_frames, accelerator):
     """Return optimizer and scheduler."""
     optimizer = policy.config.get_optimizer_preset().build(policy.parameters())
     # If `max_training_step` is specified, it takes precedence; 
     # otherwise, the value is automatically determined based on `max_epoch`.
     if cfg.training.max_training_step is None:
-        updates_per_epoch = (total_frames // (cfg.training.batch_size * cfg.training.accumulation_steps)) + 1
+        effective_batch_size = cfg.training.batch_size * accelerator.num_processes
+        # updates_per_epoch = (total_frames // (cfg.training.batch_size * cfg.training.accumulation_steps)) + 1
+        updates_per_epoch = max(1, total_frames // (effective_batch_size * cfg.training.accumulation_steps))
         num_training_steps = cfg.training.max_epoch * updates_per_epoch
     else:
         num_training_steps = cfg.training.max_training_step
@@ -208,114 +211,61 @@ def remove_aug_step(pipeline, step_to_remove):
 
 @hydra.main(config_path="../configs/policy/", config_name="diffusion_config", version_base=None)
 def main(cfg: DictConfig):
-    set_seed(cfg.training.seed)
+    ddp_kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
+    # Initialize Accelerator
+    accelerator = accelerate.Accelerator(
+        gradient_accumulation_steps=cfg.training.accumulation_steps,
+        log_with=None,                        # Disable logging
+        # log_with="tensorboard",             # Disable logging
+        device_placement=True,                # Explicitly enable device placement
+        step_scheduler_with_optimizer=False,  # A fix to the stepping logic as accelerate might make this thread-unsafe.
+        mixed_precision="fp16" if cfg.policy.get("use_amp", False) else "no",
+        kwargs_handlers=[ddp_kwargs]          # transfer DDP kwargs
+    )
 
-    # Setup output directory
-    output_directory = Path(cfg.training.output_directory) / f"run_{cfg.timestamp}"
-    output_directory.mkdir(parents=True, exist_ok=True)
-    writer = SummaryWriter(log_dir=str(output_directory))
+    # With Accelerate, we get the device from accelerator
+    device = accelerator.device
 
-    device = torch.device(cfg.training.device)
+    # set_seed(cfg.training.seed)
+    accelerate.utils.set_seed(cfg.training.seed)
+
+    # mkdir and output TensorBoard only in the main process
+    output_directory = None
+    if accelerator.is_main_process:
+        output_directory = Path(cfg.training.output_directory) / f"run_{cfg.timestamp}"
+        output_directory.mkdir(parents=True, exist_ok=True)
+        writer = SummaryWriter(log_dir=str(output_directory))
 
     # Dataset metadata and features
     dataset_metadata = LeRobotDatasetMetadata(cfg.repoid, root=cfg.root)
-    print("Camera_keys:", dataset_metadata.camera_keys)
-    print("Original dataset features:", dataset_metadata.features)
-
     features = dataset_to_policy_features(dataset_metadata.features)
     input_features = {k: ft for k, ft in features.items() if ft.type is not FeatureType.ACTION}
     output_features = {k: ft for k, ft in features.items() if ft.type is FeatureType.ACTION}
 
-    print(f"Input features: {input_features}")
-    print(f"Output features: {output_features}")
-
     # instantiate the policy
     policy_cfg = build_policy_config(cfg, input_features, output_features)
-    print("policy_cfg", policy_cfg)
-
     # Build policy
     policy = build_policy(cfg.policy_name, policy_cfg)
+    accelerator.wait_for_everyone()
     preprocessor, postprocessor = make_pre_post_processors(policy_cfg, dataset_stats=dataset_metadata.stats)
-    preprocessor.save_pretrained(output_directory)
-    postprocessor.save_pretrained(output_directory)
-    optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"])
-    
-    # Initialize AMP GradScaler if use_amp is True
-    amp_requested = bool(getattr(cfg.policy, "use_amp", False))
-    amp_enabled = amp_requested and device.type == "cuda"
+    if accelerator.is_main_process:
+        preprocessor.save_pretrained(output_directory)
+        postprocessor.save_pretrained(output_directory)
+    # Initialize optimizer and lr scheduler
+    optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"], accelerator)
 
-    # autocast context (cuda, or no-op when disabled/non-cuda)
-    has_torch_autocast = hasattr(torch, "autocast")
-    def make_autocast(enabled: bool):
-        if not enabled:
-            return nullcontext()
-        if device.type == "cuda":
-            if has_torch_autocast:
-                return torch.autocast(device_type="cuda", dtype=torch.float16, enabled=enabled)  # noqa
-            else:
-                from torch.cuda.amp import autocast as cuda_autocast  # noqa
-                return cuda_autocast()
-        # Fallback: disable on non-cuda to avoid dtype surprises
-        return nullcontext()
+    # print only in main process
+    accelerator.print("\n---policy_cfg", policy_cfg)
+    accelerator.print(f"\n---Input features: {input_features}")
+    accelerator.print(f"\n---Output features: {output_features}")
+    accelerator.print(f"\n---camera_keys:", dataset_metadata.camera_keys)
+    accelerator.print(f"\n---Original dataset features:", dataset_metadata.features) 
 
-    scaler = torch.amp.GradScaler(device=device.type, enabled=amp_enabled) if hasattr(torch, "amp") else torch.cuda.amp.GradScaler(device=device.type, enabled=amp_enabled)
-    # print("scaler", device.type, make_autocast(amp_enabled))
-    # Initialize training state variables
-    start_epoch = 0
-    steps = 0
-    best_loss = float('inf')
+    num_total_params = sum(p.numel() for p in policy.parameters())
+    num_learnable_params = sum(p.numel() for p in policy.parameters() if p.requires_grad)
+    accelerator.print(f"num_learnable_params={num_learnable_params}", f"num_total_params={num_total_params}")
 
-    # ===== Resume logic (perfect resume for AMP & RNG) =====
-    
-    if cfg.training.resume and cfg.training.resume_timestamp:
-        resume_path = Path(cfg.training.output_directory) / cfg.training.resume_timestamp
-        print("Resuming from:", resume_path)
-        try:
-            # Load RNG state
-            load_rng_state(resume_path / "rng_state.pth")
-            
-            # Load policy
-            policy = policy.from_pretrained(resume_path, strict=True)
-            preprocessor = preprocessor.from_pretrained(resume_path,config_filename="policy_preprocessor.json")
 
-            """ Warning: using `from_pretrained` creates a new policy instance, 
-            so the optimizer must be reinitialized here! """
-            # print("load policy done ! ")
-            optimizer, lr_scheduler = build_optimizer_and_scheduler(policy, cfg, dataset_metadata.info["total_frames"])
-            
-            # Load optimizer, scheduler, scaler and training state
-            checkpoint = torch.load(resume_path / "learning_state.pth", map_location=device)
-            optimizer.load_state_dict(checkpoint["optimizer"])
-
-            if "lr_scheduler" in checkpoint:
-                lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
-            
-            if "scaler" in checkpoint and amp_enabled:
-                scaler.load_state_dict(checkpoint["scaler"])
-            
-            if "steps" in checkpoint:
-                steps = checkpoint["steps"]
-            
-            if "epoch" in checkpoint:
-                start_epoch = checkpoint["epoch"]
-            
-            if "best_loss" in checkpoint:
-                best_loss = checkpoint["best_loss"]
-            
-            # Copy and load log_event
-            for file in resume_path.glob("events.*"):
-                shutil.copy(file, output_directory)
-                
-            print(f"Resumed training from epoch {start_epoch}, step {steps}")
-        except Exception as e:
-            print("Failed to load checkpoint:", e)
-            return
-    else:
-        print("Training from scratch!")
-
-    policy.train().to(device)
-    print(f"Total parameters: {sum(p.numel() for p in policy.parameters()):,}")
-    print(f"Using AMP: {amp_enabled}")
     # Build dataset and dataloader
     delta_timestamps = build_delta_timestamps(dataset_metadata, policy_cfg)
 
@@ -326,6 +276,7 @@ def main(cfg: DictConfig):
         root=cfg.root,
         image_transforms=None,
     )
+    accelerator.wait_for_everyone()
     # Training loop
     aug_step = insert_before_normalizer(preprocessor, AugmentationProcessorStep(image_transforms, dataset.meta.camera_keys))  # just for training
     
@@ -340,80 +291,116 @@ def main(cfg: DictConfig):
     else:
         shuffle = True
         sampler = None
+
+    dataloader = DataLoader(
+        dataset,
+        num_workers=cfg.training.num_workers,
+        batch_size=cfg.training.batch_size,
+        shuffle=shuffle,
+        sampler=sampler,
+        pin_memory=(device.type != "cpu"),
+        drop_last=cfg.training.drop_last,
+        prefetch_factor=2 if cfg.training.num_workers > 0 else None,
+    )
+    # Use accelerator to prepare data, model, and optimizer
+    accelerator.wait_for_everyone()
+
+    policy, optimizer, dataloader, lr_scheduler = accelerator.prepare(
+        policy, optimizer, dataloader, lr_scheduler
+    )
+
+
+    # Initialize training state variables
+    start_epoch = 0
+    steps = 0
+    best_loss = float('inf')
+
+    # # ===== Resume logic (perfect resume for AMP & RNG) =====
+    if cfg.training.resume and cfg.training.resume_timestamp:
+        resume_path = Path(cfg.training.output_directory) / cfg.training.resume_timestamp
+        accelerator.print("Resuming from:", resume_path)
+        try:
+            # Load state
+            accelerator.load_state(resume_path / "epochlatest")
+            if accelerator.is_main_process:
+                latest_training_state = torch.load(resume_path / "training_latest_state.pth", map_location='cpu')
+                steps = latest_training_state["steps"]
+                start_epoch = latest_training_state["epoch"]
+                best_loss = latest_training_state["best_loss"]
+                accelerator.print(f"Resumed training from epoch {start_epoch}, step {steps}, best_loss {best_loss}")
+        except Exception as e:
+            accelerator.print("Failed to load checkpoint:", e, " Starting training from scratch.")
+    else:
+        accelerator.print("Training from scratch!")
+
     
+    # Training loop
     for epoch in range(start_epoch, cfg.training.max_epoch):
-        dataloader = DataLoader(
-            dataset,
-            num_workers=cfg.training.num_workers,
-            batch_size=cfg.training.batch_size,
-            shuffle=shuffle,
-            sampler=sampler,
-            pin_memory=(device.type != "cpu"),
-            drop_last=cfg.training.drop_last,
-            prefetch_factor=2 if cfg.training.num_workers > 0 else None,
-        )
+        policy.train()
 
-        epoch_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{cfg.training.max_epoch}")
+        # Use tqdm only on main process
+        if accelerator.is_main_process:
+            epoch_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{cfg.training.max_epoch}")
+        else:
+            epoch_bar = dataloader
 
-        
         total_loss = 0.0
+        batch_count = 0
         for batch in epoch_bar:
-            batch = preprocessor(batch)  # will normalize and put batch to device
-            with make_autocast(amp_enabled):
-                loss, _ = policy.forward(batch)
-            # Scale loss and backward with AMP if enabled
-            scaled_loss = loss / cfg.training.accumulation_steps
-            
-            if amp_enabled:
-                scaler.scale(scaled_loss).backward()
-            else:
-                scaled_loss.backward()
+            batch = preprocessor(batch)
+            with accelerator.accumulate(policy):
+                # batch = {k: (v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
+                with accelerator.autocast():
+                    loss, _ = policy.forward(batch)
+                accelerator.backward(loss)
 
-            if steps % cfg.training.accumulation_steps == 0:
-                if amp_enabled:
-                    # Optionally unscale and clip gradients here if you use clipping
-                    scaler.step(optimizer)
-                    scaler.update()
-                else:
+                if accelerator.sync_gradients:
+                    accelerator.clip_grad_norm_(policy.parameters(), 1.0)
                     optimizer.step()
-                optimizer.zero_grad()
-                lr_scheduler.step()
+                    optimizer.zero_grad()
+                    lr_scheduler.step()
+                    if accelerator.is_main_process:
+                        if steps % cfg.training.log_freq == 0:
+                            writer.add_scalar("train/loss", loss.item(), steps)
+                            writer.add_scalar("train/lr", lr_scheduler.get_last_lr()[0], steps)
+                            epoch_bar.set_postfix(loss=f"{loss.item():.3f}", step=steps, lr=lr_scheduler.get_last_lr()[0])
+                    steps += 1
+                    batch_count += 1
+                    total_loss += accelerator.gather(loss).mean().item()
 
-            if steps % cfg.training.log_freq == 0:
-                writer.add_scalar("train/loss", scaled_loss.item(), steps)
-                writer.add_scalar("train/lr", lr_scheduler.get_last_lr()[0], steps)
-                epoch_bar.set_postfix(loss=f"{scaled_loss.item():.3f}", step=steps, lr=lr_scheduler.get_last_lr()[0])
-
-            steps += 1
-            total_loss += scaled_loss.item()
+        total_loss = total_loss / batch_count if batch_count > 0 else total_loss
         
-        # Update best loss
-        if total_loss < best_loss:
-            best_loss = total_loss
-            # Save best model
-            policy.save_pretrained(output_directory / "epochbest")
-        # Save checkpoint every N epochs
-        if (epoch + 1) % cfg.training.save_freq_epoch == 0:
-            policy.save_pretrained(output_directory / f"epoch{epoch+1}")
-            # preprocessor.save_pretrained(output_directory)
+        # Log, save, and eval flags
+        accelerator.wait_for_everyone()
+        if accelerator.is_main_process:
+            # Update best loss
+            if total_loss < best_loss:
+                best_loss = total_loss
+                unwrapped_policy = accelerator.unwrap_model(policy)
+                unwrapped_policy.save_pretrained(output_directory / "epochbest")
 
-        # Save last checkpoint (includes AMP scaler & progress for perfect resume)
-        # Save last checkpoint
-        policy.save_pretrained(output_directory)
+            # Save checkpoint every N epochs
+            if (epoch + 1) % cfg.training.save_freq_epoch == 0:
+                unwrapped_policy = accelerator.unwrap_model(policy)
+                unwrapped_policy.save_pretrained(output_directory / f"epoch{epoch+1}")
 
-        # Save training state including optimizer, scheduler, scaler, and step/epoch info
-        checkpoint = {
-            "optimizer": optimizer.state_dict(),
-            "lr_scheduler": lr_scheduler.state_dict(),
-            "scaler": scaler.state_dict() if amp_enabled else None,
-            "steps": steps,
-            "epoch": epoch + 1,
-            "best_loss": best_loss
-        }
-        torch.save(checkpoint, output_directory / "learning_state.pth")
-        save_rng_state(output_directory / "rng_state.pth")
+                # save latest epoch training state based on accelerator save_state
+            accelerator.print("!!!!!!Saving latest epoch training state...,DON'T CTRL+C EXIT!!!!!!")
+            accelerator.save_state(output_directory / "epochlatest")
+            training_state = {
+                "epoch": epoch+1, 
+                "steps": steps,
+                "best_loss": best_loss
+            }
+            torch.save(training_state, output_directory / "training_latest_state.pth")
+            accelerator.print(f"Epoch {epoch+1} completed. Avg Loss: {total_loss:.4f}. Best Loss: {best_loss:.4f}")
+        accelerator.wait_for_everyone()
 
-    writer.close()
+    accelerator.wait_for_everyone()
+    if accelerator.is_main_process:
+        writer.close()
+    
+    accelerator.end_training()
 
 
 if __name__ == "__main__":

@@ -88,6 +88,7 @@ def init_parameters(cfg):
     TASK_DESCRIPTION = config.task_description  # 任务描述
 
 
+
 # ================ 数据处理函数定义 ==================
 class KuavoMsgProcesser:
     """
@@ -152,7 +153,9 @@ class KuavoMsgProcesser:
             print("Warning: The decoded image is not a 16-bit image, actual dtype: ", image.dtype)
         depth_image = cv2.resize(image, (RESIZE_W, RESIZE_H), interpolation=cv2.INTER_NEAREST)
         # print("depth image dtype: ", depth_image.dtype)
-        return {"data": depth_image[np.newaxis,...], "timestamp": msg.header.stamp.to_sec()}
+        # return {"data": depth_image, "timestamp": msg.header.stamp.to_sec()}
+        # return {"data": depth_image[..., np.newaxis], "timestamp": msg.header.stamp.to_sec()}
+        return {"data": depth_image, "timestamp": msg.header.stamp.to_sec()}
 
 
     @staticmethod
@@ -198,15 +201,6 @@ class KuavoMsgProcesser:
         return {"data": np.deg2rad(msg.position), "timestamp": msg.header.stamp.to_sec()}
     
     @staticmethod
-    def process_cmd_pos_world(msg):    #cmd_pose_world处理函数
-        linear = [msg.twist.linear.x, msg.twist.linear.y]
-        angular = [msg.twist.angular.z]
-        
-        twist_data = linear + angular
-        
-        return {"data": twist_data, "timestamp": msg.header.stamp.to_sec()}
-
-    @staticmethod
     def process_claw_state(msg):
         """
             Args:
@@ -218,6 +212,7 @@ class KuavoMsgProcesser:
         """
         state= msg.data.position
         return { "data": state, "timestamp": msg.header.stamp.to_sec() }
+        
     @staticmethod
     def process_claw_cmd(msg):
         position= msg.data.position
@@ -252,6 +247,17 @@ class KuavoMsgProcesser:
         position= list(msg.left_hand_position)
         position.extend(list(msg.right_hand_position))
         return { "data": position, "timestamp": msg.header.stamp.to_sec() }
+    
+    @staticmethod
+    def process_cmd_pos_world(msg):
+        # Extract linear and angular velocities
+        linear = [msg.twist.linear.x, msg.twist.linear.y]
+        angular = [msg.twist.angular.z]
+        
+        # Combine linear and angular data
+        twist_data = linear + angular
+        
+        return {"data": twist_data, "timestamp": msg.header.stamp.to_sec()}
     
 
     @staticmethod
@@ -319,17 +325,10 @@ class KuavoRosbagReader:
                 "topic": "/kuavo_arm_traj",
                 "msg_process_fn": self._msg_processer.process_kuavo_arm_traj,
             },
-            # 连续版kauvo_arm_traj,用于task4
             "action.kuavo_arm_traj_alt": {
                 "topic": "/kuavo_arm_traj_synced",
                 "msg_process_fn": self._msg_processer.process_kuavo_arm_traj,
             },
-            # 新action：cmd_pos_world，控制位置
-            "action.cmd_pos_world": {
-                "topic": "/cmd_pose_world_synced",
-                "msg_process_fn": self._msg_processer.process_cmd_pos_world,
-            },
-
             "action": {
                 "topic": "/joint_cmd",
                 "msg_process_fn": self._msg_processer.process_joint_cmd,
@@ -363,6 +362,10 @@ class KuavoRosbagReader:
             "action.rq2f85": {
                 "topic": "/gripper/command",
                 "msg_process_fn": self._msg_processer.process_rq2f85_cmd,
+            },
+            "action.cmd_pos_world": {
+                "topic": "/cmd_pose_world_synced",
+                "msg_process_fn": self._msg_processer.process_cmd_pos_world,
             },
         }
         for camera in DEFAULT_CAMERA_NAMES:
@@ -485,25 +488,24 @@ class KuavoRosbagReader:
         main_img_timestamps = [t['timestamp'] for t in data[main_timeline]][SAMPLE_DROP:-SAMPLE_DROP][::jump]
         min_end = min([data[k][-1]['timestamp'] for k in data.keys() if len(data[k]) > 0])
         main_img_timestamps = [t for t in main_img_timestamps if t < min_end]
-        
-        # 特殊处理kuavo_arm_traj话题的时间戳连续性检测（可能有断点，需要999处理）
-        def detect_timestamp_gaps(timestamps, gap_threshold=0.15 * 10 / TRAIN_HZ):
+
+        # 特殊处理kuavo_arm_traj话题的时间戳连续性检测（可能有断点，需要999处理）在控制下肢时候
+        def detect_timestamp_gaps(timestamps, gap_threshold=0.15 * 10 / TRAIN_HZ): # gap_threshold可调
             """检测时间戳中的间隙，返回间隙位置"""
             if len(timestamps) < 2:
                 return []
-            
             gaps = []
             for i in range(1, len(timestamps)):
                 if timestamps[i] - timestamps[i-1] > gap_threshold:
                     gaps.append(i)
             return gaps
-        
-        gaps = []
+
         # 检查kuavo_arm_traj是否有断点，如果有则进行特殊处理
+        gaps = []
+
         if not ONLY_HALF_UP_BODY and "action.kuavo_arm_traj" in data and len(data["action.kuavo_arm_traj"]) > 0:
             arm_traj_timestamps = [t['timestamp'] for t in data["action.kuavo_arm_traj"]]
             gaps = detect_timestamp_gaps(arm_traj_timestamps)
-            
             # 只有在检测到间隙时才进行特殊处理
             if len(gaps) > 0:
                 print(f"Detected {len(gaps)} gaps in action.kuavo_arm_traj, applying 999 flag processing")
@@ -552,7 +554,7 @@ class KuavoRosbagReader:
                 # 跳过已经特殊处理的kuavo_arm_traj（只有在有间隙时才跳过）
                 if key == "action.kuavo_arm_traj" and len(gaps) > 0:
                     continue
-                
+
                 if len(v) > 0:
                     this_obs_time_seq = [this_frame['timestamp'] for this_frame in v]
                     time_array = np.array([t for t in this_obs_time_seq])
@@ -560,6 +562,7 @@ class KuavoRosbagReader:
                     aligned_data[key].append(v[idx])
                 else:
                     aligned_data[key] = []
+
         print(f"Aligned {key}: {len((data[main_timeline]))} -> {len(next(iter(aligned_data.values())))}")
         for k, v in aligned_data.items():
             if len(v) > 0:

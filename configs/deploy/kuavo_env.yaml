@@ -1,0 +1,99 @@
+# ==========================
+# Kuavo Unified Config File
+# ==========================
+
+hydra:  # Hydra config directory, for parameter checking only
+  run:
+    dir: ./outputs/kuavo_deploy_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # Single run root dir
+  sweep:
+    dir: ./outputs/kuavo_deploy_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep root dir
+    subdir: ${hydra:job.override_dirname}
+
+
+# =====================================================
+# env config: Simulator-based Environment Configuration
+# =====================================================
+env:
+  env_name: Kuavo-Sim  # kuavo environment name. Default for simulator is Kuavo-Sim, real-device is Kuavo-Real
+  control_mode: joint # joint or eef （eef still under development）
+  eef_type: rq2f85  # End-effector type. rq2f85 for simulation. Real-device options being leju_claw (claw, used in this competition) or qiangnao (dexhand)
+  which_arm: both  # Which arm joint + image data to use. Available options:left, right, both. Head cam data will be included regardless
+  head_init: [0,0.209]  # Robot head initial position. Use this value for simulation so that the observation is consistent. Can be adjusted for real-device inferencing, typically being null!!
+  ros_rate: 10  # Inference speed in Hz
+
+  #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  only_arm: true  # Default is true, whether to use only arm data. Setting this to true automatically ignores all lower limb data.
+  #!!!!!!!!!!!!Should be true for all tasks in this competition!!!!!!!!!!!!!!!
+
+  image_size: &IMGSIZE [640, 480]  # Img size: width, height
+  depth_range: &DEPTHRANGE [0, 1500]  # Depth imaging range in mm, default=[0,1500]
+  obs_key_map:  # Topic, msg type, freq, img size, depth crop. Must be consistent with training config!
+    head_cam_h: ["/cam_h/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # Head RGB img topic, COMPULSORY
+    wrist_cam_l: ["/cam_l/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # Left wrist RGB img topic, choose one between this and below
+    wrist_cam_r: ["/cam_r/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # Left wrist RGB img topic, choose one between this and above
+    depth_h: ["/cam_h/depth/image_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # Head depth topic, select if depth is needed
+    depth_l: ["/cam_l/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # Left wrist depth topic, select if depth is needed
+    depth_r: ["/cam_r/depth/image_rect_raw/compressedDepth", "CompressedImage", 30, *IMGSIZE, *DEPTHRANGE]  # Right wrist depth topic, select if depth is needed
+    joint_q: ["/sensors_data_raw", "sensorsData", 500]  # Joint angle topic, COMPULSORY
+    qiangnao: ["/dexhand/state", "JointState", 500]  # End-effector topic for dexterous hand
+    leju_claw: ["/leju_claw_state", "lejuClawState", 500]  # End-effector topic for gripper-claw
+    rq2f85: ["/gripper/state", "JointState", 500]  # End-effector topic for simulator claw
+  
+  arm_state_keys: ["joint_q","gripper"]  # Do not change. Model observation arm state, with joint angles and gripper state.
+  frame_alignment: false  # Frame alignment. default=false
+  ratio: 1.0 # With frame alignment, this is the ratio of the latest observation vs all older observations. default=1.0
+  
+  # Limits joint values. I.e. upper and lower limit definitions. Do not change these.
+  limits:
+    # joint angle limits (7 joints per arm)
+    joint_q:
+      min: [-3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14]
+      max: [3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14]
+    
+    # Gripper limits
+    gripper:
+      min: [0, 0]
+      max: [1, 1]
+    
+    # End-effector limits
+    eef:
+      min: [-1, -1, -1, -3.14, -3.14, -3.14, -1, -1, -1, -3.14, -3.14, -3.14]
+      max: [1, 1, 1, 3.14, 3.14, 3.14, 1, 1, 1, 3.14, 3.14, 3.14]
+    
+    # End-effector relative limits (for delta, currently in development)
+    eef_relative:
+      min: [-0.005, -0.0075, -0.004, -0.03, -0.03, -0.05, -0.005, -0.0075, -0.004, -0.03, -0.03, -0.05]
+      max: [0.005, 0.0075, 0.004, 0.03, 0.03, 0.05, 0.005, 0.0075, 0.004, 0.03, 0.03, 0.05]
+    
+    # Robot movement limits (x, y, yaw, move_flag)
+    base:
+      min: [-2.0, -2.0, -3.14, 0]
+      max: [2.0, 2.0, 3.14, 1]
+
+  # It is NOT recommended to change these following configs
+
+  # dex_dof_needed is the dof needed for dex hand. The qiangnao dexhand has 6 dof, with fully closed being [100] * 6, fully open being [0] * 6.
+  # 1: When precise operation or multi-finger coordinated operation is not required, it is usually set to 1, which means that only the first joint is needed as the basis for opening and closing.
+  #    In this case, [0, 100, 0, 0, 0, 0] is used to represent the open state, and [100] * 6 represents the clenched fist state.
+  # 2(Untested): 0,2,3,4,5 dof becomes a single dof.
+  # 6(Untested): All 6 dof are available.
+  qiangnao_dof_needed: 1   # default=1
+
+  is_binary: false  # Is open and close binary? default=false
+
+
+# =====================================================
+# inference config: Change here for inferencing configuration, both in sim and real-device
+# =====================================================
+inference:
+  go_bag_path: /path/to/your/go.bag  # !!! Not used in simulation !!! In real-device inferencing, a rosbag path is provided for the robot to initialise properly to the correct init position. Any single rosbag from corresponding training data will do.
+  policy_type: "act"  # Policy name. Supports diffusion, act
+  eval_episodes: 100  # Number of evaluation episodes. 100 times default for simulator competition, for scoring purposes.
+  seed: 42  # Randomisation seeding.
+  start_seed: 42  # Initial seed for each episode
+  device: "cuda"  # or "cpu"
+  task: "your_task"
+  method: "your_method"
+  timestamp: "your_timestamp"
+  epoch: best  # Which epoch to use from the training weights. I.e. 50, 100, best, etc. Note:Weights will be used from outputs/train/<task>/<method>/<timestamp>/epoch<epoch> to load policy
+  max_episode_steps: 200  # Max episode steps. Stops after this threshold. Increase for longer tasks.
