@@ -1,8 +1,5 @@
 # 🚀 **Kuavo Data Challenge**
-<p align="right">
-  <a href="README.md"><b>English</b></a> |
-  <a href="README_ZH.md">简体中文</a>
-</p>
+
 
 [![leju](https://img.shields.io/badge/LEJUROBOT-blue)](https://www.lejurobot.com/zh)
 [![tong](https://img.shields.io/badge/BIGAI-red)](https://www.bigai.ai/)
@@ -325,7 +322,7 @@ pip install -r requirements_total.txt    # Ensure ROS Noetic is installed first 
 
 After installation, double-check the lerobot version: Should be Version 0.4.2 as of November 2025.
 ```bash
-pip show | grep lerobot
+pip show lerobot
 ```
 
 If not, reset the lerobot repository:
