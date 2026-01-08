@@ -347,6 +347,12 @@ class KuavoBaseRosEnv(gym.Env):
                 self.rate.sleep()
                 self._record_sleep_time(t1)
                 return self.get_obs(), 0, False, False, {}
+            else:
+                log_robot.info(f"机器人是否处于站立状态：{self.robot._kuavo_core.state},(mode_flag < 0.5)")
+                if self.robot._kuavo_core.state != 'stance':
+                    self.robot.stance()
+                    self.robot_state.wait_for_stance()
+                    log_robot.info(f"➡️  执行【机器人站立】成功! (mode_flag < 0.5)")
             # 如果不执行base移动，则执行手部动作，此时使用action的前面部分
             action = action[:-4]
 
