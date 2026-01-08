@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 分块流式rosbag转换器 - 低内存版本
 
@@ -16,7 +15,7 @@
         rosbag.lerobot_dir=/path/to/output \
         rosbag.chunk_size=100
 """
-
+import lerobot_patches.custom_patches  # Ensure custom patches are applied, DON'T REMOVE THIS LINE!
 import os
 import gc
 import shutil
