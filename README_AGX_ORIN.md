@@ -62,10 +62,12 @@ which pip
 pip list
 
 # 若需要 ROS 依赖
-# source /opt/ros/noetic/setup.bash
+source /opt/ros/noetic/setup.bash
 
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -r requirements_agxorin.txt
+# 如果遇到ROS相关的库的问题：
+pip install -r requirements_agxorin_old.bk
 
 # 如果因pip版本问题导致依赖冲突：
 pip install -r requirements_agxorin.txt --use-deprecated=legacy-resolver

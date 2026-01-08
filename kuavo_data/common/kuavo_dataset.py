@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # pip install --extra-index-url https://rospypi.github.io/simple/ rospy rosbag
 # pip install roslz4 --extra-index-url https://rospypi.github.io/simple/
-from flask import config
 import numpy as np
 import cv2
 import rosbag
@@ -9,6 +8,7 @@ from pprint import pprint
 import os
 import glob
 from collections import defaultdict
+from typing import Callable, Optional
 
 # ================ 机器人关节信息定义 ================
 
@@ -88,7 +88,6 @@ def init_parameters(cfg):
     TASK_DESCRIPTION = config.task_description  # 任务描述
 
 
-
 # ================ 数据处理函数定义 ==================
 class KuavoMsgProcesser:
     """
@@ -153,8 +152,7 @@ class KuavoMsgProcesser:
             print("Warning: The decoded image is not a 16-bit image, actual dtype: ", image.dtype)
         depth_image = cv2.resize(image, (RESIZE_W, RESIZE_H), interpolation=cv2.INTER_NEAREST)
         # print("depth image dtype: ", depth_image.dtype)
-        # return {"data": depth_image, "timestamp": msg.header.stamp.to_sec()}
-        # return {"data": depth_image[..., np.newaxis], "timestamp": msg.header.stamp.to_sec()}
+        # return {"data": depth_image[np.newaxis,...], "timestamp": msg.header.stamp.to_sec()}
         return {"data": depth_image, "timestamp": msg.header.stamp.to_sec()}
 
 
@@ -201,6 +199,15 @@ class KuavoMsgProcesser:
         return {"data": np.deg2rad(msg.position), "timestamp": msg.header.stamp.to_sec()}
     
     @staticmethod
+    def process_cmd_pos_world(msg):    #cmd_pose_world处理函数
+        linear = [msg.twist.linear.x, msg.twist.linear.y]
+        angular = [msg.twist.angular.z]
+        
+        twist_data = linear + angular
+        
+        return {"data": twist_data, "timestamp": msg.header.stamp.to_sec()}
+
+    @staticmethod
     def process_claw_state(msg):
         """
             Args:
@@ -212,7 +219,6 @@ class KuavoMsgProcesser:
         """
         state= msg.data.position
         return { "data": state, "timestamp": msg.header.stamp.to_sec() }
-        
     @staticmethod
     def process_claw_cmd(msg):
         position= msg.data.position
@@ -247,17 +253,6 @@ class KuavoMsgProcesser:
         position= list(msg.left_hand_position)
         position.extend(list(msg.right_hand_position))
         return { "data": position, "timestamp": msg.header.stamp.to_sec() }
-    
-    @staticmethod
-    def process_cmd_pos_world(msg):
-        # Extract linear and angular velocities
-        linear = [msg.twist.linear.x, msg.twist.linear.y]
-        angular = [msg.twist.angular.z]
-        
-        # Combine linear and angular data
-        twist_data = linear + angular
-        
-        return {"data": twist_data, "timestamp": msg.header.stamp.to_sec()}
     
 
     @staticmethod
@@ -325,10 +320,17 @@ class KuavoRosbagReader:
                 "topic": "/kuavo_arm_traj",
                 "msg_process_fn": self._msg_processer.process_kuavo_arm_traj,
             },
+            # 连续版kauvo_arm_traj,用于task4
             "action.kuavo_arm_traj_alt": {
                 "topic": "/kuavo_arm_traj_synced",
                 "msg_process_fn": self._msg_processer.process_kuavo_arm_traj,
             },
+            # 新action：cmd_pos_world，控制位置
+            "action.cmd_pos_world": {
+                "topic": "/cmd_pose_world_synced",
+                "msg_process_fn": self._msg_processer.process_cmd_pos_world,
+            },
+
             "action": {
                 "topic": "/joint_cmd",
                 "msg_process_fn": self._msg_processer.process_joint_cmd,
@@ -362,10 +364,6 @@ class KuavoRosbagReader:
             "action.rq2f85": {
                 "topic": "/gripper/command",
                 "msg_process_fn": self._msg_processer.process_rq2f85_cmd,
-            },
-            "action.cmd_pos_world": {
-                "topic": "/cmd_pose_world_synced",
-                "msg_process_fn": self._msg_processer.process_cmd_pos_world,
             },
         }
         for camera in DEFAULT_CAMERA_NAMES:
@@ -453,6 +451,9 @@ class KuavoRosbagReader:
     def process_rosbag(self, bag_file: str):
         """
         Process the rosbag file and return the processed data.
+        
+        Note: This method loads all data into memory. For large rosbags, 
+        consider using process_rosbag_streaming() or process_rosbag_chunked() instead.
 
         Args:
             bag_file (str): The path to the rosbag file.
@@ -477,35 +478,114 @@ class KuavoRosbagReader:
         
         return data_aligned
     
+    
+    def process_rosbag_chunked(
+        self,
+        bag_file: str,
+        frame_callback: Callable[[dict, int], None],
+        chunk_size: int = 100,
+        save_callback: Optional[Callable[[], None]] = None
+    ) -> int:
+        """
+        分块流式处理rosbag（推荐用于超大rosbag）
+        
+        参考Diffusion Policy的按需读取方式：
+        1. 第一遍扫描：只读取时间戳（内存占用极小，只有几MB）
+        2. 第二遍扫描：按时间窗口分块读取+对齐+处理
+        
+        与process_rosbag的区别：
+        - process_rosbag: 一次性加载所有数据到内存（内存峰值巨大）
+        - process_rosbag_chunked: 分块读取，边读边对齐边处理（内存可控）
+        
+        Args:
+            bag_file: rosbag文件路径
+            frame_callback: 处理每帧的回调函数 (aligned_frame, frame_idx) -> None
+                           aligned_frame包含所有话题的对齐数据
+            chunk_size: 每个chunk包含的帧数（默认100帧）
+            save_callback: 每个chunk处理完后的回调（用于保存dataset和释放内存）
+        
+        Returns:
+            处理的总帧数
+            
+        Example:
+            def on_frame(aligned_frame, frame_idx):
+                # 处理对齐后的帧，添加到dataset
+                dataset.add_frame(...)
+            
+            def on_chunk_done():
+                # 保存当前chunk，释放内存
+                dataset.save_episode()
+                gc.collect()
+            
+            reader.process_rosbag_chunked(
+                bag_file="large.bag",
+                frame_callback=on_frame,
+                chunk_size=100,
+                save_callback=on_chunk_done
+            )
+        """
+        from kuavo_data.common.chunk_process import ChunkedRosbagProcessor
+        
+        processor = ChunkedRosbagProcessor(
+            msg_processer=self._msg_processer,
+            topic_process_map=self._topic_process_map,
+            camera_names=DEFAULT_CAMERA_NAMES,
+            train_hz=TRAIN_HZ,
+            main_timeline_fps=MAIN_TIMELINE_FPS,
+            sample_drop=SAMPLE_DROP,
+            only_half_up_body=ONLY_HALF_UP_BODY
+        )
+        
+        # 第一遍：只扫描时间戳（内存占用极小）
+        main_timeline, main_timestamps, all_timestamps = processor.scan_timestamps_only(bag_file)
+        
+        # 第二遍：分块处理
+        return processor.process_in_chunks(
+            bag_file=bag_file,
+            main_timestamps=main_timestamps,
+            all_timestamps=all_timestamps,
+            frame_callback=frame_callback,
+            chunk_size=chunk_size,
+            save_callback=save_callback
+        )
+    
     def align_frame_data(self, data: dict):
         aligned_data = defaultdict(list)
         main_timeline = max(
-            DEFAULT_CAMERA_NAMES, 
-            key=lambda cam_k: len(data.get(cam_k, []))
+            DEFAULT_CAMERA_NAMES,
+            key=lambda cam_k: len(data.get(cam_k, [])),
         )
-        
+
         jump = MAIN_TIMELINE_FPS // TRAIN_HZ
-        main_img_timestamps = [t['timestamp'] for t in data[main_timeline]][SAMPLE_DROP:-SAMPLE_DROP][::jump]
+
+        # 注意：当 SAMPLE_DROP 为 0 时，不能使用 [SAMPLE_DROP:-SAMPLE_DROP]，
+        # 因为 [-0] 等价于 [0]，会导致切片为空列表。
+        main_timeline_list = [t['timestamp'] for t in data[main_timeline]]
+        if SAMPLE_DROP > 0:
+            main_img_timestamps = main_timeline_list[SAMPLE_DROP:-SAMPLE_DROP][::jump]
+        else:
+            main_img_timestamps = main_timeline_list[::jump]
         min_end = min([data[k][-1]['timestamp'] for k in data.keys() if len(data[k]) > 0])
         main_img_timestamps = [t for t in main_img_timestamps if t < min_end]
-
+        
         # 特殊处理kuavo_arm_traj话题的时间戳连续性检测（可能有断点，需要999处理）在控制下肢时候
         def detect_timestamp_gaps(timestamps, gap_threshold=0.15 * 10 / TRAIN_HZ): # gap_threshold可调
             """检测时间戳中的间隙，返回间隙位置"""
             if len(timestamps) < 2:
                 return []
+            
             gaps = []
             for i in range(1, len(timestamps)):
                 if timestamps[i] - timestamps[i-1] > gap_threshold:
                     gaps.append(i)
             return gaps
-
-        # 检查kuavo_arm_traj是否有断点，如果有则进行特殊处理
+        
         gaps = []
-
+        # 检查kuavo_arm_traj是否有断点，如果有则进行特殊处理
         if not ONLY_HALF_UP_BODY and "action.kuavo_arm_traj" in data and len(data["action.kuavo_arm_traj"]) > 0:
             arm_traj_timestamps = [t['timestamp'] for t in data["action.kuavo_arm_traj"]]
             gaps = detect_timestamp_gaps(arm_traj_timestamps)
+            
             # 只有在检测到间隙时才进行特殊处理
             if len(gaps) > 0:
                 print(f"Detected {len(gaps)} gaps in action.kuavo_arm_traj, applying 999 flag processing")
@@ -554,7 +634,7 @@ class KuavoRosbagReader:
                 # 跳过已经特殊处理的kuavo_arm_traj（只有在有间隙时才跳过）
                 if key == "action.kuavo_arm_traj" and len(gaps) > 0:
                     continue
-
+                
                 if len(v) > 0:
                     this_obs_time_seq = [this_frame['timestamp'] for this_frame in v]
                     time_array = np.array([t for t in this_obs_time_seq])
@@ -562,11 +642,28 @@ class KuavoRosbagReader:
                     aligned_data[key].append(v[idx])
                 else:
                     aligned_data[key] = []
-
-        print(f"Aligned {key}: {len((data[main_timeline]))} -> {len(next(iter(aligned_data.values())))}")
+        
+        # 打印对齐结果（安全地处理空数据情况）
+        if len(main_img_timestamps) > 0 and len(aligned_data) > 0:
+            # 使用main_timeline作为参考，或者使用aligned_data中的第一个非空键
+            reference_key = main_timeline if main_timeline in aligned_data and len(aligned_data[main_timeline]) > 0 else next(iter([k for k, v in aligned_data.items() if len(v) > 0]), None)
+            if reference_key is not None:
+                original_len = len(data.get(main_timeline, []))
+                aligned_len = len(aligned_data[reference_key])
+                print(f"Aligned {reference_key}: {original_len} -> {aligned_len}")
+            else:
+                print("Warning: No aligned data found")
+        else:
+            print(f"Warning: No timestamps to align (main_img_timestamps={len(main_img_timestamps)}, aligned_data keys={list(aligned_data.keys())})")
+        
+        # 打印每个键的对齐结果
         for k, v in aligned_data.items():
             if len(v) > 0:
-                print(v[0]['timestamp'], v[1]['timestamp'],"length", k,len(v))
+                if len(v) >= 2:
+                    print(v[0]['timestamp'], v[1]['timestamp'], "length", k, len(v))
+                else:
+                    print(v[0]['timestamp'], "length", k, len(v))
+        
         return aligned_data
     
     

@@ -274,7 +274,7 @@ toml==0.10.2
 topic-tools==1.17.0
 torch @ http://120.55.169.67/downloads/torch-2.2.0-cp310-cp310-linux_aarch64.whl
 torch-complex==0.4.4
-torchaudio==2.7.1
+torchaudio==2.2.0
 torchcodec==0.0.0.dev0
 torchvision @ http://120.55.169.67/downloads/torchvision-0.17.2+c1d70fe-cp310-cp310-linux_aarch64.whl
 tqdm==4.67.1

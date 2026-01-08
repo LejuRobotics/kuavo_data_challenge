@@ -1,128 +1,57 @@
 """
-Script to convert Kuavo rosbag data to the LeRobot dataset v2.0 format.
+分块流式rosbag转换器 - 低内存版本
 
-Example usage: uv run examples/aloha_real/convert_aloha_data_to_lerobot.py --raw-dir /path/to/raw/data --repo-id <org>/<dataset-name>
+核心优化（参考Diffusion Policy的按需读取方式）：
+1. 第一遍扫描：只读取时间戳（内存占用几MB）
+2. 第二遍扫描：按时间窗口分块读取+对齐+写入dataset
+
+与原始CvtRosbag2Lerobot.py的区别：
+- 原始：一次性加载整个rosbag到内存 → 对齐 → 写入（内存峰值巨大）
+- 本版：分块读取 → 即时对齐 → 即时写入 → 释放内存（内存可控）
+
+使用方法：
+    python CvtRosbag2Lerobot_chunked.py --config-name=KuavoRosbag2Lerobot \
+        rosbag.rosbag_dir=/path/to/rosbag \
+        rosbag.lerobot_dir=/path/to/output \
+        rosbag.chunk_size=100
 """
 import lerobot_patches.custom_patches  # Ensure custom patches are applied, DON'T REMOVE THIS LINE!
-import dataclasses
-from pathlib import Path
-import shutil
-import hydra
-from omegaconf import DictConfig
-from typing import Literal
-import sys
 import os
-from rich.logging import RichHandler
-import logging
-import resource
-
-logging.basicConfig(
-    level="DEBUG",
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)]
-)
-
-
-from pympler import asizeof
-import matplotlib.pyplot as plt
-
-
-
-# 临时测试使用：
-# -------------------------------------------------
-DEFAULT_ARM_JOINT_RANGE = [
-    [-3.14159, 1.5708], 
-    [-0.349066, 2.0944], 
-    [-1.5708, 1.5708],
-    [-2.61799, 0],
-    [-1.5708, 1.5708], 
-    [-1.309, 0.698132], 
-    [-0.698132, 0.698132],
-    [-1, 1],
-    [-3.14159, 1.5708], 
-    [-2.0944, 0.349066], 
-    [-1.5708, 1.5708], 
-    [-2.61799, 0], 
-    [-1.5708, 1.5708], 
-    [-0.698132, 1.309], 
-    [-0.698132, 0.698132],
-    [-1, 1]
-] 
-# -------------------------------------------------
-
-def get_attr_sizes(obj, prefix=""):
-    """递归获取对象每个属性及嵌套属性的内存占用"""
-    sizes = {}
-    for attr in dir(obj):
-        if attr.startswith("__"):
-            continue
-        try:
-            value = getattr(obj, attr)
-        except Exception:
-            continue
-        key = f"{prefix}.{attr}" if prefix else attr
-        size = asizeof.asizeof(value)
-        sizes[key] = size
-        # 如果是自定义类实例，递归获取
-        if hasattr(value, "__dict__"):
-            sizes.update(get_attr_sizes(value, prefix=key))
-    return sizes
-
-def visualize_memory(attr_sizes, top_n=20):
-    """可视化内存占用"""
-    # 按大小排序，取前 top_n
-    sorted_attrs = sorted(attr_sizes.items(), key=lambda x: x[1], reverse=True)[:top_n]
-    labels, sizes = zip(*sorted_attrs)
-    sizes_kb = [s / 1024 /1024 for s in sizes]
-
-    plt.figure(figsize=(12, 6))
-    plt.barh(labels[::-1], sizes_kb[::-1])
-    plt.xlabel("Memory (MB)")
-    plt.title(f"Top {top_n} attributes by memory usage")
-    plt.tight_layout()
-    plt.show()
-
-
-
-
-log_print = logging.getLogger("rich")
-
-try:
-    from lerobot.common.datasets.lerobot_dataset import LEROBOT_HOME
-    from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
-    log_print.warning("import lerobot.common.xxx will be deprecated in lerobot v2.0, please use lerobot.xxx instead in the future.")
-except Exception as import_error:
-    try:
-        import lerobot
-    except Exception as lerobot_error:
-        log_print.error("Error: lerobot package not found. Please change to 'third_party/lerobot' and install it using 'pip install -e .'.")
-        sys.exit(1)
-    log_print.info("Error: "+ str(import_error))
-    log_print.info("Import lerobot.common.xxx is deprecated in lerobot v2.0, try to use import lerobot.xxx instead ...")
-    try:
-        from lerobot.datasets.lerobot_dataset import LEROBOT_HOME
-        from lerobot.datasets.lerobot_dataset import LeRobotDataset
-        log_print.info("import lerobot.datasets.lerobot_dataset ok!")
-    except Exception as import_failed:
-        log_print.info("Error:"+str(import_failed))
-        if "LEROBOT_HOME" in str(import_failed):
-            try:
-                from lerobot.datasets.lerobot_dataset import HF_LEROBOT_HOME as LEROBOT_HOME
-                from lerobot.datasets.lerobot_dataset import LeRobotDataset
-                log_print.info("import lerobot.datasets.lerobot_dataset HF_LEROBOT_HOME,  LeRobotDataset ok!")
-            except Exception as e:
-                log_print.error(str(e))
-                sys.exit(1)
-
+import gc
+import shutil
+from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import torch
 import tqdm
-import json
+import hydra
+from omegaconf import DictConfig
 
-import kuavo_data.common.kuavo_dataset as kuavo
-import rospy
+from lerobot.datasets.lerobot_dataset import HF_LEROBOT_HOME as LEROBOT_HOME
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
+import dataclasses
+from kuavo_data.common import kuavo_dataset as kuavo
+from rich.logging import RichHandler
+import logging
+
+log_print = logging.getLogger(__name__)
+
+
+def setup_logging():
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.setLevel(logging.INFO)
+
+    from rich.logging import RichHandler
+    root.addHandler(
+        RichHandler(
+            show_level=True,
+            show_path=False,
+            rich_tracebacks=True,
+        )
+    )
+
 
 @dataclasses.dataclass(frozen=True)
 class DatasetConfig:
@@ -134,21 +63,7 @@ class DatasetConfig:
 
 DEFAULT_DATASET_CONFIG = DatasetConfig()
 
-
-def get_cameras(bag_data: dict) -> list[str]:
-    """
-    /cam_l/color/image_raw/compressed                    : sensor_msgs/CompressedImage                
-    /cam_r/color/image_raw/compressed                    : sensor_msgs/CompressedImage                
-    /zedm/zed_node/left/image_rect_color/compressed      : sensor_msgs/CompressedImage                
-    /zedm/zed_node/right/image_rect_color/compressed     : sensor_msgs/CompressedImage 
-    """
-    cameras = []
-
-    for k in kuavo.DEFAULT_CAMERA_NAMES:
-        cameras.append(k)
-    return cameras
-
-def create_empty_dataset(
+def create_empty_dataset_chunked(
     repo_id: str,
     robot_type: str,
     mode: Literal["video", "image"] = "video",
@@ -255,254 +170,297 @@ def create_empty_dataset(
         root=root,
     )
 
-def load_raw_images_per_camera(bag_data: dict) -> dict[str, np.ndarray]:
-    imgs_per_cam = {}
-    for camera in get_cameras(bag_data):
-        imgs_per_cam[camera] = np.array([msg['data'] for msg in bag_data[camera]])
-        print(f"camera {camera} image", imgs_per_cam[camera].shape)
-    
-    return imgs_per_cam
 
-
-def load_raw_episode_data(
-    ep_path: Path,
-) -> tuple[dict[str, np.ndarray], torch.Tensor, torch.Tensor, torch.Tensor | None, torch.Tensor | None,torch.Tensor,torch.Tensor,torch.Tensor,torch.Tensor]:
-
-    bag_reader = kuavo.KuavoRosbagReader()
-    bag_data = bag_reader.process_rosbag(ep_path)
-    
-    state = np.array([msg['data'] for msg in bag_data['observation.state']], dtype=np.float32)
-    action = np.array([msg['data'] for msg in bag_data['action']], dtype=np.float32)
-    action_kuavo_arm_traj = np.array([msg['data'] for msg in bag_data['action.kuavo_arm_traj']], dtype=np.float32)
-    claw_state = np.array([msg['data'] for msg in bag_data['observation.claw']], dtype=np.float64)
-    claw_action= np.array([msg['data'] for msg in bag_data['action.claw']], dtype=np.float64)
-    qiangnao_state = np.array([msg['data'] for msg in bag_data['observation.qiangnao']], dtype=np.float64)
-    qiangnao_action= np.array([msg['data'] for msg in bag_data['action.qiangnao']], dtype=np.float64)
-    rq2f85_state = np.array([msg['data'] for msg in bag_data['observation.rq2f85']], dtype=np.float64)
-    rq2f85_action= np.array([msg['data'] for msg in bag_data['action.rq2f85']], dtype=np.float64)
-    cmd_pos_world_action = np.array([msg['data'] for msg in bag_data['action.cmd_pos_world']], dtype=np.float32)
-    action_kuavo_arm_traj_alt = np.array([msg['data'] for msg in bag_data['action.kuavo_arm_traj_alt']], dtype=np.float32)
-    # print("eef_type shape: ",claw_action.shape,qiangnao_action.shape, rq2f85_action.shape)
-    action[:, 12:26] = action_kuavo_arm_traj if len(action_kuavo_arm_traj_alt) == 0 else action_kuavo_arm_traj_alt
-
-    velocity = None
-    effort = None
-    
-    imgs_per_cam = load_raw_images_per_camera(bag_data)
-    
-    return imgs_per_cam, state, action, velocity, effort ,claw_state ,claw_action,qiangnao_state,qiangnao_action, rq2f85_state, rq2f85_action, cmd_pos_world_action, action_kuavo_arm_traj,
-
-
-def diagnose_frame_data(data):
-    for k, v in data.items():
-        print(f"Field: {k}")
-        print(f"  Shape    : {v.shape}")
-        print(f"  Dtype    : {v.dtype}")
-        print(f"  Type     : {type(v).__name__}")
-        print("-" * 40)
-
-
-def populate_dataset(
+def populate_dataset_chunked(
     dataset: LeRobotDataset,
     bag_files: list[Path],
     task: str,
     episodes: list[int] | None = None,
+    chunk_size: int = 100,
 ) -> LeRobotDataset:
+    """
+    使用分块流式处理填充数据集
+    
+    核心优化：
+    1. 第一遍扫描只读取时间戳（内存几MB）
+    2. 第二遍扫描按时间窗口分块读取+对齐+写入
+    3. 每个chunk处理完立即保存并释放内存
+    
+    Args:
+        dataset: LeRobotDataset实例
+        bag_files: rosbag文件路径列表
+        task: 任务描述
+        episodes: 要处理的episode索引列表
+        chunk_size: 每个chunk包含的帧数（默认100帧）
+    """
     if episodes is None:
         episodes = range(len(bag_files))
+    
     failed_bags = []
-    print( f"Total episodes to process: {len(episodes)}")
-
+    log_print.info(f"Total episodes to process: {len(episodes)}")
+    bag_reader = kuavo.KuavoRosbagReader()
+    
+    # 内存监控
+    process = None
+    try:
+        import psutil
+        process = psutil.Process(os.getpid())
+    except ImportError:
+        pass
+    
+    def log_memory(prefix: str):
+        if process:
+            mem_mb = process.memory_info().rss / 1024 / 1024
+            log_print.debug(f"{prefix} Memory: {mem_mb:.2f} MB")
+    
     for ep_idx in tqdm.tqdm(episodes):
         ep_path = bag_files[ep_idx]
-        from termcolor import colored
-        print(colored(f"Processing {ep_path}", "yellow", attrs=["bold"]))
-        # 默认读取所有的数据如果话题不存在相应的数值应该是一个空的数据
-        # try:
-        imgs_per_cam, state, action, velocity, effort ,claw_state, claw_action,qiangnao_state,qiangnao_action, rq2f85_state, rq2f85_action, cmd_pos_world_action, action_kuavo_arm_traj = load_raw_episode_data(ep_path)
-        # except Exception as e:
-        #     print(f"❌ Error processing {ep_path}: {e}")
-        #     failed_bags.append(str(ep_path))
-        #     continue
-        # 对手部进行二值化处理
-        if kuavo.IS_BINARY:
-            qiangnao_state = np.where(qiangnao_state > 50, 1, 0)
-            qiangnao_action = np.where(qiangnao_action > 50, 1, 0)
-            claw_state = np.where(claw_state > 50, 1, 0)
-            claw_action = np.where(claw_action > 50, 1, 0)
-            rq2f85_state = np.where(rq2f85_state > 0.4, 1, 0)
-            rq2f85_action = np.where(rq2f85_action > 70, 1, 0)
-
-            # rq2f85_state = np.where(rq2f85_state > 0.1, 1, 0)
-            # rq2f85_action = np.where(rq2f85_action > 128, 1, 0)
-        else:
-            # 进行数据归一化处理
-            claw_state = claw_state / 100
-            claw_action = claw_action / 100
-            qiangnao_state = qiangnao_state / 100
-            qiangnao_action = qiangnao_action / 100
-            rq2f85_state = rq2f85_state / 0.8
-            rq2f85_action = rq2f85_action / 255
-
-            # rq2f85_state = rq2f85_state / 0.8
-            # rq2f85_action = rq2f85_action / 255
-        print(f"eef_action shape, leju_claw: {claw_action.shape},qiangnao: {qiangnao_action.shape}, rq2f85: {rq2f85_action.shape}")
-        if len(claw_action)==0 and len(qiangnao_action) == 0:
-            claw_action = rq2f85_action
-            claw_state = rq2f85_state
-
-        # =====================
-        # 为了解决零点问题，将每帧与第一帧相减
-        if kuavo.RELATIVE_START:
-            # 每个state, action与他们的第一帧相减
-            state = state - state[0]
-            action = action - action[0]
+        log_print.warning(f"Processing {ep_path}")
+        log_memory("Before processing")
         
+        try:
+            # 收集当前episode的所有帧
+            frames_buffer = []
+            frame_count = [0]
+            
+            def on_frame(aligned_frame: dict, frame_idx: int):
+                """处理单帧对齐数据"""
 
-        def get_hand_data(i, hand_side, hand_type):
-            if hand_type == "LEJU":
-                s_slice = kuavo.SLICE_ROBOT[hand_side]
-                c_slice = kuavo.SLICE_CLAW[hand_side]
-                s = np.concatenate((state[i, s_slice[0]:s_slice[-1]], claw_state[i, c_slice[0]:c_slice[-1]]))
-                a = np.concatenate((action[i, s_slice[0]:s_slice[-1]], claw_action[i, c_slice[0]:c_slice[-1]]))
-            else:
-                s_slice = kuavo.SLICE_ROBOT[hand_side]
-                d_slice = kuavo.SLICE_DEX[hand_side]
-                s = np.concatenate((state[i, s_slice[0]:s_slice[-1]], qiangnao_state[i, d_slice[0]:d_slice[-1]]))
-                a = np.concatenate((action[i, s_slice[0]:s_slice[-1]], qiangnao_action[i, d_slice[0]:d_slice[-1]]))
-            return s, a
+                def get_array(key, dtype, default_empty=True):
+                    item = aligned_frame.get(key)
+                    if item is None:
+                        return np.array([], dtype=dtype) if default_empty else None
+                    return np.array(item.get("data", []), dtype=dtype)
 
-        num_frames = state.shape[0]
-
-        for i in range(num_frames):
-            if kuavo.USE_LEJU_CLAW or kuavo.USE_QIANGNAO:
-                hand_type = "LEJU" if kuavo.USE_LEJU_CLAW else "QIANGNAO"
-                s_list, a_list = [], []
-                if kuavo.CONTROL_HAND_SIDE in ("left", "both"):
-                    s, a = get_hand_data(i, 0, hand_type)
-                    s_list.append(s); a_list.append(a)
-                if kuavo.CONTROL_HAND_SIDE in ("right", "both"):
-                    s, a = get_hand_data(i, 1, hand_type)
-                    s_list.append(s); a_list.append(a)
-                output_state = np.concatenate(s_list).astype(np.float32)
-                output_action = np.concatenate(a_list).astype(np.float32)
-
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~手臂关节角度范围限制，防止有数据超限 ~~~~~~~~~~~~~~~~~~~~~~~~~
-            assert len(DEFAULT_ARM_JOINT_RANGE) >= 16, "DEFAULT_ARM_JOINT_RANGE should have at least 16 joint ranges"
-
-            if kuavo.CONTROL_HAND_SIDE == "left":
-                joint_indices = range(0, 8)
-            elif kuavo.CONTROL_HAND_SIDE == "right":
-                joint_indices = range(8, 16)
-            elif kuavo.CONTROL_HAND_SIDE == "both":
-                joint_indices = range(0, 16)
-            else:
-                raise ValueError(f"Invalid CONTROL_HAND_SIDE: {kuavo.CONTROL_HAND_SIDE}")
-
-            # 保证 output_action 长度匹配选中的手臂
-            assert len(joint_indices) == output_action.shape[0], (
-                f"Expected output_action of length {len(joint_indices)}, "
-                f"but got {output_action.shape[0]}"
-            )
-
-            for enu_i, jidx_k in enumerate(joint_indices):
-                low, high = DEFAULT_ARM_JOINT_RANGE[jidx_k]
-                if output_action[enu_i] < low:
-                    output_action[enu_i] = low
-                elif output_action[enu_i] > high:
-                    output_action[enu_i] = high
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+                # =========================
+                # 1. state / action
+                # =========================
+                state = get_array('observation.state', np.float32)
+                action = get_array('action', np.float32)
                 
-            final_action = output_action
-            final_state = output_state
 
+                if state.size == 0 or action.size == 0:
+                    return
 
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~deal with cmd_pos_world and gap_flag under task4 ~~~~~~~~~~~~~~~~~~~~~~~~~
-            if not kuavo.ONLY_HALF_UP_BODY:
-                cmd_pos_world = cmd_pos_world_action[i]
-                # 6. 断点标志 (1维): 检查action_kuavo_arm_traj是否包含999
-                gap_flag = 1.0 if np.any(action_kuavo_arm_traj[i] == 999.0) else 0.0
-                # 合并所有action
-                final_action = np.concatenate([
-                    final_action,
-                    cmd_pos_world,
-                    np.array([gap_flag], dtype=np.float32)
-                ], axis=0)
-            
-            frame = {
-                "observation.state": torch.from_numpy(final_state).type(torch.float32),      # left+right: pos+rot6d+gripper;  dim: 2*10           
-                "action": torch.from_numpy(final_action).type(torch.float32),                # left+right: pos+rot6d+gripper;  dim: 2*10                  
-            }
+                # =========================
+                # 2. arm trajectory（alt 优先）
+                # =========================
+                arm_traj     = get_array("action.kuavo_arm_traj", np.float32)
+                arm_traj_alt = get_array("action.kuavo_arm_traj_alt", np.float32)
+                if arm_traj_alt.size == 0 and arm_traj.size == 0:
+                    return
+                action[12:26] = arm_traj_alt if arm_traj_alt.size else arm_traj
+                
+                # 接口留用
+                velocity = None
+                effort = None
 
-            for idx, (camera, img_array) in enumerate(imgs_per_cam.items()):
-                if "depth" in camera:
-                    min_depth, max_depth = kuavo.DEPTH_RANGE[0], kuavo.DEPTH_RANGE[1]
-                    depth_uint16 = np.clip(img_array[i], min_depth, max_depth)
-                    max_depth = depth_uint16.max()
-                    min_depth = depth_uint16.min()
-                    depth_normalized = (depth_uint16 - min_depth) / (max_depth - min_depth + 1e-9)
-                    depth_normalized = (depth_normalized * 255).astype(np.uint8)
-                    frame[f"observation.{camera}"] = depth_normalized[..., np.newaxis].repeat(3, axis=-1)
-                    if i % 50 == 0:
-                        print("[info]: Clip depth in range %d ~ %d, camera: %s" % (min_depth, max_depth, camera))
+                # =========================
+                # 3. 手部数据读取
+                # =========================
+                claw_state     = get_array("observation.claw", np.float64)
+                claw_action    = get_array("action.claw", np.float64)
+                qiangnao_state = get_array("observation.qiangnao", np.float64)
+                qiangnao_action= get_array("action.qiangnao", np.float64)
+                rq2f85_state   = get_array("observation.rq2f85", np.float64)
+                rq2f85_action  = get_array("action.rq2f85", np.float64)
 
+                if claw_state.size == 0 and qiangnao_state.size == 0 and rq2f85_state.size==0:
+                    return 
+                if claw_action.size == 0 and qiangnao_action.size==0 and rq2f85_action.size ==0:
+                    return
+                # =========================
+                # 4. 手部归一化（保持原逻辑）
+                # =========================
+                if kuavo.IS_BINARY:
+                    qiangnao_state  = np.where(qiangnao_state > 50, 1, 0)
+                    qiangnao_action = np.where(qiangnao_action > 50, 1, 0)
+                    claw_state      = np.where(claw_state > 50, 1, 0)
+                    claw_action     = np.where(claw_action > 50, 1, 0)
+                    rq2f85_state    = np.where(rq2f85_state > 0.4, 1, 0)
+                    rq2f85_action   = np.where(rq2f85_action > 70, 1, 0)
+                    # rq2f85_state = np.where(rq2f85_state > 0.1, 1, 0)
+                    # rq2f85_action = np.where(rq2f85_action > 128, 1, 0)
                 else:
-                    frame[f"observation.images.{camera}"] = img_array[i]
+                    if claw_state.size:      claw_state /= 100
+                    if claw_action.size:     claw_action /= 100
+                    if qiangnao_state.size:  qiangnao_state /= 100
+                    if qiangnao_action.size: qiangnao_action /= 100
+                    if rq2f85_state.size:    rq2f85_state /= 0.8
+                    if rq2f85_action.size:   rq2f85_action /= 255
+                    # rq2f85_state = rq2f85_state / 0.8
+                    # rq2f85_action = rq2f85_action / 255
+
+                if claw_action.size == 0 and qiangnao_action.size == 0:
+                    claw_action = rq2f85_action
+                    claw_state  = rq2f85_state
+
+                # =========================
+                # 5. 构建最终 state / action
+                # =========================
+                if kuavo.USE_LEJU_CLAW or kuavo.USE_QIANGNAO:
+                    hand_type = "LEJU" if kuavo.USE_LEJU_CLAW else "QIANGNAO"
+                    s_list, a_list = [], []
+
+                    def get_hand_slice(hand_side):
+                        s_slice = kuavo.SLICE_ROBOT[hand_side]
+
+                        if hand_type == "LEJU":
+                            c_slice = kuavo.SLICE_CLAW[hand_side]
+                            s = np.concatenate((state[s_slice[0]:s_slice[-1]],
+                                                claw_state[c_slice[0]:c_slice[-1]]))
+                            a = np.concatenate((action[s_slice[0]:s_slice[-1]],
+                                                claw_action[c_slice[0]:c_slice[-1]]))
+                        else:
+                            d_slice = kuavo.SLICE_DEX[hand_side]
+                            s = np.concatenate((state[s_slice[0]:s_slice[-1]],
+                                                qiangnao_state[d_slice[0]:d_slice[-1]]))
+                            a = np.concatenate((action[s_slice[0]:s_slice[-1]],
+                                                qiangnao_action[d_slice[0]:d_slice[-1]]))
+                        return s, a
+
+                    if kuavo.CONTROL_HAND_SIDE in ("left", "both"):
+                        s, a = get_hand_slice(0)
+                        s_list.append(s)
+                        a_list.append(a)
+
+                    if kuavo.CONTROL_HAND_SIDE in ("right", "both"):
+                        s, a = get_hand_slice(1)
+                        s_list.append(s)
+                        a_list.append(a)
+
+                    final_state  = np.concatenate(s_list).astype(np.float32)
+                    final_action = np.concatenate(a_list).astype(np.float32)
+                else:
+                    raise ValueError(f"eef type are not supported! ")
+
+                # =========================
+                # 6. cmd_pos_world & gap_flag
+                # =========================
+                if not kuavo.ONLY_HALF_UP_BODY:
+                    cmd_pos_world = get_array(
+                        "action.cmd_pos_world", np.float32
+                    )
+                    if cmd_pos_world.size == 0:
+                        raise ValueError(f"kuavo.ONLY_HALF_UP_BODY is {kuavo.ONLY_HALF_UP_BODY}, but no action.cmd_pos_world found! ")
+                    gap_flag = 1.0 if arm_traj.size and np.any(arm_traj == 999.0) else 0.0
+
+                    final_action = np.concatenate(
+                        [final_action, cmd_pos_world, np.array([gap_flag], np.float32)],
+                        axis=0
+                    )
+
+                # =========================
+                # 7. 构建 frame
+                # =========================
+                frame = {
+                    "observation.state": torch.from_numpy(final_state).type(torch.float32),
+                    "action": torch.from_numpy(final_action).type(torch.float32),
+                }
+
+                for cam_key in kuavo.DEFAULT_CAMERA_NAMES:
+                    cam_data = aligned_frame.get(cam_key)
+                    if cam_data and "data" in cam_data:
+                        img = cam_data["data"]
+                        if "depth" in cam_key:
+                            min_d, max_d = kuavo.DEPTH_RANGE
+                            depth = np.clip(img, min_d, max_d)
+                            depth_norm = (depth - depth.min()) / (depth.max() - depth.min() + 1e-9)
+                            depth_uint8 = (depth_norm * 255).astype(np.uint8)
+                            frame[f"observation.{cam_key}"] = depth_uint8[..., None].repeat(3, -1)
+                        else:
+                            frame[f"observation.images.{cam_key}"] = img
+                    else:
+                        return
+                
+                if velocity is not None:
+                    frame["observation.velocity"] = velocity
+                if effort is not None:
+                    frame["observation.effort"] = effort
+                
+                frames_buffer.append(frame)
+                frame_count[0] += 1
+
             
-            if velocity is not None:
-                frame["observation.velocity"] = velocity[i]
-            if effort is not None:
-                frame["observation.effort"] = effort[i]
-
-            frame["task"] = task
-            # diagnose_frame_data(frame)
-            dataset.add_frame(frame)
-        # dataset.save_episode(task="Pick the black workpiece from the white conveyor belt on your left and place it onto the white box in front of you",)
-        # raise ValueError("stop!")
-
-
-        # usage = resource.getrusage(resource.RUSAGE_SELF)
-        # print(f"~~~~~~~~~~~~~~Before Memory usage: {usage.ru_maxrss / 1024:.2f} MB")
-        # print(dataset.episode_buffer)
-        dataset.save_episode()
-        # usage = resource.getrusage(resource.RUSAGE_SELF)
-        # print(f"~~~~~~~~~~~~~~After Memory usage: {usage.ru_maxrss / 1024:.2f} MB")
-        # print(dataset.episode_buffer)
-        # sizes = get_attr_sizes(dataset)
-        # for k, v in sizes.items():
-        #     print(f"{k}: {v/1024/1024:.2f} MB")
-        # visualize_memory(sizes, top_n=10)
-        # dataset.hf_dataset = None  # reduce memory usage in data convert
-        # del dataset.hf_dataset
-        dataset.hf_dataset = dataset.create_hf_dataset()  # reset to reduce memory usage in data convert
-
-    # 将失败的bag文件写入error.txt
+            def on_chunk_done():
+                """每个chunk处理完后的回调：保存并释放内存"""
+                if len(frames_buffer) == 0:
+                    return
+                
+                # 将所有缓存的帧添加到dataset
+                for frame in frames_buffer:
+                    frame["task"] = task
+                    dataset.add_frame(frame)
+                
+                # 保存当前chunk
+                dataset.save_episode()
+                dataset.hf_dataset = dataset.create_hf_dataset()
+                
+                # 清空buffer并释放内存
+                frames_buffer.clear()
+                gc.collect()
+                
+                log_memory(f"After saving chunk (total frames: {frame_count[0]})")
+            
+            # 使用分块流式处理
+            bag_reader.process_rosbag_chunked(
+                bag_file=str(ep_path),
+                frame_callback=on_frame,
+                chunk_size=chunk_size,
+                save_callback=on_chunk_done
+            )
+             
+            # 处理剩余的帧
+            if len(frames_buffer) > 0:
+                for frame in frames_buffer:
+                    dataset.add_frame(frame, task=task)
+                dataset.save_episode()
+                dataset.hf_dataset = dataset.create_hf_dataset()
+                frames_buffer.clear()
+                gc.collect()
+            
+            log_print.info(f"Episode {ep_idx} completed: {frame_count[0]} frames")
+            
+        except Exception as e:
+            log_print.error(f"Error processing {ep_path}: {e}")
+            import traceback
+            traceback.print_exc()
+            failed_bags.append(str(ep_path))
+            continue
+        
+        log_memory("After episode")
+        gc.collect()
+    
     if failed_bags:
         with open("error.txt", "w") as f:
             for bag in failed_bags:
                 f.write(bag + "\n")
-        print(f"❌ {len(failed_bags)} failed bags written to error.txt")
-
+        log_print.error(f"{len(failed_bags)} failed bags written to error.txt")
+    
     return dataset
-            
 
 
-def port_kuavo_rosbag(
+def port_kuavo_rosbag_chunked(
     raw_dir: Path,
     repo_id: str,
-    raw_repo_id: str | None = None,
     task: str = "DEBUG",
     *,
     episodes: list[int] | None = None,
-    push_to_hub: bool = False,
-    is_mobile: bool = False,
     mode: Literal["video", "image"] = "video",
     dataset_config: DatasetConfig = DEFAULT_DATASET_CONFIG,
     root: str,
     n: int | None = None,
+    chunk_size: int = 100,
 ):
-    # Download raw data if not exists
+    """
+    分块流式转换rosbag到LeRobot格式
+    
+    Args:
+        raw_dir: rosbag目录
+        repo_id: 输出数据集ID
+        task: 任务描述
+        chunk_size: 每个chunk的帧数（默认100）
+    """
     if (LEROBOT_HOME / repo_id).exists():
         shutil.rmtree(LEROBOT_HOME / repo_id)
 
@@ -512,32 +470,48 @@ def port_kuavo_rosbag(
     if isinstance(n, int) and n > 0:
         num_available_bags = len(bag_files)
         if n > num_available_bags:
-            log_print.warning(f"Warning: Requested {n} bags, but only {num_available_bags} are available. Using all available bags.")
+            log_print.warning(f"Requested {n} bags, but only {num_available_bags} available. Using all available bags.")
             n = num_available_bags
-        
-        # random sample num_of_bag files
         select_idx = np.random.choice(num_available_bags, n, replace=False)
         bag_files = [bag_files[i] for i in select_idx]
     
-    dataset = create_empty_dataset( 
+    dataset = create_empty_dataset_chunked(
         repo_id,
         robot_type="kuavo4pro",
         mode=mode,
         has_effort=False,
         has_velocity=False,
         dataset_config=dataset_config,
-        root = root,
+        root=root,
     )
-    dataset = populate_dataset(
+    
+    dataset = populate_dataset_chunked(
         dataset,
         bag_files,
         task=task,
         episodes=episodes,
+        chunk_size=chunk_size,
     )
-    # dataset.consolidate()
     
-@hydra.main(config_path="../configs/data/", config_name="KuavoRosbag2Lerobot", version_base=None)
+    return dataset
+
+
+@hydra.main(
+    config_path="../configs/data/",
+    config_name="KuavoRosbag2Lerobot",
+    version_base="1.2",
+)
 def main(cfg: DictConfig):
+    """
+    分块流式转换入口
+    
+    使用方法：
+        python CvtRosbag2Lerobot_chunked.py \
+            rosbag.rosbag_dir=/path/to/rosbag \
+            rosbag.lerobot_dir=/path/to/output \
+            rosbag.chunk_size=100
+    """
+    setup_logging()  # set logger 
 
     global DEFAULT_JOINT_NAMES_LIST
     kuavo.init_parameters(cfg)
@@ -552,6 +526,13 @@ def main(cfg: DictConfig):
     if os.path.exists(lerobot_dir):
         shutil.rmtree(lerobot_dir)
     
+    chunk_size = cfg.rosbag.get("chunk_size", 100)
+    
+    log_print.info(f"=== Chunked Streaming Rosbag Converter ===")
+    log_print.info(f"Rosbag dir: {raw_dir}")
+    log_print.info(f"Output dir: {lerobot_dir}")
+    log_print.info(f"Chunk size: {chunk_size}")
+
     half_arm = len(kuavo.DEFAULT_ARM_JOINT_NAMES) // 2
     half_claw = len(kuavo.DEFAULT_LEJUCLAW_JOINT_NAMES) // 2
     half_dexhand = len(kuavo.DEFAULT_DEXHAND_JOINT_NAMES) // 2
@@ -572,22 +553,25 @@ def main(cfg: DictConfig):
             (kuavo.SLICE_ROBOT[1][0] - UP_START_INDEX + half_dexhand, kuavo.SLICE_ROBOT[1][-1] - UP_START_INDEX + half_dexhand), (kuavo.SLICE_DEX[1][0] + half_arm * 2, kuavo.SLICE_DEX[1][-1] + half_arm * 2)
             ]
     DEFAULT_JOINT_NAMES_LIST = [DEFAULT_ARM_JOINT_NAMES[k] for l, r in arm_slice for k in range(l, r)]  
-    # else:
-    #     if kuavo.USE_LEJU_CLAW:
-    #         DEFAULT_ARM_JOINT_NAMES = kuavo.DEFAULT_ARM_JOINT_NAMES[:half_arm] + kuavo.DEFAULT_LEJUCLAW_JOINT_NAMES[:half_claw] \
-    #                                 + kuavo.DEFAULT_ARM_JOINT_NAMES[half_arm:] + kuavo.DEFAULT_LEJUCLAW_JOINT_NAMES[half_claw:]
-    #     elif kuavo.USE_QIANGNAO:
-    #         DEFAULT_ARM_JOINT_NAMES = kuavo.DEFAULT_ARM_JOINT_NAMES[:half_arm] + kuavo.DEFAULT_DEXHAND_JOINT_NAMES[:half_dexhand] \
-    #                                 + kuavo.DEFAULT_ARM_JOINT_NAMES[half_arm:] + kuavo.DEFAULT_DEXHAND_JOINT_NAMES[half_dexhand:]             
-    #     DEFAULT_JOINT_NAMES_LIST = kuavo.DEFAULT_LEG_JOINT_NAMES + DEFAULT_ARM_JOINT_NAMES + kuavo.DEFAULT_HEAD_JOINT_NAMES
-
-    port_kuavo_rosbag(raw_dir, repo_id, root=lerobot_dir,n = n, task=kuavo.TASK_DESCRIPTION)
-
+    
+    
+    port_kuavo_rosbag_chunked(
+        raw_dir=raw_dir,
+        repo_id=repo_id,
+        task=kuavo.TASK_DESCRIPTION,
+        mode="video",
+        root=lerobot_dir,
+        n=n,
+        chunk_size=chunk_size,
+    )
+    
+    log_print.info("Conversion completed!")
 
 
 if __name__ == "__main__":
-    
     main()
-    
 
-    
+
+
+
+
