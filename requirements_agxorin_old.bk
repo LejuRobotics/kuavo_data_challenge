@@ -230,9 +230,11 @@ tifffile==2025.5.10
 timm==1.0.19
 toml==0.10.2
 topic-tools
-torch==2.7.1
+torch @ http://120.55.169.67/downloads/torch-2.2.0-cp310-cp310-linux_aarch64.whl
+torch-complex==0.4.4
+torchaudi
 torchcodec
-torchvision==0.22.1
+torchvision @ http://120.55.169.67/downloads/torchvision-0.17.2+c1d70fe-cp310-cp310-linux_aarch64.whl
 tqdm==4.67.1
 triton
 typing-inspect==0.9.0

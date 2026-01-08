@@ -105,10 +105,11 @@ class ObsBuffer:
 
     def depth_preprocess(self, depth, depth_range=[0, 1500]):
         """深度图像预处理"""
-        depth_uint16 = torch.tensor(depth, dtype=torch.float32).clamp(*depth_range).unsqueeze(0)
-        max_depth = depth_uint16.max()
-        min_depth = depth_uint16.min()
-        depth_normalized = (depth_uint16 - min_depth) / (max_depth - min_depth + 1e-9)
+        depth_float32 = depth.astype(np.float32)
+        depth_float32 = torch.tensor(depth_float32, dtype=torch.float32).clamp(*depth_range).unsqueeze(0)
+        max_depth = depth_float32.max()
+        min_depth = depth_float32.min()
+        depth_normalized = (depth_float32 - min_depth) / (max_depth - min_depth + 1e-9)
         return depth_normalized
 
     # ===== Callback 函数群 =====

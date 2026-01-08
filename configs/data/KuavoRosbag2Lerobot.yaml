@@ -8,14 +8,15 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
 
 # kuavo rosbag数据转换成lerobot-parquet格式的配置文件
 # 请注意！！！
-# 本分支的数转代码与lerobot版本同步更新，目前支持了lerobot0.4.1版本
-# 由于版本变更，数据转换代码、训练、推理代码都有较大改动，请务必安装使用lerobot0.4.1版本的代码进行数据转换
+# 本分支的数转代码与lerobot版本同步更新，目前支持了lerobot0.4.2版本
+# 由于版本变更，数据转换代码、训练、推理代码都有较大改动，请务必安装使用lerobot0.4.2版本的代码进行数据转换
 # lerobot地址：https://github.com/huggingface/lerobot
 
 rosbag:
   rosbag_dir: /path/to/your/rosbag # rosbag文件存放的目录
   num_used: null # 使用的rosbag数量(若设置为任意数字，则会随机采样选择)，null表示使用全部rosbag
   lerobot_dir: /your/path/to/your/lerobotdata/  # 转换后的lerobot文件的保存目录，会在该目录下生成lerobot子目录，并存放对应数据
+  chunk_size: 100  # 这是目前使用流式读取bag并按块处理的大小设置，与模仿学习动作块那个没有任何关系
 
 dataset:
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
