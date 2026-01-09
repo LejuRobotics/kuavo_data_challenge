@@ -537,11 +537,11 @@ b. 调用部署代码
 conda activate kdc_dev
 # 或
 source kdc_dev/bin/activate
-pip install kuavo-humanoid-sdk==xxx #安装对应版本的sdk
+pip install kuavo-humanoid-sdk==xxx #安装对应版本的sdk，目前pip安装支持下位机版本 1.2.2 对应 kuavo-humanoid-sdk==1.2.2，1.3.1 对应 kuavo-humanoid-sdk==1.3.1b98
 ```
 
 
-（b）（时间较久，较复杂，不推荐）可以拷贝机器人下位机的kuavo-ros-opensource的内容安装，[kuavo-ros-opensource](https://github.com/LejuRobotics/kuavo-ros-opensource)，例如，
+（b）（时间较久，较复杂，不推荐）可以拷贝机器人下位机的kuavo-ros-opensource的内容安装，[kuavo-ros-opensource](https://github.com/LejuRobotics/kuavo-ros-opensource)，例如：
 
 ```bash
 scp -r lab@192.168.26.1:~/kuavo-ros-opensource /your/path/
@@ -555,6 +555,13 @@ source kdc_dev/bin/activate
 
 ./install.sh
 ```
+（c）若出现段错误，则需卸载pyarrow，用conda重装：
+
+```bash
+pip uninstall pyarrow
+conda install -c conda-forge pyarrow
+```
+
 ---
 
 ## 📡 ROS 话题说明
