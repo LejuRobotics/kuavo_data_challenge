@@ -28,7 +28,7 @@ class Config:
     is_binary: bool
     delta_action: bool
     relative_start: bool
-    
+
     # Image resize settings
     resize: ResizeConfig
 
@@ -47,7 +47,7 @@ class Config:
     
     @property
     def only_half_up_body(self) -> bool:
-        """True when only using arm, False when including base control."""
+        """Always true when only using arm."""
         return self.only_arm
     
     @property
@@ -143,6 +143,6 @@ def load_config(cfg) -> Config:
         delta_action=OmegaConf.select(cfg, 'dataset.delta_action', default=False),
         relative_start=OmegaConf.select(cfg, 'dataset.relative_start', default=False),
         resize=resize_config,
-        task_description=OmegaConf.select(cfg, 'dataset.task_description', default="Pick and Place Task")
+        task_description=OmegaConf.select(cfg, 'dataset.task_description', default="Pick and Place Task"),
     )
 

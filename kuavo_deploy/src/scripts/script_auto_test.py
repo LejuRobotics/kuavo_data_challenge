@@ -17,8 +17,7 @@ from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.kuavo_env.KuavoBaseRosEnv import KuavoBaseRosEnv
-from configs.deploy.config_inference import load_inference_config
-from configs.deploy.config_kuavo_env import load_kuavo_env_config
+from kuavo_deploy.config import load_kuavo_config, KuavoConfig
 import gymnasium as gym
 
 import numpy as np
@@ -44,17 +43,17 @@ class ArmMoveController:
     def pause(self):
         with self.lock:
             self.paused = True
-            log_robot.info("🔄 机械臂运动已暂停")
+            log_robot.info("🔄 Robot arm motion paused")
     
     def resume(self):
         with self.lock:
             self.paused = False
-            log_robot.info("▶️ 机械臂运动已恢复")
+            log_robot.info("▶️ Robot arm motion resumed")
     
     def stop(self):
         with self.lock:
             self.should_stop = True
-            log_robot.info("⏹️ 机械臂运动已停止")
+            log_robot.info("⏹️ Robot arm motion stopped")
     
     def is_paused(self):
         with self.lock:
@@ -73,41 +72,41 @@ stop_pub = rospy.Publisher('/kuavo/stop_state', Bool, queue_size=1)
 
 def signal_handler(signum, frame):
     """信号处理器"""
-    log_robot.info(f"🔔 收到信号: {signum}")
+    log_robot.info(f"🔔 Received signal: {signum}")
     if signum == signal.SIGUSR1:  # 暂停/恢复
         if arm_controller.is_paused():
-            log_robot.info("🔔 当前状态：已暂停，执行恢复")
+            log_robot.info("🔔 Current status: Paused. Resuming")
             arm_controller.resume()
             pause_pub.publish(False)
         else:
-            log_robot.info("🔔 当前状态：运行中，执行暂停")
+            log_robot.info("🔔 Current status: Operating. Pausing")
             arm_controller.pause()
             pause_pub.publish(True)
     elif signum == signal.SIGUSR2:  # 停止
-        log_robot.info("�� 执行停止")
+        log_robot.info("�� Stopping")
         arm_controller.stop()
         stop_pub.publish(True)
-    log_robot.info(f"🔔 信号处理完成，当前状态 - 暂停: {arm_controller.is_paused()}, 停止: {arm_controller.should_exit()}")
+    log_robot.info(f"🔔 Signal successfully processed. Current state - Pause: {arm_controller.is_paused()}, Stop: {arm_controller.should_exit()}")
 
 def setup_signal_handlers():
     """设置信号处理器"""
     signal.signal(signal.SIGUSR1, signal_handler)  # 暂停/恢复
     signal.signal(signal.SIGUSR2, signal_handler)  # 停止
-    log_robot.info("📡 信号处理器已设置:")
-    log_robot.info("  SIGUSR1 (kill -USR1): 暂停/恢复机械臂运动")
-    log_robot.info("  SIGUSR2 (kill -USR2): 停止机械臂运动")
+    log_robot.info("📡 Signal handler successfully set up:")
+    log_robot.info("  SIGUSR1 (kill -USR1): Pause/resume arm motion")
+    log_robot.info("  SIGUSR2 (kill -USR2): Stop arm motion")
 
 class ArmMove:
     """机械臂运动控制类"""
     
-    def __init__(self, config_path: Path):
+    def __init__(self, config: KuavoConfig):
         """
         初始化机械臂控制
         
         Args:
             bag_path: 轨迹文件路径
         """
-        self.config_path = config_path
+        self.config = config
 
         # 设置信号处理器
         self.shutdown_requested = False
@@ -116,12 +115,12 @@ class ArmMove:
         
         # 输出当前进程ID，方便外部控制
         pid = os.getpid()
-        log_robot.info(f"🆔 当前进程ID: {pid}")
-        log_robot.info(f"💡 使用以下命令控制机械臂运动:")
-        log_robot.info(f"   暂停/恢复: kill -USR1 {pid}")
-        log_robot.info(f"   停止运动: kill -USR2 {pid}")
+        log_robot.info(f"🆔 Current process ID: {pid}")
+        log_robot.info(f"💡 Use the following commands to control arm motion:")
+        log_robot.info(f"   Pause/Resume: kill -USR1 {pid}")
+        log_robot.info(f"   Stop: kill -USR2 {pid}")
 
-        self.inference_config = load_inference_config(config_path)
+        self.inference_config = config.inference
 
         rospy.init_node('kuavo_deploy', anonymous=True)
 
@@ -129,15 +128,15 @@ class ArmMove:
         """检查控制信号"""
         # 检查暂停状态
         while arm_controller.is_paused():
-            log_robot.info("🔄 机械臂运动已暂停")
+            log_robot.info("🔄 Robot arm motion paused")
             time.sleep(0.1)
             if arm_controller.should_exit():
-                log_robot.info("🛑 机械臂运动被停止")
+                log_robot.info("🛑 Robot arm motion stopped")
                 return False
         
         # 检查是否需要停止
         if arm_controller.should_exit():
-            log_robot.info("🛑 收到停止信号，退出机械臂运动")
+            log_robot.info("🛑 Stop signal detected, exiting arm motion")
             return False
             
         return True  # 正常继续
@@ -145,8 +144,8 @@ class ArmMove:
 
     def auto_test(self) -> None:
         """执行自动测试"""
-        from kuavo_deploy.examples.eval.auto_test.eval_kuavo_autotest import kuavo_eval_autotest
-        kuavo_eval_autotest(config_path=self.config_path)
+        from kuavo_deploy.src.eval.sim_auto_test import kuavo_eval_autotest
+        kuavo_eval_autotest(config=self.config)
     
 def parse_args():
     """解析命令行参数"""
@@ -207,22 +206,23 @@ def main():
     # 确定配置文件路径
     config_path = Path(args.config)
     
-    log_robot.info(f"使用配置文件: {config_path}")
-    log_robot.info(f"执行任务: {args.task}")
+    log_robot.info(f"Use configuration file: {config_path}")
+    log_robot.info(f"Executing task: {args.task}")
     
+    config = load_kuavo_config(config_path)
     # 初始化机械臂
     try:
-        arm = ArmMove(config_path)
-        log_robot.info("机械臂初始化成功")
+        arm = ArmMove(config)
+        log_robot.info("Arm initialisation successful")
     except Exception as e:
-        log_robot.error(f"机械臂初始化失败: {e}")
+        log_robot.error(f"Arm initialisation failed: {e}")
         return
     
     # 干运行模式
     if args.dry_run:
-        log_robot.info("=== 干运行模式 ===")
-        log_robot.info(f"将要执行的任务: {args.task}")
-        log_robot.info("干运行模式结束，未实际执行任何操作")
+        log_robot.info("=== Dry Run Mode ===")
+        log_robot.info(f"Task to be executed: {args.task}")
+        log_robot.info("Dry run successfully completed. No actual tasks executed")
         return
     
     # 任务映射
@@ -232,14 +232,14 @@ def main():
     
     # 执行任务
     try:
-        log_robot.info(f"开始执行任务: {args.task}")
+        log_robot.info(f"Now running task: {args.task}")
         task_map[args.task]()
-        log_robot.info(f"任务 {args.task} 执行完成")
+        log_robot.info(f"Task {args.task} successfully completed")
     except KeyboardInterrupt:
-        log_robot.info("用户中断操作")
+        log_robot.info("User interrupt detected!")
     except Exception as e:
         traceback.print_exc()
-        log_robot.error(f"执行任务 {args.task} 时发生错误: {e}")
+        log_robot.error(f"Task {args.task} encountered error: {e}")
 
 if __name__ == "__main__":
     main()

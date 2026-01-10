@@ -1,11 +1,24 @@
 # 🚀 **Kuavo Data Challenge**
-<p align="right">
-  <a href="README.md"><b>English</b></a> |
-  <a href="README_ZH.md">简体中文</a>
-</p>
+
 
 [![leju](https://img.shields.io/badge/LEJUROBOT-blue)](https://www.lejurobot.com/zh)
 [![tong](https://img.shields.io/badge/BIGAI-red)](https://www.bigai.ai/)
+
+
+## ✨ New features!
+
+### This is a branch under continuous development! It now supports:
+
+- Depth imaging under ACT / Diffusion policy, each with its own fusion method for RGB vs depth imaging. For more details, see [ACT](kuavo_train/wrapper/policy/act/ACTModelWrapper.py) and [Diffusion](kuavo_train/wrapper/policy/diffusion/DiffusionModelWrapper.py)
+- Multi-GPU acceleration provided by Accelerate! See [Multi-GPU acceleration](#multigpu) for details.
+- Latest Lerobot version 0.4.2 support! [lerobot](https://github.com/huggingface/lerobot)
+- [Frame alignment](kuavo_deploy/utils/obs_buffer.py)!
+- Complete restructuring of the directories.
+- ···
+
+### More to come:
+- End-effector delta control support
+- Extra Imitation Learning based algorithms!
 
 ---
 ## 🌟 Overview
@@ -225,7 +238,7 @@ If everything is correct, the Docker configuration for Ubuntu 20.04 + ROS Noetic
 
 ```bash
 # SSH
-git clone --depth=1 git@github.com:LejuRobotics/kuavo_data_challenge.git
+git clone --depth=1 https://github.com/LejuRobotics/kuavo_data_challenge.git
 # Or
 # HTTPS
 git clone --depth=1 https://github.com/LejuRobotics/kuavo_data_challenge.git
@@ -243,14 +256,19 @@ git submodule update --recursive
 
 ### 4. Python Environment Configuration
 
-Use conda (recommended) or python venv to create a virtual environment (Python 3.10 recommended):
+#### Choose one of the following:
+- **Use conda** (recommended):
 
 ```bash
-conda create -n kdc python=3.10
-conda activate kdc
+conda create -n kdc_icra python=3.10
+conda activate kdc_icra
 ```
 
-Or: Install python3.10 first, then use venv to create a virtual environment:
+- **Use venv**: 
+
+Install python3.10 first, then use venv to create a virtual environment:
+
+⚠️ Warning: ```ppa:deadsnakes``` no longer provide packages for ubuntu20.04 after June 2025, the following installation method may not work anymore:
 
 ```bash
 sudo apt update
@@ -258,9 +276,25 @@ sudo apt install -y software-properties-common
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
 sudo apt install -y python3.10 python3.10-venv python3.10-dev
+```
+You may need to build from source as follows:
+```bash
+sudo apt update
+sudo apt install -y build-essential libssl-dev zlib1g-dev libncurses5-dev libncursesw5-devlibreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev tk-dev libffi-dev uuid-dev wget
 
-python3.10 -m venv kdc
-source kdc/bin/activate
+wget https://www.python.org/ftp/python/3.10.18/Python-3.10.18.tgz
+tar -xzf Python-3.10.18.tgz
+cd Python-3.10.18
+./configure --prefix=$HOME/python3.10 --enable-optimizations
+make -j$(nproc)
+sudo make install
+```
+
+Now create the venv environment:
+
+```bash
+python3.10 -m venv kdc_dev
+source kdc_dev/bin/activate
 ```
 
 Check and ensure correct installation:
@@ -275,16 +309,31 @@ pip --version # Check pip version, confirm output shows pip for 3.10
 # Example output: pip 25.1 from /path/to/your/env/python3.10/site-packages/pip (python 3.10)
 ```
 
-
-Install dependencies:
+#### Install dependencies:
 
 ```bash
-pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple  # It is recommended to change the source first to speed up download and installation
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple  # If youre located within mainland China, it is recommended to change the source first to speed up download and installation
+# There is no need for you to run this if otherwise!
 
-pip install -r requirements_ilcode.txt   # No ROS Noetic required, but can only use kuavo_train imitation learning training code. kuavo_data (data conversion) and kuavo_deploy (deployment code) both depend on ROS
+pip install -r requirements_ilcode.txt   # No ROS Noetic required, but only guarantees functionality of kuavo_train imitation learning training code. kuavo_data (data conversion) and kuavo_deploy (deployment code) both depend on ROS
 # Or
-pip install -r requirements_total.txt    # Ensure ROS Noetic is installed (recommended)
+pip install -r requirements_total.txt    # Ensure ROS Noetic is installed first (recommended)
 ```
+
+After installation, double-check the lerobot version: Should be Version 0.4.2 as of November 2025.
+```bash
+pip show lerobot
+```
+
+If not, reset the lerobot repository:
+```bash
+cd third_party/lerobot
+git fetch
+git reset --hard origin/main
+cd ../../
+```
+
+Retry pip install -r requirement_xx.txt to retry installation.
 
 If you encounter ffmpeg or torchcodec errors when running:
 
@@ -293,7 +342,7 @@ conda install ffmpeg==6.1.1
 
 # Or
 
-pip uninstall torchcodec
+# pip uninstall torchcodec
 ```
 
 ---
@@ -317,6 +366,8 @@ Description:
 * `rosbag.rosbag_dir`: Path to original rosbag data
 * `rosbag.lerobot_dir`: Path to save converted lerobot-parquet data. A subfolder named lerobot is usually created in this directory
 * `configs/data/KuavoRosbag2Lerobot.yaml`: Please review and select cameras to enable and whether to use depth images as needed
+
+Or, you can set args in ```configs/data/KuavoRosbag2Lerobot.yaml```
 
 ---
 
@@ -344,35 +395,54 @@ Description:
 * `policy_name`: Policy to use, used for policy instantiation. Currently supports `diffusion` and `act`
 * For other parameters, please refer to the yaml file documentation. It is recommended to directly modify the yaml file to avoid command-line input errors
 
+Or, you can set args in ```configs/policy/act_config/diffusion_config.yaml```
+
+---
+
+<a id="multigpu"></a>
+### 2.1 IL Training with Multi-GPU Support
+
+Double-check installation of Accelerate: pip install accelerate (Usually automatically installed with Lerobot)
+
+```bash
+# Configure the accelerate yaml according to your machines specs
+vim configs/accelerate/accelerate_config.yaml
+# After configuration, try this example:
+accelerate launch --config_file configs/accelerate/accelerate_config.yaml kuavo_train/train_policy_with_accelerate.py  --config-path=../configs/policy --config-name=diffusion_config.yaml
+```
+
 ---
 
 ### 3. Simulator Testing
 
 After training is complete, you can start the Mujoco simulator and call the deployment code for evaluation:
 
-a. Start Mujoco simulator: For details, see [readme for simulator](https://github.com/LejuRobotics/kuavo-ros-opensource/blob/opensource/kuavo-data-challenge/readme.md)
+a. Start Mujoco simulator: For details, see [readme for simulator](https://github.com/LejuRobotics/kuavo-ros-opensource/tree/opensource/kuavo-data-challenge-icra)
 
 b. Call deployment code
 
 - Configuration files are located in `./configs/deploy/`:
-  * `kuavo_sim_env.yaml`: Simulator running configuration
-  * `kuavo_real_env.yaml`: Real robot running configuration
+  * `kuavo_env.yaml`: Kuavo robot execution environment configuration, with `env_name` as `Kuavo-Sim`. Change other parameters such as `obs_key_map` as needed.
 
 
 - Please review the yaml file and modify the `# inference configs` related parameters (model loading), etc.
 
 - Start automated inference deployment:
   ```bash
-  bash kuavo_deploy/eval_kuavo.sh
+  python kuavo_deploy/eval_kuavo.py
   ```
-- Follow the instructions. Generally, finally select `"8. Auto-test model in simulation, execute eval_episodes times:"`. For details on this operation, see [kuavo deploy](kuavo_deploy/readme/inference.md)
+- Follow the instructions. Generally, Select `3` first, then provide the `kuavo_env.yaml` path (`configs/deploy/kuavo_env.yaml`). Finally, select `"8. Auto-test model in simulation, execute eval_episodes times:"`. For details on this operation, see [kuavo deploy](kuavo_deploy/readme/inference.md)
 ---
 
 
 
 ### 4. Real Robot Testing
 
-Same steps as part a in step 3, change the specified configuration file to `kuavo_real_env.yaml` to deploy and test on the real robot.
+Same steps as part a in step 3, change the configuration file `kuavo_env.yaml`'s `env_name` as `Kuavo-Real`.
+
+- PC deployment steps to be updated; For Orin deployment, please check: [README_AGX_ORIN.md](README_AGX_ORIN.md)
+
+- The log during testing is located at log/kuavo_deploy/kuavo_deploy.log, please check thoroughly.
 
 ---
 

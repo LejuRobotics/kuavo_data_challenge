@@ -2,7 +2,7 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+myenv/
 # C extensions
 *.so
 
@@ -211,4 +211,9 @@ outputs/
 log/
 .vscode/
 .claude/
-third_party/
+*.pth
+ana.py
+*.gz
+*.tar
+error.txt
+obs.png

@@ -1,20 +1,20 @@
-hydra:  # Hydra 配置文件保存目录，不用管，仅供检查使用
+hydra:  # Hydra config directory, for parameter checking only
   run:
-    dir: ./outputs/other_env_task_eval_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # 单次运行目录
+    dir: ./outputs/other_env_task_eval_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # Single run root dir
   sweep:
-    dir: ./outputs/other_env_task_eval_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep并行时的根目录
+    dir: ./outputs/other_env_task_eval_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep root dir
     subdir: ${hydra:job.override_dirname}
 
 
-# 其他环境的配置文件，用于pusht、aloha insert/cube 等gym官方提供的环境
-use_delta: false  # 是否使用增量动作，default=false（暂未支持）
-eval_episodes: 100  # 测试回合数，仿真默认为100，用于评测成功率
+# Config for all other environments, used for gym enviornment such as pusht, aloha, insert/cube, etc.
+use_delta: false  # Whether to use delta action. default=false (Not yet supported)
+eval_episodes: 100  # Number of evaluation episodes. 100 times default for simulator competition, for scoring purposes.
 seed: 42
 device: "cuda"  # or "cpu"
-task: "aloha_sim_insertion_human"
-method: "test"
-timestamp: "run_20250825_114605" # 类似的运行时时间戳
-epoch: 100  # 使用训练保存的哪一个epoch。注意：代码将在outputs/<task>/<method>/<timestamp>/epoch10中load policy的模型参数
-max_episode_steps: 600  # 最大回合步数，超过自动结束，根据任务所需时长调整
-env: aloha  # gym官方提供的环境名称pusht or aloha
+task: "aloha_sim_transfer_cube_human"
+method: "your_method_name"
+timestamp: "run_20251017_095912"
+epoch: 300  # Which epoch to use from the training weights. I.e. 50, 100, best, etc. Note:Weights will be used from outputs/train/<task>/<method>/<timestamp>/epoch<epoch> to load policy
+max_episode_steps: 500  # Max episode steps. Stops after this threshold. Increase for longer tasks.
+env: aloha  # gym environment name. pusht or aloha
 

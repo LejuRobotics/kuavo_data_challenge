@@ -1,52 +1,53 @@
-hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
+hydra:  # Hydra config directory, for parameter checking only
   run:
-    dir: ./outputs/train_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # 单次运行目录
+    dir: ./outputs/train_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # Single run root dir
   sweep:
-    dir: ./outputs/train_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep并行时的根目录
+    dir: ./outputs/train_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep root dir
     subdir: ${hydra:job.override_dirname}
 
 
-task: "your_task_name"  # 自定义任务名称，如果不使用本地数据想使用huggingface官方数据，请指定，例如pusht，aloha_sim_insertion_human等
-method: "your_method_name"  # 自定义方法名称
-timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
+task: "your_task_name"  # Custom task name. If using huggingface datasets instead of local dataset, please specify, such as pusht, aloha_sim_insertion_human etc.
+method: "your_method_name"  # Custom method name
+timestamp: ${now:%Y%m%d_%H%M%S}  # Auto-obtained timestamp
 # 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
-repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
-root: "/your/path/to/your/lerobotdata/lerobot"  # 你的本地转换好的lerobot数据的目录
-# root: null  # 如果不使用本地数据想使用huggingface官方数据，请在task中指定，例如pusht，aloha_sim_insertion_human，此处就设置为null空
-# 将去云端调用下载数据集
+repoid: "lerobot/${task}"  # Newer versions of lerobot require this, for lerobot reference only. Not actually used elsewhere.
+root: "/your/path/to/your/lerobotdata/lerobot"  # Locally converted lerobot dataset directory
+# root: null  # If using huggingface datasets instead of local dataset, please specify in task, such as pusht, aloha_sim_insertion_human.
+# Uncomment and leave that to null in that case. This will then use their cloud downloads
 
-# 训练相关配置
+# Training Configurations
 training:
-    output_directory: "outputs/train/${task}/${method}"  # 模型参数保存路径，默认这个结构，不要改动
-    seed: 42  # 数据增广、训练模型的随机种子，便于复现
-    max_epoch: 500  # 最大训练轮次，用于控制学习率调整器，与下述max_training_step相关
+    output_directory: "outputs/train/${task}/${method}"  # Training parameters default output path. Do not modify this structure
+    seed: 42  # Data augmentation and training seed. Used for easier result reproduction
+    max_epoch: 500  # Max trainign epoch, used to control learning rate controller. Related to max_training_step beneath
     
-    save_freq_epoch: 10  # 模型参数保存频率，每10个epoch保存一次
-    log_freq: 1  # 进度条刷新频率，每1个迭代step
-    device: "cuda" # 训练设备，目前只支持单卡，多卡请使用CUDA_VISIBLE_DEVICES=6指定环境变量后使用，cuda:6这种类似的可能会出错
-    accumulation_steps: 1  # 梯度累积步数，自定义
-    ema_power: 0.75  # 如果使用ema移动指数平均方法可使用这个参数，目前测试使用ema会掉性能，所以代码中不再支持
+    save_freq_epoch: 10  # Training parameter save frequency. 10 epoch per saved weights
+    log_freq: 1  # Progress bar refresh frequency. 1 = Every iteration step.
+    device: "cuda" # Training device. Single GPU only by default. Systems with multiple GPU's please use CUDA_VISIBLE_DEVICES=6 as an envionment variable. cuda:6 might not work.
+    accumulation_steps: 1  # Grad accumulation step
+    ema_power: 0.75  # This parameter can be used if the EMA (Equation of Mobility) moving exponential average method is employed.
+    # However, current testing shows that using EMA causes performance degradation, so it is no longer supported in the code.
 
-    batch_size: 64  # 批次大小
-    num_workers: 8  # dataloader的num_workers
-    drop_last: False  # 是否丢弃最后一个不完整的batch
+    batch_size: 32  # Batch size. Adjust as needed.
+    num_workers: 8  # dataloader's num_workers. Adjust as needed per your computer's performance. Setting it too high might lock up your computer
+    drop_last: False  # Whether to drop the last incomplete batch
 
-    # 最大训练步数，用于控制学习率调整器，如果指定了 `max_training_step`，则它将优先生效，否则，该值将根据上述的 `max_epoch` 自动确定。
-    # `max_epoch` 和 `max_training_step` 不会同时生效。
+    # Max training step. Used to control the learning rate adjuster. If `max_training_step` is specified, it will take precedence
+    # otherwise, this value will be automatically determined based on `max_epoch` mentioned above. ONLY one of the two will take effect!
     max_training_step: null  
 
-    # resume training，断点续训
-    resume: False
-    resume_timestamp: "run_20250902_150345"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    # resume training
+    resume: false
+    resume_timestamp: "run_20251120_164240"  # If enabled, it will pull the last epoch from outputs/train/<task>/<method>/<resume_timestamp> to continue training
 
-    # 数据增广相关的配置
+    # Data augmentation related config
     RGB_Augmenter:
       enable: True
       max_num_transforms: 1
       random_order: True
       tfs:
         notransform:
-          weight: 2.0  # 占比权重
+          weight: 3.0  # Weight
           type: "Identity"
           kwargs: {}
         brightness:
@@ -73,7 +74,7 @@ training:
           weight: 1.0
           type: RandomMask
           kwargs:
-            mask_size: [0.1, 0.1]   # h_ratio, w_ratio
+            mask_size: [0.15, 0.15]   # h_ratio, w_ratio
         random_border_cutout:
           weight: 1.0
           type: RandomBorderCutout
@@ -84,7 +85,7 @@ training:
           type: GaussianNoise
           kwargs:
             mean: 0.0
-            std: 0.05
+            std: 0.1
         gamma_correction:
           weight: 1.0
           type: GammaCorrection
@@ -92,15 +93,16 @@ training:
             gamma: [0.5, 2.0]
         
 
-policy_name: diffusion   # 策略类型，支持diffusion和act
+policy_name: diffusion  # Policy type. Supports diffusion and act
 
 policy:
-    _target_: kuavo_train.wrapper.policy.diffusion.DiffusionConfigWrapper.CustomDiffusionConfigWrapper  # 实例化diffusion config
-    horizon: 16  # 预测步数
-    n_action_steps: 8  # 1,2,4,12 执行动作步数
-    drop_n_last_frames: 7  # 丢弃最后n帧
+    _target_: kuavo_train.wrapper.policy.diffusion.DiffusionConfigWrapper.CustomDiffusionConfigWrapper  # Used for instantiation
+    n_obs_steps: 2
+    horizon: 16
+    n_action_steps: 8
+    drop_n_last_frames: 7  # Drop the last n frames
 
-    normalization_mapping: # RGB等同于VISUAL类型, diffusion策略另外支持了深度数据，这两个参数用于设置normalize方式
+    normalization_mapping: # RGB is equivalent to VISUAL type. diffusion also supports depth data. These two parameters are used to set the normalization method.
       RGB: 
         _target_: lerobot.configs.types.NormalizationMode
         value: MEAN_STD
@@ -108,13 +110,13 @@ policy:
         _target_: lerobot.configs.types.NormalizationMode
         value: MIN_MAX
 
-    # 图像裁剪，（lerobot内有的策略不支持）
+    # Image cropping. Not supported in lerobot built-in policies
     crop_is_random: True
-    crop_shape: [420, 560]  #  [84, 84]
+    crop_shape: [420, 560]  #  [84, 84] [420, 742]
 
-    use_amp: True  # 是否使用混合精度训练
+    use_amp: False  # Mixed precision training
 
-    # 模型相关超参数设置
+    # Model hyperparameters adjustments
     vision_backbone: resnet18
     spatial_softmax_num_keypoints: 64
     use_separate_rgb_encoder_per_camera: False
@@ -152,24 +154,28 @@ policy:
     scheduler_name: cosine
     scheduler_warmup_steps: 500
 
-    custom:  # 一些自定义设置，是本代码仓库针对lerobot diffusion policy的特色更改，包含深度数据支持以及transformer模型等，可参考相关代码
+    custom:  # Custom configs. Special adjustments based on the lerobot diffusion policy, including depth support. You may refer to related codes for details
       # support depth image
-      use_depth: True
+      use_depth: true
       depth_backbone: resnet18
       use_separate_depth_encoder_per_camera: False
 
       # resize and augmentation
-      resize_shape: [210, 280] 
+      resize_shape: [210,280]  # [224, 368]
 
       # state encoder.
-      use_state_encoder: True
+      use_state_encoder: true
       state_feature_dim: 128
 
       # Unet
       use_unet: False
       # transformer
       use_transformer: True
-      transformer_n_emb: 512
+      transformer_n_emb: 384
       transformer_n_head: 8
-      transformer_n_layer: 4
+      transformer_n_layer: 12
       transformer_dropout: 0.1
+
+      # eta for ddim
+      ddim_eta: 0.1
+      state_fuse: False  # Whether to use state fusion modules
