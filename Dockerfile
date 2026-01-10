@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 Miniforge
-ENV MINIFORGE_URL="https://mirrors.tuna.tsinghua.edu.cn/github-release/conda-forge/miniforge/Release%2025.3.1-0/Miniforge3-25.3.1-0-Linux-x86_64.sh"
+ENV MINIFORGE_URL="https://mirrors.zju.edu.cn/miniforge/Miniforge3-Linux-x86_64.sh"
 RUN curl -L ${MINIFORGE_URL} -o /tmp/miniforge.sh \
     && bash /tmp/miniforge.sh -b -p /opt/conda \
     && rm /tmp/miniforge.sh

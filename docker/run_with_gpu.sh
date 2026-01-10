@@ -34,3 +34,4 @@ docker run --gpus all -it \
     --name ${CONTAINER_NAME} \
     ${IMAGE_NAME} bash
 
+

@@ -7,4 +7,4 @@ main_process_port: null
 main_training_function: main
 num_machines: 1
 num_processes: 2                # 2 threads in this example (I.e. 2 GPU's)
-gpu_ids: "6,7"                  # Which GPU ID's to be used for training
+gpu_ids: "4,5"                  # Which GPU ID's to be used for training
