@@ -1,0 +1,7 @@
+prefix=/root/kuavo_data_challenge/myenv
+includedir=${prefix}/include
+
+Name: VideoProto
+Description: Video extension headers
+Version: 2.3.3
+Cflags: -I${includedir}

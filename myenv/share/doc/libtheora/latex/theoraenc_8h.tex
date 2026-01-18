@@ -1,0 +1,763 @@
+\doxysection{theoraenc.\+h File Reference}
+\label{theoraenc_8h}\index{theoraenc.h@{theoraenc.h}}
+
+
+The {\ttfamily libtheoraenc} C encoding API.  
+
+
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include $<$ogg/ogg.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}codec.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \textbf{ OGG\+\_\+\+THEORA\+\_\+\+THEORAENC\+\_\+\+HEADER}~(1)
+\end{DoxyCompactItemize}
+\begin{Indent}\textbf{ th\+\_\+encode\+\_\+ctl() codes}\par
+{\em \label{theoraenc_8h_encctlcodes}%
+These are the available request codes for \doxyref{th\+\_\+encode\+\_\+ctl()}{p.}{theoraenc_8h_a3a427f6514dfdc01ea72172c469d51d9}.
+
+By convention, these are even, to distinguish them from the \doxyref{decoder control codes}{p.}{theoradec_8h_decctlcodes}. Keep any experimental or vendor-\/specific values above {\ttfamily 0x8000}. }\begin{DoxyCompactItemize}
+\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+HUFFMAN\+\_\+\+CODES}~(0)
+\begin{DoxyCompactList}\small\item\em Sets the Huffman tables to use. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+QUANT\+\_\+\+PARAMS}~(2)
+\begin{DoxyCompactList}\small\item\em Sets the quantization parameters to use. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+KEYFRAME\+\_\+\+FREQUENCY\+\_\+\+FORCE}~(4)
+\begin{DoxyCompactList}\small\item\em Sets the maximum distance between key frames. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+VP3\+\_\+\+COMPATIBLE}~(10)
+\begin{DoxyCompactList}\small\item\em Disables any encoder features that would prevent lossless transcoding back to VP3. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+GET\+\_\+\+SPLEVEL\+\_\+\+MAX}~(12)
+\begin{DoxyCompactList}\small\item\em Gets the maximum speed level. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+SPLEVEL}~(14)
+\begin{DoxyCompactList}\small\item\em Sets the speed level. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+GET\+\_\+\+SPLEVEL}~(16)
+\begin{DoxyCompactList}\small\item\em Gets the current speed level. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+DUP\+\_\+\+COUNT}~(18)
+\begin{DoxyCompactList}\small\item\em Sets the number of duplicates of the next frame to produce. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+RATE\+\_\+\+FLAGS}~(20)
+\begin{DoxyCompactList}\small\item\em Modifies the default bitrate management behavior. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+RATE\+\_\+\+BUFFER}~(22)
+\begin{DoxyCompactList}\small\item\em Sets the size of the bitrate management bit reservoir as a function of number of frames. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+2\+PASS\+\_\+\+OUT}~(24)
+\begin{DoxyCompactList}\small\item\em Enable pass 1 of two-\/pass encoding mode and retrieve the first pass metrics. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+2\+PASS\+\_\+\+IN}~(26)
+\begin{DoxyCompactList}\small\item\em Submits two-\/pass encoding metric data collected the first encoding pass to the second pass. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+QUALITY}~(28)
+\begin{DoxyCompactList}\small\item\em Sets the current encoding quality. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+BITRATE}~(30)
+\begin{DoxyCompactList}\small\item\em Sets the current encoding bitrate. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+COMPAT\+\_\+\+CONFIG}~(32)
+\begin{DoxyCompactList}\small\item\em Sets the configuration to be compatible with that from the given setup header. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{Typedefs}
+\begin{Indent}\textbf{ Encoder state}\par
+{\em The following data structure is opaque, and its contents are not publicly defined by this API.
+
+Referring to its internals directly is unsupported, and may break without warning. }\begin{DoxyCompactItemize}
+\item 
+typedef struct \textbf{ th\+\_\+enc\+\_\+ctx} \textbf{ th\+\_\+enc\+\_\+ctx}
+\begin{DoxyCompactList}\small\item\em The encoder context. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{Functions}
+\begin{Indent}\textbf{ Functions for encoding}\par
+{\em You must link to {\ttfamily libtheoraenc} and {\ttfamily libtheoradec} if you use any of the functions in this section.
+
+The functions are listed in the order they are used in a typical encode. The basic steps are\+:
+\begin{DoxyItemize}
+\item Fill in a \doxyref{th\+\_\+info}{p.}{structth__info} structure with details on the format of the video you wish to encode.
+\item Allocate a \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} handle with \doxyref{th\+\_\+encode\+\_\+alloc()}{p.}{theoraenc_8h_aad036b5967e07629b9be10a4d77ada00}.
+\item Perform any additional encoder configuration required with \doxyref{th\+\_\+encode\+\_\+ctl()}{p.}{theoraenc_8h_a3a427f6514dfdc01ea72172c469d51d9}.
+\item Repeatedly call \doxyref{th\+\_\+encode\+\_\+flushheader()}{p.}{theoraenc_8h_a9439d61b566039d194ff782681fbc408} to retrieve all the header packets.
+\item For each uncompressed frame\+:
+\begin{DoxyItemize}
+\item Submit the uncompressed frame via \doxyref{th\+\_\+encode\+\_\+ycbcr\+\_\+in()}{p.}{theoraenc_8h_adbe7dd66b411c2d61ab8153c15308750}
+\item Repeatedly call \doxyref{th\+\_\+encode\+\_\+packetout()}{p.}{theoraenc_8h_a96d8ac1dda53187455352f99bbb5b04b} to retrieve any video data packets that are ready.
+\end{DoxyItemize}
+\item Call \doxyref{th\+\_\+encode\+\_\+free()}{p.}{theoraenc_8h_a36b23d216532231925c4107894204680} to release all encoder memory. 
+\end{DoxyItemize}}\begin{DoxyCompactItemize}
+\item 
+\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$ \textbf{ th\+\_\+encode\+\_\+alloc} (const \textbf{ th\+\_\+info} $\ast$\+\_\+info)
+\begin{DoxyCompactList}\small\item\em Allocates an encoder instance. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+encode\+\_\+ctl} (\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$\+\_\+enc, int \+\_\+req, void $\ast$\+\_\+buf, size\+\_\+t \+\_\+buf\+\_\+sz)
+\begin{DoxyCompactList}\small\item\em Encoder control function. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+encode\+\_\+flushheader} (\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$\+\_\+enc, \textbf{ th\+\_\+comment} $\ast$\+\_\+comments, ogg\+\_\+packet $\ast$\+\_\+op)
+\begin{DoxyCompactList}\small\item\em Outputs the next header packet. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+encode\+\_\+ycbcr\+\_\+in} (\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$\+\_\+enc, \textbf{ th\+\_\+ycbcr\+\_\+buffer} \+\_\+ycbcr)
+\begin{DoxyCompactList}\small\item\em Submits an uncompressed frame to the encoder. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+encode\+\_\+packetout} (\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$\+\_\+enc, int \+\_\+last, ogg\+\_\+packet $\ast$\+\_\+op)
+\begin{DoxyCompactList}\small\item\em Retrieves encoded video data packets. \end{DoxyCompactList}\item 
+void \textbf{ th\+\_\+encode\+\_\+free} (\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$\+\_\+enc)
+\begin{DoxyCompactList}\small\item\em Frees an allocated encoder instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+RATE\+\_\+\+FLAGS flags}
+\label{theoraenc_8h_ratectlflags}%
+These are the flags available for use with \doxyref{TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+RATE\+\_\+\+FLAGS}{p.}{theoraenc_8h_a026502e08fbe1af0a1063f39bd18129c}. \begin{DoxyCompactItemize}
+\item 
+\#define \textbf{ TH\+\_\+\+RATECTL\+\_\+\+DROP\+\_\+\+FRAMES}~(0x1)
+\begin{DoxyCompactList}\small\item\em Drop frames to keep within bitrate buffer constraints. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+RATECTL\+\_\+\+CAP\+\_\+\+OVERFLOW}~(0x2)
+\begin{DoxyCompactList}\small\item\em Ignore bitrate buffer overflows. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+RATECTL\+\_\+\+CAP\+\_\+\+UNDERFLOW}~(0x4)
+\begin{DoxyCompactList}\small\item\em Ignore bitrate buffer underflows. \end{DoxyCompactList}\item 
+const \textbf{ th\+\_\+quant\+\_\+info} \textbf{ TH\+\_\+\+VP31\+\_\+\+QUANT\+\_\+\+INFO}
+\begin{DoxyCompactList}\small\item\em The quantization parameters used by VP3. \end{DoxyCompactList}\item 
+const \textbf{ th\+\_\+huff\+\_\+code} \textbf{ TH\+\_\+\+VP31\+\_\+\+HUFF\+\_\+\+CODES} [\textbf{ TH\+\_\+\+NHUFFMAN\+\_\+\+TABLES}][\textbf{ TH\+\_\+\+NDCT\+\_\+\+TOKENS}]
+\begin{DoxyCompactList}\small\item\em The Huffman tables used by VP3. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The {\ttfamily libtheoraenc} C encoding API. 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\label{theoraenc_8h_ab43b2364621da8df29ee636107fef234}} 
+\index{theoraenc.h@{theoraenc.h}!OGG\_THEORA\_THEORAENC\_HEADER@{OGG\_THEORA\_THEORAENC\_HEADER}}
+\index{OGG\_THEORA\_THEORAENC\_HEADER@{OGG\_THEORA\_THEORAENC\_HEADER}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{OGG\_THEORA\_THEORAENC\_HEADER}
+{\footnotesize\ttfamily \#define OGG\+\_\+\+THEORA\+\_\+\+THEORAENC\+\_\+\+HEADER~(1)}
+
+\mbox{\label{theoraenc_8h_a4a84f982cdd9a3e3c803a29bbde9df0b}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_2PASS\_IN@{TH\_ENCCTL\_2PASS\_IN}}
+\index{TH\_ENCCTL\_2PASS\_IN@{TH\_ENCCTL\_2PASS\_IN}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_2PASS\_IN}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+2\+PASS\+\_\+\+IN~(26)}
+
+
+
+Submits two-\/pass encoding metric data collected the first encoding pass to the second pass. 
+
+The first call must be made before the first frame is encoded, and a target bitrate must have already been specified to the encoder. It sets the encoder to pass 2 mode implicitly; this cannot be disabled. The encoder may require reading data from some or all of the frames in advance, depending on, e.\+g., the reservoir size used in the second pass. You must call this function repeatedly before each frame to provide data until either a) it fails to consume all of the data presented or b) all of the pass 1 data has been consumed. In the first case, you must save the remaining data to be presented after the next frame. You can call this function with a NULL argument to get an upper bound on the number of bytes that will be required before the next frame.
+
+When pass 2 is first enabled, the default bit reservoir is set to the entire file; this gives maximum flexibility but can lead to very high peak rates. You can subsequently set it to another value with \doxyref{TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+RATE\+\_\+\+BUFFER}{p.}{theoraenc_8h_aaefb515876b2a180ad5c3120fc584a52} (e.\+g., to set it to the keyframe interval for non-\/live streaming), however, you may then need to provide more data before the next frame.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily char[]}\+: A buffer containing the data returned by \doxyref{TH\+\_\+\+ENCCTL\+\_\+2\+PASS\+\_\+\+OUT}{p.}{theoraenc_8h_ac3751b9c3838888ec2e3f0b0d2823282} in pass 1. You may pass {\ttfamily NULL} for {\itshape \+\_\+buf} to return an upper bound on the number of additional bytes needed before the next frame. The summary data returned at the end of pass 1 must be at the head of the buffer on the first call with a non-\/{\ttfamily NULL} {\itshape \+\_\+buf}, and the placeholder data returned at the start of pass 1 should be omitted. After each call you should advance this buffer by the number of bytes consumed. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em $>$0} & The number of bytes of metric data required/consumed. \\
+\hline
+{\em 0} & No more data is required before the next frame. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & No target bitrate has been set, or the first call was made after the first frame was submitted for encoding. \\
+\hline
+{\em TH\+\_\+\+ENOTFORMAT} & The data did not appear to be pass 1 from a compatible implementation of this library. \\
+\hline
+{\em TH\+\_\+\+EBADHEADER} & The data was invalid; this may be returned when attempting to read an aborted pass 1 file that still has the placeholder data in place of the summary data. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_ac3751b9c3838888ec2e3f0b0d2823282}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_2PASS\_OUT@{TH\_ENCCTL\_2PASS\_OUT}}
+\index{TH\_ENCCTL\_2PASS\_OUT@{TH\_ENCCTL\_2PASS\_OUT}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_2PASS\_OUT}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+2\+PASS\+\_\+\+OUT~(24)}
+
+
+
+Enable pass 1 of two-\/pass encoding mode and retrieve the first pass metrics. 
+
+Pass 1 mode must be enabled before the first frame is encoded, and a target bitrate must have already been specified to the encoder. Although this does not have to be the exact rate that will be used in the second pass, closer values may produce better results. The first call returns the size of the two-\/pass header data, along with some placeholder content, and sets the encoder into pass 1 mode implicitly. This call sets the encoder to pass 1 mode implicitly. Then, a subsequent call must be made after each call to \doxyref{th\+\_\+encode\+\_\+ycbcr\+\_\+in()}{p.}{theoraenc_8h_adbe7dd66b411c2d61ab8153c15308750} to retrieve the metrics for that frame. An additional, final call must be made to retrieve the summary data, containing such information as the total number of frames, etc. This must be stored in place of the placeholder data that was returned in the first call, before the frame metrics data. All of this data must be presented back to the encoder during pass 2 using \doxyref{TH\+\_\+\+ENCCTL\+\_\+2\+PASS\+\_\+\+IN}{p.}{theoraenc_8h_a4a84f982cdd9a3e3c803a29bbde9df0b}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em $<$tt$>$char} & $\ast$\+\_\+buf\+: Returns a pointer to internal storage containing the two pass metrics data. This storage is only valid until the next call, or until the encoder context is freed, and must be copied by the application. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em $>$=0} & The number of bytes of metric data available in the returned buffer. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(char $\ast$)}, no target bitrate has been set, or the first call was made after the first frame was submitted for encoding. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a114b7c552f50b7b8d881a39489af1f61}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_GET\_SPLEVEL@{TH\_ENCCTL\_GET\_SPLEVEL}}
+\index{TH\_ENCCTL\_GET\_SPLEVEL@{TH\_ENCCTL\_GET\_SPLEVEL}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_GET\_SPLEVEL}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+GET\+\_\+\+SPLEVEL~(16)}
+
+
+
+Gets the current speed level. 
+
+The default speed level may vary according to encoder implementation, but if this control code is not supported (it returns \doxyref{TH\+\_\+\+EIMPL}{p.}{codec_8h_a921c47accc17841f220af5a6afb79efe}), the default may be assumed to be the slowest available speed (0). The maximum encoding speed level may be implementation-\/ and encoding mode-\/specific, and can be obtained via \doxyref{TH\+\_\+\+ENCCTL\+\_\+\+GET\+\_\+\+SPLEVEL\+\_\+\+MAX}{p.}{theoraenc_8h_a9baf5bdd206e80c78a8fd44687e89783}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em \+\_\+buf} & {\ttfamily int}\+: The current encoding speed level. 0 is slowest, larger values use less CPU. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation in the current encoding mode. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a9baf5bdd206e80c78a8fd44687e89783}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_GET\_SPLEVEL\_MAX@{TH\_ENCCTL\_GET\_SPLEVEL\_MAX}}
+\index{TH\_ENCCTL\_GET\_SPLEVEL\_MAX@{TH\_ENCCTL\_GET\_SPLEVEL\_MAX}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_GET\_SPLEVEL\_MAX}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+GET\+\_\+\+SPLEVEL\+\_\+\+MAX~(12)}
+
+
+
+Gets the maximum speed level. 
+
+Higher speed levels favor quicker encoding over better quality per bit. Depending on the encoding mode, and the internal algorithms used, quality may actually improve, but in this case bitrate will also likely increase. In any case, overall rate/distortion performance will probably decrease. The maximum value, and the meaning of each value, may change depending on the current encoding mode (VBR vs. constant quality, etc.).
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em \+\_\+buf} & {\ttfamily int}\+: The maximum encoding speed level. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation in the current encoding mode. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a9b969df55ecad1acd1ae207fad42592e}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_BITRATE@{TH\_ENCCTL\_SET\_BITRATE}}
+\index{TH\_ENCCTL\_SET\_BITRATE@{TH\_ENCCTL\_SET\_BITRATE}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_BITRATE}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+BITRATE~(30)}
+
+
+
+Sets the current encoding bitrate. 
+
+Once a bitrate is set, the encoder must use a rate-\/controlled mode for all future frames (this restriction may be relaxed in a future version). If it is set before the headers are emitted, the target bitrate encoded in them will be updated. Due to the buffer delay, the exact bitrate of each section of the encode is not guaranteed. The encoder may have already used more bits than allowed for the frames it has encoded, expecting to make them up in future frames, or it may have used fewer, holding the excess in reserve. The exact transition between the two bitrates is not well-\/defined by this API, but may be affected by flags set with \doxyref{TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+RATE\+\_\+\+FLAGS}{p.}{theoraenc_8h_a026502e08fbe1af0a1063f39bd18129c}. After a number of frames equal to the buffer delay, one may expect further output to average at the target bitrate.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily long}\+: The new target bitrate, in bits per second. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & Success. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & The target bitrate was not positive. A future version of this library may allow passing 0 to disabled rate-\/controlled mode and return to a quality-\/based mode, in which case this function will not return an error for that value. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_aeb3085ec96e06eca81b3a372e5ed9bff}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_COMPAT\_CONFIG@{TH\_ENCCTL\_SET\_COMPAT\_CONFIG}}
+\index{TH\_ENCCTL\_SET\_COMPAT\_CONFIG@{TH\_ENCCTL\_SET\_COMPAT\_CONFIG}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_COMPAT\_CONFIG}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+COMPAT\+\_\+\+CONFIG~(32)}
+
+
+
+Sets the configuration to be compatible with that from the given setup header. 
+
+This sets the Huffman codebooks and quantization parameters to match those found in the given setup header. This guarantees that packets encoded by this encoder will be decodable using a decoder configured with the passed-\/in setup header. It does {\itshape not} guarantee that \doxyref{th\+\_\+encode\+\_\+flushheader()}{p.}{theoraenc_8h_a9439d61b566039d194ff782681fbc408} will produce a bit-\/identical setup header, only that they will be compatible. If you need a bit-\/identical setup header, then use the one you passed into this command, and not the one returned by \doxyref{th\+\_\+encode\+\_\+flushheader()}{p.}{theoraenc_8h_a9439d61b566039d194ff782681fbc408}.
+
+This also does {\itshape not} enable or disable VP3 compatibility; that is not signaled in the setup header (or anywhere else in the encoded stream), and is controlled independently by the \doxyref{TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+VP3\+\_\+\+COMPATIBLE}{p.}{theoraenc_8h_a382d685a39a34d8e6ba76b00d804efd8} function. If you wish to enable VP3 compatibility mode {\itshape and} want the codebooks and quantization parameters to match the given setup header, you should enable VP3 compatibility before invoking this command, otherwise the codebooks and quantization parameters will be reset to the VP3 defaults.
+
+The current encoder does not support Huffman codebooks which do not contain codewords for all 32 tokens. Such codebooks are legal, according to the specification, but cannot be configured with this function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily unsigned char[]}\+: The encoded setup header to copy the configuration from. This should be the original, undecoded setup header packet, and {\itshape not} a \doxyref{th\+\_\+setup\+\_\+info}{p.}{theoradec_8h_ab71cd2657455cc27d6c0127c66a89f28} structure filled in by \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50}. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & Encoding has already begun, so the codebooks and quantization parameters cannot be changed, or the data in the setup header was not supported by this encoder. \\
+\hline
+{\em TH\+\_\+\+EBADHEADER} & {\itshape \+\_\+buf} did not contain a valid setup header packet. \\
+\hline
+{\em TH\+\_\+\+ENOTFORMAT} & {\itshape \+\_\+buf} did not contain a Theora header at all. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a8bb9b05471c42a09f8684a2583b8a1df}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_DUP\_COUNT@{TH\_ENCCTL\_SET\_DUP\_COUNT}}
+\index{TH\_ENCCTL\_SET\_DUP\_COUNT@{TH\_ENCCTL\_SET\_DUP\_COUNT}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_DUP\_COUNT}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+DUP\+\_\+\+COUNT~(18)}
+
+
+
+Sets the number of duplicates of the next frame to produce. 
+
+Although libtheora can encode duplicate frames very cheaply, it costs some amount of CPU to detect them, and a run of duplicates cannot span a keyframe boundary. This control code tells the encoder to produce the specified number of extra duplicates of the next frame. This allows the encoder to make smarter keyframe placement decisions and rate control decisions, and reduces CPU usage as well, when compared to just submitting the same frame for encoding multiple times. This setting only applies to the next frame submitted for encoding. You MUST call \doxyref{th\+\_\+encode\+\_\+packetout()}{p.}{theoraenc_8h_a96d8ac1dda53187455352f99bbb5b04b} repeatedly until it returns 0, or the extra duplicate frames will be lost.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily int}\+: The number of duplicates to produce. If this is negative or zero, no duplicates will be produced. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)}, or the number of duplicates is greater than or equal to the maximum keyframe interval. In the latter case, NO duplicate frames will be produced. You must ensure that the maximum keyframe interval is set larger than the maximum number of duplicates you will ever wish to insert prior to encoding. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation in the current encoding mode. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a0165348788e560a19b7c61ae8f0c2283}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_HUFFMAN\_CODES@{TH\_ENCCTL\_SET\_HUFFMAN\_CODES}}
+\index{TH\_ENCCTL\_SET\_HUFFMAN\_CODES@{TH\_ENCCTL\_SET\_HUFFMAN\_CODES}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_HUFFMAN\_CODES}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+HUFFMAN\+\_\+\+CODES~(0)}
+
+
+
+Sets the Huffman tables to use. 
+
+The tables are copied, not stored by reference, so they can be freed after this call. {\ttfamily NULL} may be specified to revert to the default tables.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily \doxyref{th\+\_\+huff\+\_\+code}{p.}{structth__huff__code}[\doxyref{TH\+\_\+\+NHUFFMAN\+\_\+\+TABLES}{p.}{codec_8h_a49bf449eae33c5320f0c308f32c6ae42}][\doxyref{TH\+\_\+\+NDCT\+\_\+\+TOKENS}{p.}{codec_8h_a2a44f48084e76a58cae48fb5d47cd422}]} \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & Encoding has already begun or one or more of the given tables is not full or prefix-\/free, {\itshape \+\_\+buf} is {\ttfamily NULL} and {\itshape \+\_\+buf\+\_\+sz} is not zero, or {\itshape \+\_\+buf} is non-\/{\ttfamily NULL} and {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(\doxyref{th\+\_\+huff\+\_\+code}{p.}{structth__huff__code})$\ast$\doxyref{TH\+\_\+\+NHUFFMAN\+\_\+\+TABLES}{p.}{codec_8h_a49bf449eae33c5320f0c308f32c6ae42}$\ast$\doxyref{TH\+\_\+\+NDCT\+\_\+\+TOKENS}{p.}{codec_8h_a2a44f48084e76a58cae48fb5d47cd422}}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a27e755e15b4b5604c54974b304037a49}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_KEYFRAME\_FREQUENCY\_FORCE@{TH\_ENCCTL\_SET\_KEYFRAME\_FREQUENCY\_FORCE}}
+\index{TH\_ENCCTL\_SET\_KEYFRAME\_FREQUENCY\_FORCE@{TH\_ENCCTL\_SET\_KEYFRAME\_FREQUENCY\_FORCE}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_KEYFRAME\_FREQUENCY\_FORCE}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+KEYFRAME\+\_\+\+FREQUENCY\+\_\+\+FORCE~(4)}
+
+
+
+Sets the maximum distance between key frames. 
+
+This can be changed during an encode, but will be bounded by {\ttfamily 1$<$$<$\doxyref{th\+\_\+info\+::keyframe\+\_\+granule\+\_\+shift}{p.}{structth__info_a693ca4ab11fbc0c3f32594b4bb8766ed}}. If it is set before encoding begins, \doxyref{th\+\_\+info\+::keyframe\+\_\+granule\+\_\+shift}{p.}{structth__info_a693ca4ab11fbc0c3f32594b4bb8766ed} will be enlarged appropriately.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily ogg\+\_\+uint32\+\_\+t}\+: The maximum distance between key frames. \\
+\hline
+\mbox{\texttt{ out}}  & {\em \+\_\+buf} & {\ttfamily ogg\+\_\+uint32\+\_\+t}\+: The actual maximum distance set. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(ogg\+\_\+uint32\+\_\+t)}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_aac087983fa951b9148c9db6bc2e81ef4}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_QUALITY@{TH\_ENCCTL\_SET\_QUALITY}}
+\index{TH\_ENCCTL\_SET\_QUALITY@{TH\_ENCCTL\_SET\_QUALITY}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_QUALITY}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+QUALITY~(28)}
+
+
+
+Sets the current encoding quality. 
+
+This is only valid so long as no bitrate has been specified, either through the \doxyref{th\+\_\+info}{p.}{structth__info} struct used to initialize the encoder or through \doxyref{TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+BITRATE}{p.}{theoraenc_8h_a9b969df55ecad1acd1ae207fad42592e} (this restriction may be relaxed in a future version). If it is set before the headers are emitted, the target quality encoded in them will be updated.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily int}\+: The new target quality, in the range 0...63, inclusive. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & Success. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & A target bitrate has already been specified, or the quality index was not in the range 0...63. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a3befcdd66678f8d27034f9c4b16d1b9c}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_QUANT\_PARAMS@{TH\_ENCCTL\_SET\_QUANT\_PARAMS}}
+\index{TH\_ENCCTL\_SET\_QUANT\_PARAMS@{TH\_ENCCTL\_SET\_QUANT\_PARAMS}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_QUANT\_PARAMS}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+QUANT\+\_\+\+PARAMS~(2)}
+
+
+
+Sets the quantization parameters to use. 
+
+The parameters are copied, not stored by reference, so they can be freed after this call. {\ttfamily NULL} may be specified to revert to the default parameters.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & \doxyref{th\+\_\+quant\+\_\+info}{p.}{structth__quant__info} \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & Encoding has already begun, {\itshape \+\_\+buf} is {\ttfamily NULL} and {\itshape \+\_\+buf\+\_\+sz} is not zero, or {\itshape \+\_\+buf} is non-\/{\ttfamily NULL} and {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(\doxyref{th\+\_\+quant\+\_\+info}{p.}{structth__quant__info})}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_aaefb515876b2a180ad5c3120fc584a52}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_RATE\_BUFFER@{TH\_ENCCTL\_SET\_RATE\_BUFFER}}
+\index{TH\_ENCCTL\_SET\_RATE\_BUFFER@{TH\_ENCCTL\_SET\_RATE\_BUFFER}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_RATE\_BUFFER}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+RATE\+\_\+\+BUFFER~(22)}
+
+
+
+Sets the size of the bitrate management bit reservoir as a function of number of frames. 
+
+The reservoir size affects how quickly bitrate management reacts to instantaneous changes in the video complexity. Larger reservoirs react more slowly, and provide better overall quality, but require more buffering by a client, adding more latency to live streams. By default, libtheora sets the reservoir to the maximum distance between keyframes, subject to a minimum and maximum limit. This call may be used to increase or decrease the reservoir, increasing or decreasing the allowed temporary variance in bitrate. An implementation may impose some limits on the size of a reservoir it can handle, in which case the actual reservoir size may not be exactly what was requested. The actual value set will be returned.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily int}\+: Requested size of the reservoir measured in frames. \\
+\hline
+\mbox{\texttt{ out}}  & {\em \+\_\+buf} & {\ttfamily int}\+: The actual size of the reservoir set. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)}, or rate control is not enabled. The buffer has an implementation defined minimum and maximum size and the value in \+\_\+buf will be adjusted to match the actual value set. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation in the current encoding mode. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a026502e08fbe1af0a1063f39bd18129c}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_RATE\_FLAGS@{TH\_ENCCTL\_SET\_RATE\_FLAGS}}
+\index{TH\_ENCCTL\_SET\_RATE\_FLAGS@{TH\_ENCCTL\_SET\_RATE\_FLAGS}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_RATE\_FLAGS}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+RATE\+\_\+\+FLAGS~(20)}
+
+
+
+Modifies the default bitrate management behavior. 
+
+Use to allow or disallow frame dropping, and to enable or disable capping bit reservoir overflows and underflows. See \doxyref{the list of available flags}{p.}{theoraenc_8h_encctlcodes}. The flags are set by default to {\ttfamily \doxyref{TH\+\_\+\+RATECTL\+\_\+\+DROP\+\_\+\+FRAMES}{p.}{theoraenc_8h_a3e7fab53b902b54135522ba286f45e33}$\vert$\doxyref{TH\+\_\+\+RATECTL\+\_\+\+CAP\+\_\+\+OVERFLOW}{p.}{theoraenc_8h_a32f9983b344a431334493cefb0b9337c}}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily int}\+: Any combination of \doxyref{the available flags}{p.}{theoraenc_8h_ratectlflags}\+:
+\begin{DoxyItemize}
+\item \doxyref{TH\+\_\+\+RATECTL\+\_\+\+DROP\+\_\+\+FRAMES}{p.}{theoraenc_8h_a3e7fab53b902b54135522ba286f45e33}\+: Enable frame dropping.
+\item \doxyref{TH\+\_\+\+RATECTL\+\_\+\+CAP\+\_\+\+OVERFLOW}{p.}{theoraenc_8h_a32f9983b344a431334493cefb0b9337c}\+: Don\textquotesingle{}t bank excess bits for later use.
+\item \doxyref{TH\+\_\+\+RATECTL\+\_\+\+CAP\+\_\+\+UNDERFLOW}{p.}{theoraenc_8h_ad0d62d9dce542caf5296b03b97e020a6}\+: Don\textquotesingle{}t try to make up shortfalls later. 
+\end{DoxyItemize}\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)} or rate control is not enabled. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation in the current encoding mode. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_abd9fbcb6a25a77d991d3620164fe59d6}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_SPLEVEL@{TH\_ENCCTL\_SET\_SPLEVEL}}
+\index{TH\_ENCCTL\_SET\_SPLEVEL@{TH\_ENCCTL\_SET\_SPLEVEL}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_SPLEVEL}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+SPLEVEL~(14)}
+
+
+
+Sets the speed level. 
+
+The current speed level may be retrieved using \doxyref{TH\+\_\+\+ENCCTL\+\_\+\+GET\+\_\+\+SPLEVEL}{p.}{theoraenc_8h_a114b7c552f50b7b8d881a39489af1f61}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily int}\+: The new encoding speed level. 0 is slowest, larger values use less CPU. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)}, or the encoding speed level is out of bounds. The maximum encoding speed level may be implementation-\/ and encoding mode-\/specific, and can be obtained via \doxyref{TH\+\_\+\+ENCCTL\+\_\+\+GET\+\_\+\+SPLEVEL\+\_\+\+MAX}{p.}{theoraenc_8h_a9baf5bdd206e80c78a8fd44687e89783}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation in the current encoding mode. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a382d685a39a34d8e6ba76b00d804efd8}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_ENCCTL\_SET\_VP3\_COMPATIBLE@{TH\_ENCCTL\_SET\_VP3\_COMPATIBLE}}
+\index{TH\_ENCCTL\_SET\_VP3\_COMPATIBLE@{TH\_ENCCTL\_SET\_VP3\_COMPATIBLE}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_ENCCTL\_SET\_VP3\_COMPATIBLE}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENCCTL\+\_\+\+SET\+\_\+\+VP3\+\_\+\+COMPATIBLE~(10)}
+
+
+
+Disables any encoder features that would prevent lossless transcoding back to VP3. 
+
+This primarily means disabling block-\/adaptive quantization and always coding all four luma blocks in a macro block when 4MV is used. It also includes using the VP3 quantization tables and Huffman codes; if you set them explicitly after calling this function, the resulting stream will not be VP3-\/compatible. If you enable VP3-\/compatibility when encoding 4\+:2\+:2 or 4\+:4\+:4 source material, or when using a picture region smaller than the full frame (e.\+g. a non-\/multiple-\/of-\/16 width or height), then non-\/\+VP3 bitstream features will still be disabled, but the stream will still not be VP3-\/compatible, as VP3 was not capable of encoding such formats. If you call this after encoding has already begun, then the quantization tables and codebooks cannot be changed, but the frame-\/level features will be enabled or disabled as requested.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily int}\+: a non-\/zero value to enable VP3 compatibility, or 0 to disable it (the default). \\
+\hline
+\mbox{\texttt{ out}}  & {\em \+\_\+buf} & {\ttfamily int}\+: 1 if all bitstream features required for VP3-\/compatibility could be set, and 0 otherwise. The latter will be returned if the pixel format is not 4\+:2\+:0, the picture region is smaller than the full frame, or if encoding has begun, preventing the quantization tables and codebooks from being set. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a32f9983b344a431334493cefb0b9337c}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_RATECTL\_CAP\_OVERFLOW@{TH\_RATECTL\_CAP\_OVERFLOW}}
+\index{TH\_RATECTL\_CAP\_OVERFLOW@{TH\_RATECTL\_CAP\_OVERFLOW}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_RATECTL\_CAP\_OVERFLOW}
+{\footnotesize\ttfamily \#define TH\+\_\+\+RATECTL\+\_\+\+CAP\+\_\+\+OVERFLOW~(0x2)}
+
+
+
+Ignore bitrate buffer overflows. 
+
+If the encoder uses so few bits that the reservoir of available bits overflows, ignore the excess. The encoder will not try to use these extra bits in future frames. At high rates this may cause the result to be undersized, but allows a client to play the stream using a finite buffer; it should normally be enabled, which is the default. \mbox{\label{theoraenc_8h_ad0d62d9dce542caf5296b03b97e020a6}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_RATECTL\_CAP\_UNDERFLOW@{TH\_RATECTL\_CAP\_UNDERFLOW}}
+\index{TH\_RATECTL\_CAP\_UNDERFLOW@{TH\_RATECTL\_CAP\_UNDERFLOW}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_RATECTL\_CAP\_UNDERFLOW}
+{\footnotesize\ttfamily \#define TH\+\_\+\+RATECTL\+\_\+\+CAP\+\_\+\+UNDERFLOW~(0x4)}
+
+
+
+Ignore bitrate buffer underflows. 
+
+If the encoder uses so many bits that the reservoir of available bits underflows, ignore the deficit. The encoder will not try to make up these extra bits in future frames. At low rates this may cause the result to be oversized; it should normally be disabled, which is the default. \mbox{\label{theoraenc_8h_a3e7fab53b902b54135522ba286f45e33}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_RATECTL\_DROP\_FRAMES@{TH\_RATECTL\_DROP\_FRAMES}}
+\index{TH\_RATECTL\_DROP\_FRAMES@{TH\_RATECTL\_DROP\_FRAMES}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_RATECTL\_DROP\_FRAMES}
+{\footnotesize\ttfamily \#define TH\+\_\+\+RATECTL\+\_\+\+DROP\+\_\+\+FRAMES~(0x1)}
+
+
+
+Drop frames to keep within bitrate buffer constraints. 
+
+This can have a severe impact on quality, but is the only way to ensure that bitrate targets are met at low rates during sudden bursts of activity. It is enabled by default. 
+
+\doxysubsection{Typedef Documentation}
+\mbox{\label{theoraenc_8h_af5cc40472b925456d42526a035d66edd}} 
+\index{theoraenc.h@{theoraenc.h}!th\_enc\_ctx@{th\_enc\_ctx}}
+\index{th\_enc\_ctx@{th\_enc\_ctx}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{th\_enc\_ctx}
+{\footnotesize\ttfamily typedef struct \textbf{ th\+\_\+enc\+\_\+ctx} \textbf{ th\+\_\+enc\+\_\+ctx}}
+
+
+
+The encoder context. 
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\label{theoraenc_8h_aad036b5967e07629b9be10a4d77ada00}} 
+\index{theoraenc.h@{theoraenc.h}!th\_encode\_alloc@{th\_encode\_alloc}}
+\index{th\_encode\_alloc@{th\_encode\_alloc}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{th\_encode\_alloc()}
+{\footnotesize\ttfamily \textbf{ th\+\_\+enc\+\_\+ctx} $\ast$ th\+\_\+encode\+\_\+alloc (\begin{DoxyParamCaption}\item[{const \textbf{ th\+\_\+info} $\ast$}]{\+\_\+info }\end{DoxyParamCaption})}
+
+
+
+Allocates an encoder instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+info} & A \doxyref{th\+\_\+info}{p.}{structth__info} struct filled with the desired encoding parameters. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The initialized \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} handle. 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em NULL} & If the encoding parameters were invalid. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a3a427f6514dfdc01ea72172c469d51d9}} 
+\index{theoraenc.h@{theoraenc.h}!th\_encode\_ctl@{th\_encode\_ctl}}
+\index{th\_encode\_ctl@{th\_encode\_ctl}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{th\_encode\_ctl()}
+{\footnotesize\ttfamily int th\+\_\+encode\+\_\+ctl (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$}]{\+\_\+enc,  }\item[{int}]{\+\_\+req,  }\item[{void $\ast$}]{\+\_\+buf,  }\item[{size\+\_\+t}]{\+\_\+buf\+\_\+sz }\end{DoxyParamCaption})}
+
+
+
+Encoder control function. 
+
+This is used to provide advanced control the encoding process. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+enc} & A \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} handle. \\
+\hline
+{\em \+\_\+req} & The control code to process. See \doxyref{the list of available control codes}{p.}{theoraenc_8h_encctlcodes} for details. \\
+\hline
+{\em \+\_\+buf} & The parameters for this control code. \\
+\hline
+{\em \+\_\+buf\+\_\+sz} & The size of the parameter buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Possible return values depend on the control code used. See \doxyref{the list of control codes}{p.}{theoraenc_8h_encctlcodes} for specific values. Generally 0 indicates success. 
+\end{DoxyReturn}
+\mbox{\label{theoraenc_8h_a9439d61b566039d194ff782681fbc408}} 
+\index{theoraenc.h@{theoraenc.h}!th\_encode\_flushheader@{th\_encode\_flushheader}}
+\index{th\_encode\_flushheader@{th\_encode\_flushheader}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{th\_encode\_flushheader()}
+{\footnotesize\ttfamily int th\+\_\+encode\+\_\+flushheader (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$}]{\+\_\+enc,  }\item[{\textbf{ th\+\_\+comment} $\ast$}]{\+\_\+comments,  }\item[{ogg\+\_\+packet $\ast$}]{\+\_\+op }\end{DoxyParamCaption})}
+
+
+
+Outputs the next header packet. 
+
+This should be called repeatedly after encoder initialization until it returns 0 in order to get all of the header packets, in order, before encoding actual video data. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+enc} & A \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} handle. \\
+\hline
+{\em \+\_\+comments} & The metadata to place in the comment header, when it is encoded. \\
+\hline
+{\em \+\_\+op} & An {\ttfamily ogg\+\_\+packet} structure to fill. All of the elements of this structure will be set, including a pointer to the header data. The memory for the header data is owned by {\ttfamily libtheoraenc}, and may be invalidated when the next encoder function is called. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A positive value indicates that a header packet was successfully produced. 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & No packet was produced, and no more header packets remain. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc}, {\itshape \+\_\+comments}, or {\itshape \+\_\+op} was {\ttfamily NULL}. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_a36b23d216532231925c4107894204680}} 
+\index{theoraenc.h@{theoraenc.h}!th\_encode\_free@{th\_encode\_free}}
+\index{th\_encode\_free@{th\_encode\_free}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{th\_encode\_free()}
+{\footnotesize\ttfamily void th\+\_\+encode\+\_\+free (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$}]{\+\_\+enc }\end{DoxyParamCaption})}
+
+
+
+Frees an allocated encoder instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+enc} & A \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} handle. \\
+\hline
+\end{DoxyParams}
+\mbox{\label{theoraenc_8h_a96d8ac1dda53187455352f99bbb5b04b}} 
+\index{theoraenc.h@{theoraenc.h}!th\_encode\_packetout@{th\_encode\_packetout}}
+\index{th\_encode\_packetout@{th\_encode\_packetout}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{th\_encode\_packetout()}
+{\footnotesize\ttfamily int th\+\_\+encode\+\_\+packetout (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$}]{\+\_\+enc,  }\item[{int}]{\+\_\+last,  }\item[{ogg\+\_\+packet $\ast$}]{\+\_\+op }\end{DoxyParamCaption})}
+
+
+
+Retrieves encoded video data packets. 
+
+This should be called repeatedly after each frame is submitted to flush any encoded packets, until it returns 0. The encoder will not buffer these packets as subsequent frames are compressed, so a failure to do so will result in lost video data. \begin{DoxyNote}{Note}
+Currently the encoder operates in a one-\/frame-\/in, one-\/packet-\/out manner. However, this may be changed in the future. 
+\end{DoxyNote}
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+enc} & A \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} handle. \\
+\hline
+{\em \+\_\+last} & Set this flag to a non-\/zero value if no more uncompressed frames will be submitted. This ensures that a proper EOS flag is set on the last packet. \\
+\hline
+{\em \+\_\+op} & An {\ttfamily ogg\+\_\+packet} structure to fill. All of the elements of this structure will be set, including a pointer to the video data. The memory for the video data is owned by {\ttfamily libtheoraenc}, and may be invalidated when the next encoder function is called. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A positive value indicates that a video data packet was successfully produced. 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & No packet was produced, and no more encoded video data remains. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+op} was {\ttfamily NULL}. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoraenc_8h_adbe7dd66b411c2d61ab8153c15308750}} 
+\index{theoraenc.h@{theoraenc.h}!th\_encode\_ycbcr\_in@{th\_encode\_ycbcr\_in}}
+\index{th\_encode\_ycbcr\_in@{th\_encode\_ycbcr\_in}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{th\_encode\_ycbcr\_in()}
+{\footnotesize\ttfamily int th\+\_\+encode\+\_\+ycbcr\+\_\+in (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+enc\+\_\+ctx} $\ast$}]{\+\_\+enc,  }\item[{\textbf{ th\+\_\+ycbcr\+\_\+buffer}}]{\+\_\+ycbcr }\end{DoxyParamCaption})}
+
+
+
+Submits an uncompressed frame to the encoder. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+enc} & A \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} handle. \\
+\hline
+{\em \+\_\+ycbcr} & A buffer of Y\textquotesingle{}Cb\+Cr data to encode. If the width and height of the buffer matches the frame size the encoder was initialized with, the encoder will only reference the portion inside the picture region. Any data outside this region will be ignored, and need not map to a valid address. Alternatively, you can pass a buffer equal to the size of the picture region, if this is less than the full frame size. When using subsampled chroma planes, odd picture sizes or odd picture offsets may require an unexpected chroma plane size, and their use is generally discouraged, as they will not be well-\/supported by players and other media frameworks. See Section 4.\+4 of {\texttt{ the Theora specification}} for details if you wish to use them anyway. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & Success. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+enc} or {\itshape \+\_\+ycbcr} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & The buffer size matches neither the frame size nor the picture size the encoder was initialized with, or encoding has already completed. \\
+\hline
+\end{DoxyRetVals}
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\label{theoraenc_8h_aee1f7cb1fa0d3b7cc1d4ca0f17e6ae5e}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_VP31\_HUFF\_CODES@{TH\_VP31\_HUFF\_CODES}}
+\index{TH\_VP31\_HUFF\_CODES@{TH\_VP31\_HUFF\_CODES}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_VP31\_HUFF\_CODES}
+{\footnotesize\ttfamily const \textbf{ th\+\_\+huff\+\_\+code} TH\+\_\+\+VP31\+\_\+\+HUFF\+\_\+\+CODES[\textbf{ TH\+\_\+\+NHUFFMAN\+\_\+\+TABLES}][\textbf{ TH\+\_\+\+NDCT\+\_\+\+TOKENS}]\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+The Huffman tables used by VP3. 
+
+\mbox{\label{theoraenc_8h_a3b1b462989f4e7a5a98e6e697f1a7f7d}} 
+\index{theoraenc.h@{theoraenc.h}!TH\_VP31\_QUANT\_INFO@{TH\_VP31\_QUANT\_INFO}}
+\index{TH\_VP31\_QUANT\_INFO@{TH\_VP31\_QUANT\_INFO}!theoraenc.h@{theoraenc.h}}
+\doxysubsubsection{TH\_VP31\_QUANT\_INFO}
+{\footnotesize\ttfamily const \textbf{ th\+\_\+quant\+\_\+info} TH\+\_\+\+VP31\+\_\+\+QUANT\+\_\+\+INFO\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+The quantization parameters used by VP3. 
+

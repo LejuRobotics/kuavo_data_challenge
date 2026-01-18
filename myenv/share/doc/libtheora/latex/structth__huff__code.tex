@@ -1,0 +1,51 @@
+\doxysection{th\+\_\+huff\+\_\+code Struct Reference}
+\label{structth__huff__code}\index{th\_huff\_code@{th\_huff\_code}}
+
+
+A Huffman code for a Theora DCT token.  
+
+
+
+
+{\ttfamily \#include $<$codec.\+h$>$}
+
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ pattern}
+\begin{DoxyCompactList}\small\item\em The bit pattern for the code, with the LSbit of the pattern aligned in the LSbit of the word. \end{DoxyCompactList}\item 
+int \textbf{ nbits}
+\begin{DoxyCompactList}\small\item\em The number of bits in the code. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A Huffman code for a Theora DCT token. 
+
+Each set of Huffman codes in a given table must form a complete, prefix-\/free code. There is no requirement that all the tokens in a table have a valid code, but the current encoder is not optimized to take advantage of this. If each of the five grouops of 16 tables does not contain at least one table with a code for every token, then the encoder may fail to encode certain frames. The complete table in the first group of 16 does not have to be in the same place as the complete table in the other groups, but the complete tables in the remaining four groups must all be in the same place. 
+
+\doxysubsection{Field Documentation}
+\mbox{\label{structth__huff__code_aaf97b8f2f90042f7bc136a7b2bc35e35}} 
+\index{th\_huff\_code@{th\_huff\_code}!nbits@{nbits}}
+\index{nbits@{nbits}!th\_huff\_code@{th\_huff\_code}}
+\doxysubsubsection{nbits}
+{\footnotesize\ttfamily int th\+\_\+huff\+\_\+code\+::nbits}
+
+
+
+The number of bits in the code. 
+
+This must be between 0 and 32, inclusive. \mbox{\label{structth__huff__code_a6dd29e3aa5a0c5a2dd5ce1f45b1162b4}} 
+\index{th\_huff\_code@{th\_huff\_code}!pattern@{pattern}}
+\index{pattern@{pattern}!th\_huff\_code@{th\_huff\_code}}
+\doxysubsubsection{pattern}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t th\+\_\+huff\+\_\+code\+::pattern}
+
+
+
+The bit pattern for the code, with the LSbit of the pattern aligned in the LSbit of the word. 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\textbf{ codec.\+h}\end{DoxyCompactItemize}

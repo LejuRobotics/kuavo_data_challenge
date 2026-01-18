@@ -1,0 +1,79 @@
+\doxysection{theora\+\_\+comment Struct Reference}
+\label{structtheora__comment}\index{theora\_comment@{theora\_comment}}
+
+
+Comment header metadata.  
+
+
+
+
+{\ttfamily \#include $<$theora.\+h$>$}
+
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$$\ast$ \textbf{ user\+\_\+comments}
+\begin{DoxyCompactList}\small\item\em An array of comment string vectors. \end{DoxyCompactList}\item 
+int $\ast$ \textbf{ comment\+\_\+lengths}
+\begin{DoxyCompactList}\small\item\em An array of corresponding string vector lengths in bytes. \end{DoxyCompactList}\item 
+int \textbf{ comments}
+\begin{DoxyCompactList}\small\item\em The total number of comment string vectors. \end{DoxyCompactList}\item 
+char $\ast$ \textbf{ vendor}
+\begin{DoxyCompactList}\small\item\em The vendor string identifying the encoder, null terminated. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Comment header metadata. 
+
+This structure holds the in-\/stream metadata corresponding to the \textquotesingle{}comment\textquotesingle{} header packet.
+
+Meta data is stored as a series of (tag, value) pairs, in length-\/encoded string vectors. The first occurrence of the \textquotesingle{}=\textquotesingle{} character delimits the tag and value. A particular tag may occur more than once. The character set encoding for the strings is always UTF-\/8, but the tag names are limited to case-\/insensitive ASCII. See the spec for details.
+
+In filling in this structure, \doxyref{theora\+\_\+decode\+\_\+header()}{p.}{theora_8h_a02915e63c1bd733ee291f577a8b75a82} will null-\/terminate the user\+\_\+comment strings for safety. However, the bitstream format itself treats them as 8-\/bit clean, and so the length array should be treated as authoritative for their length. 
+
+\doxysubsection{Field Documentation}
+\mbox{\label{structtheora__comment_a5ab4a376d3c217282a684577c9c9f49a}} 
+\index{theora\_comment@{theora\_comment}!comment\_lengths@{comment\_lengths}}
+\index{comment\_lengths@{comment\_lengths}!theora\_comment@{theora\_comment}}
+\doxysubsubsection{comment\_lengths}
+{\footnotesize\ttfamily int$\ast$ theora\+\_\+comment\+::comment\+\_\+lengths}
+
+
+
+An array of corresponding string vector lengths in bytes. 
+
+\mbox{\label{structtheora__comment_a122393035c8352ff9be42d69e73aee00}} 
+\index{theora\_comment@{theora\_comment}!comments@{comments}}
+\index{comments@{comments}!theora\_comment@{theora\_comment}}
+\doxysubsubsection{comments}
+{\footnotesize\ttfamily int theora\+\_\+comment\+::comments}
+
+
+
+The total number of comment string vectors. 
+
+\mbox{\label{structtheora__comment_a1e236fd180dfce19be89081399444cf5}} 
+\index{theora\_comment@{theora\_comment}!user\_comments@{user\_comments}}
+\index{user\_comments@{user\_comments}!theora\_comment@{theora\_comment}}
+\doxysubsubsection{user\_comments}
+{\footnotesize\ttfamily char$\ast$$\ast$ theora\+\_\+comment\+::user\+\_\+comments}
+
+
+
+An array of comment string vectors. 
+
+\mbox{\label{structtheora__comment_adb371baf8f0daed42af8b875cf8430ef}} 
+\index{theora\_comment@{theora\_comment}!vendor@{vendor}}
+\index{vendor@{vendor}!theora\_comment@{theora\_comment}}
+\doxysubsubsection{vendor}
+{\footnotesize\ttfamily char$\ast$ theora\+\_\+comment\+::vendor}
+
+
+
+The vendor string identifying the encoder, null terminated. 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\textbf{ theora.\+h}\end{DoxyCompactItemize}

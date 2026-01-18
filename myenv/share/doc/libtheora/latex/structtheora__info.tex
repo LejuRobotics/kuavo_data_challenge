@@ -1,0 +1,321 @@
+\doxysection{theora\+\_\+info Struct Reference}
+\label{structtheora__info}\index{theora\_info@{theora\_info}}
+
+
+Theora bitstream info.  
+
+
+
+
+{\ttfamily \#include $<$theora.\+h$>$}
+
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ width}
+\begin{DoxyCompactList}\small\item\em encoded frame width ~\newline
+ \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ height}
+\begin{DoxyCompactList}\small\item\em encoded frame height \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ frame\+\_\+width}
+\begin{DoxyCompactList}\small\item\em display frame width ~\newline
+ \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ frame\+\_\+height}
+\begin{DoxyCompactList}\small\item\em display frame height \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ offset\+\_\+x}
+\begin{DoxyCompactList}\small\item\em horizontal offset of the displayed frame \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ offset\+\_\+y}
+\begin{DoxyCompactList}\small\item\em vertical offset of the displayed frame \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ fps\+\_\+numerator}
+\begin{DoxyCompactList}\small\item\em frame rate numerator \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ fps\+\_\+denominator}
+\begin{DoxyCompactList}\small\item\em frame rate denominator \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ aspect\+\_\+numerator}
+\begin{DoxyCompactList}\small\item\em pixel aspect ratio numerator \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ aspect\+\_\+denominator}
+\begin{DoxyCompactList}\small\item\em pixel aspect ratio denominator \end{DoxyCompactList}\item 
+\textbf{ theora\+\_\+colorspace} \textbf{ colorspace}
+\begin{DoxyCompactList}\small\item\em colorspace \end{DoxyCompactList}\item 
+int \textbf{ target\+\_\+bitrate}
+\begin{DoxyCompactList}\small\item\em nominal bitrate in bits per second \end{DoxyCompactList}\item 
+int \textbf{ quality}
+\begin{DoxyCompactList}\small\item\em Nominal quality setting, 0-\/63. \end{DoxyCompactList}\item 
+int \textbf{ quick\+\_\+p}
+\begin{DoxyCompactList}\small\item\em Quick encode/decode. \end{DoxyCompactList}\item 
+unsigned char \textbf{ version\+\_\+major}
+\item 
+unsigned char \textbf{ version\+\_\+minor}
+\item 
+unsigned char \textbf{ version\+\_\+subminor}
+\item 
+void $\ast$ \textbf{ codec\+\_\+setup}
+\item 
+int \textbf{ dropframes\+\_\+p}
+\item 
+int \textbf{ keyframe\+\_\+auto\+\_\+p}
+\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ keyframe\+\_\+frequency}
+\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ keyframe\+\_\+frequency\+\_\+force}
+\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ keyframe\+\_\+data\+\_\+target\+\_\+bitrate}
+\item 
+ogg\+\_\+int32\+\_\+t \textbf{ keyframe\+\_\+auto\+\_\+threshold}
+\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ keyframe\+\_\+mindistance}
+\item 
+ogg\+\_\+int32\+\_\+t \textbf{ noise\+\_\+sensitivity}
+\item 
+ogg\+\_\+int32\+\_\+t \textbf{ sharpness}
+\item 
+\textbf{ theora\+\_\+pixelformat} \textbf{ pixelformat}
+\begin{DoxyCompactList}\small\item\em chroma subsampling mode to expect \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Theora bitstream info. 
+
+Contains the basic playback parameters for a stream, corresponding to the initial \textquotesingle{}info\textquotesingle{} header packet.
+
+Encoded theora frames must be a multiple of 16 in width and height. To handle other frame sizes, a crop rectangle is specified in frame\+\_\+height and frame\+\_\+width, offset\+\_\+x and $\ast$ offset\+\_\+y. The offset and size should still be a multiple of 2 to avoid chroma sampling shifts. Offset values in this structure are measured from the upper left of the image.
+
+Frame rate, in frames per second, is stored as a rational fraction. Aspect ratio is also stored as a rational fraction, and refers to the aspect ratio of the frame pixels, not of the overall frame itself.
+
+See {\texttt{ examples/encoder\+\_\+example.\+c}} for usage examples of the other parameters and good default settings for the encoder parameters. 
+
+\doxysubsection{Field Documentation}
+\mbox{\label{structtheora__info_afebc4d0cbfb34b68c833a8c79e83ae12}} 
+\index{theora\_info@{theora\_info}!aspect\_denominator@{aspect\_denominator}}
+\index{aspect\_denominator@{aspect\_denominator}!theora\_info@{theora\_info}}
+\doxysubsubsection{aspect\_denominator}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::aspect\+\_\+denominator}
+
+
+
+pixel aspect ratio denominator 
+
+\mbox{\label{structtheora__info_a5a3ed8c79815fba1aa06c3f7d8e48b35}} 
+\index{theora\_info@{theora\_info}!aspect\_numerator@{aspect\_numerator}}
+\index{aspect\_numerator@{aspect\_numerator}!theora\_info@{theora\_info}}
+\doxysubsubsection{aspect\_numerator}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::aspect\+\_\+numerator}
+
+
+
+pixel aspect ratio numerator 
+
+\mbox{\label{structtheora__info_a719a1d77a4a3bfeab79aa5747dbbb04c}} 
+\index{theora\_info@{theora\_info}!codec\_setup@{codec\_setup}}
+\index{codec\_setup@{codec\_setup}!theora\_info@{theora\_info}}
+\doxysubsubsection{codec\_setup}
+{\footnotesize\ttfamily void$\ast$ theora\+\_\+info\+::codec\+\_\+setup}
+
+\mbox{\label{structtheora__info_a5eaba99c96706d47b426ab7b7602dc5d}} 
+\index{theora\_info@{theora\_info}!colorspace@{colorspace}}
+\index{colorspace@{colorspace}!theora\_info@{theora\_info}}
+\doxysubsubsection{colorspace}
+{\footnotesize\ttfamily \textbf{ theora\+\_\+colorspace} theora\+\_\+info\+::colorspace}
+
+
+
+colorspace 
+
+\mbox{\label{structtheora__info_af294db65a8363a0bcf43f4727763b291}} 
+\index{theora\_info@{theora\_info}!dropframes\_p@{dropframes\_p}}
+\index{dropframes\_p@{dropframes\_p}!theora\_info@{theora\_info}}
+\doxysubsubsection{dropframes\_p}
+{\footnotesize\ttfamily int theora\+\_\+info\+::dropframes\+\_\+p}
+
+\mbox{\label{structtheora__info_a9aa7e826e0323a4ae8cd8646a6cfbfea}} 
+\index{theora\_info@{theora\_info}!fps\_denominator@{fps\_denominator}}
+\index{fps\_denominator@{fps\_denominator}!theora\_info@{theora\_info}}
+\doxysubsubsection{fps\_denominator}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::fps\+\_\+denominator}
+
+
+
+frame rate denominator 
+
+\mbox{\label{structtheora__info_a3478199aa5ab213816c1819f70085ad7}} 
+\index{theora\_info@{theora\_info}!fps\_numerator@{fps\_numerator}}
+\index{fps\_numerator@{fps\_numerator}!theora\_info@{theora\_info}}
+\doxysubsubsection{fps\_numerator}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::fps\+\_\+numerator}
+
+
+
+frame rate numerator 
+
+\mbox{\label{structtheora__info_a287e4c194f1d2e6deb39d59f1748ea48}} 
+\index{theora\_info@{theora\_info}!frame\_height@{frame\_height}}
+\index{frame\_height@{frame\_height}!theora\_info@{theora\_info}}
+\doxysubsubsection{frame\_height}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::frame\+\_\+height}
+
+
+
+display frame height 
+
+\mbox{\label{structtheora__info_a8f28f4018a25634d40e4ae861fbbccfa}} 
+\index{theora\_info@{theora\_info}!frame\_width@{frame\_width}}
+\index{frame\_width@{frame\_width}!theora\_info@{theora\_info}}
+\doxysubsubsection{frame\_width}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::frame\+\_\+width}
+
+
+
+display frame width ~\newline
+ 
+
+\mbox{\label{structtheora__info_ae6f0274fc4a7f285c422d91abb35f9c6}} 
+\index{theora\_info@{theora\_info}!height@{height}}
+\index{height@{height}!theora\_info@{theora\_info}}
+\doxysubsubsection{height}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::height}
+
+
+
+encoded frame height 
+
+\mbox{\label{structtheora__info_a23648173369174f687085c0ce85ef30e}} 
+\index{theora\_info@{theora\_info}!keyframe\_auto\_p@{keyframe\_auto\_p}}
+\index{keyframe\_auto\_p@{keyframe\_auto\_p}!theora\_info@{theora\_info}}
+\doxysubsubsection{keyframe\_auto\_p}
+{\footnotesize\ttfamily int theora\+\_\+info\+::keyframe\+\_\+auto\+\_\+p}
+
+\mbox{\label{structtheora__info_a95cb8958e29ad3d24047ee8f9e7fd99b}} 
+\index{theora\_info@{theora\_info}!keyframe\_auto\_threshold@{keyframe\_auto\_threshold}}
+\index{keyframe\_auto\_threshold@{keyframe\_auto\_threshold}!theora\_info@{theora\_info}}
+\doxysubsubsection{keyframe\_auto\_threshold}
+{\footnotesize\ttfamily ogg\+\_\+int32\+\_\+t theora\+\_\+info\+::keyframe\+\_\+auto\+\_\+threshold}
+
+\mbox{\label{structtheora__info_a588942d1ee90a26a7effdf6a0e98b9ce}} 
+\index{theora\_info@{theora\_info}!keyframe\_data\_target\_bitrate@{keyframe\_data\_target\_bitrate}}
+\index{keyframe\_data\_target\_bitrate@{keyframe\_data\_target\_bitrate}!theora\_info@{theora\_info}}
+\doxysubsubsection{keyframe\_data\_target\_bitrate}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::keyframe\+\_\+data\+\_\+target\+\_\+bitrate}
+
+\mbox{\label{structtheora__info_a03e1b3e337af5f9dabaaaeb9050f145a}} 
+\index{theora\_info@{theora\_info}!keyframe\_frequency@{keyframe\_frequency}}
+\index{keyframe\_frequency@{keyframe\_frequency}!theora\_info@{theora\_info}}
+\doxysubsubsection{keyframe\_frequency}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::keyframe\+\_\+frequency}
+
+\mbox{\label{structtheora__info_ad9d2e22c44a53473010e6d1042dfe0d8}} 
+\index{theora\_info@{theora\_info}!keyframe\_frequency\_force@{keyframe\_frequency\_force}}
+\index{keyframe\_frequency\_force@{keyframe\_frequency\_force}!theora\_info@{theora\_info}}
+\doxysubsubsection{keyframe\_frequency\_force}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::keyframe\+\_\+frequency\+\_\+force}
+
+\mbox{\label{structtheora__info_aa79ca8c0e77a884d4487fd627fae32e9}} 
+\index{theora\_info@{theora\_info}!keyframe\_mindistance@{keyframe\_mindistance}}
+\index{keyframe\_mindistance@{keyframe\_mindistance}!theora\_info@{theora\_info}}
+\doxysubsubsection{keyframe\_mindistance}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::keyframe\+\_\+mindistance}
+
+\mbox{\label{structtheora__info_ac4789034f547b57d1075e035050eeed9}} 
+\index{theora\_info@{theora\_info}!noise\_sensitivity@{noise\_sensitivity}}
+\index{noise\_sensitivity@{noise\_sensitivity}!theora\_info@{theora\_info}}
+\doxysubsubsection{noise\_sensitivity}
+{\footnotesize\ttfamily ogg\+\_\+int32\+\_\+t theora\+\_\+info\+::noise\+\_\+sensitivity}
+
+\mbox{\label{structtheora__info_af5949a02bef29512f2705e6f6c944e3b}} 
+\index{theora\_info@{theora\_info}!offset\_x@{offset\_x}}
+\index{offset\_x@{offset\_x}!theora\_info@{theora\_info}}
+\doxysubsubsection{offset\_x}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::offset\+\_\+x}
+
+
+
+horizontal offset of the displayed frame 
+
+\mbox{\label{structtheora__info_a91c3922097ba32a85acd584a01dc2c93}} 
+\index{theora\_info@{theora\_info}!offset\_y@{offset\_y}}
+\index{offset\_y@{offset\_y}!theora\_info@{theora\_info}}
+\doxysubsubsection{offset\_y}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::offset\+\_\+y}
+
+
+
+vertical offset of the displayed frame 
+
+\mbox{\label{structtheora__info_a65ab4376ab5242ee82e06c78fb7008ab}} 
+\index{theora\_info@{theora\_info}!pixelformat@{pixelformat}}
+\index{pixelformat@{pixelformat}!theora\_info@{theora\_info}}
+\doxysubsubsection{pixelformat}
+{\footnotesize\ttfamily \textbf{ theora\+\_\+pixelformat} theora\+\_\+info\+::pixelformat}
+
+
+
+chroma subsampling mode to expect 
+
+\mbox{\label{structtheora__info_a71a4748a5f31bd58d0e403b7806c980d}} 
+\index{theora\_info@{theora\_info}!quality@{quality}}
+\index{quality@{quality}!theora\_info@{theora\_info}}
+\doxysubsubsection{quality}
+{\footnotesize\ttfamily int theora\+\_\+info\+::quality}
+
+
+
+Nominal quality setting, 0-\/63. 
+
+\mbox{\label{structtheora__info_a2dfae4fd175dbd19254eaf0697778ff5}} 
+\index{theora\_info@{theora\_info}!quick\_p@{quick\_p}}
+\index{quick\_p@{quick\_p}!theora\_info@{theora\_info}}
+\doxysubsubsection{quick\_p}
+{\footnotesize\ttfamily int theora\+\_\+info\+::quick\+\_\+p}
+
+
+
+Quick encode/decode. 
+
+\mbox{\label{structtheora__info_a3fb695de2b2f56dd0203b9e2eb0df1cc}} 
+\index{theora\_info@{theora\_info}!sharpness@{sharpness}}
+\index{sharpness@{sharpness}!theora\_info@{theora\_info}}
+\doxysubsubsection{sharpness}
+{\footnotesize\ttfamily ogg\+\_\+int32\+\_\+t theora\+\_\+info\+::sharpness}
+
+\mbox{\label{structtheora__info_a0cfba041767ae2416dd190a406afe713}} 
+\index{theora\_info@{theora\_info}!target\_bitrate@{target\_bitrate}}
+\index{target\_bitrate@{target\_bitrate}!theora\_info@{theora\_info}}
+\doxysubsubsection{target\_bitrate}
+{\footnotesize\ttfamily int theora\+\_\+info\+::target\+\_\+bitrate}
+
+
+
+nominal bitrate in bits per second 
+
+\mbox{\label{structtheora__info_a7c5ebb9e6700aaef87f29f7c6074e474}} 
+\index{theora\_info@{theora\_info}!version\_major@{version\_major}}
+\index{version\_major@{version\_major}!theora\_info@{theora\_info}}
+\doxysubsubsection{version\_major}
+{\footnotesize\ttfamily unsigned char theora\+\_\+info\+::version\+\_\+major}
+
+\mbox{\label{structtheora__info_a75eda4f30270d833c7b9dba43932a06a}} 
+\index{theora\_info@{theora\_info}!version\_minor@{version\_minor}}
+\index{version\_minor@{version\_minor}!theora\_info@{theora\_info}}
+\doxysubsubsection{version\_minor}
+{\footnotesize\ttfamily unsigned char theora\+\_\+info\+::version\+\_\+minor}
+
+\mbox{\label{structtheora__info_aa07967ecd6e20bd2928ead42b6397b3d}} 
+\index{theora\_info@{theora\_info}!version\_subminor@{version\_subminor}}
+\index{version\_subminor@{version\_subminor}!theora\_info@{theora\_info}}
+\doxysubsubsection{version\_subminor}
+{\footnotesize\ttfamily unsigned char theora\+\_\+info\+::version\+\_\+subminor}
+
+\mbox{\label{structtheora__info_a17c2fc651bb3329f1ea6b13ff1d3957b}} 
+\index{theora\_info@{theora\_info}!width@{width}}
+\index{width@{width}!theora\_info@{theora\_info}}
+\doxysubsubsection{width}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t theora\+\_\+info\+::width}
+
+
+
+encoded frame width ~\newline
+ 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\textbf{ theora.\+h}\end{DoxyCompactItemize}

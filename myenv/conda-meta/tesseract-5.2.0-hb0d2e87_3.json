@@ -1,0 +1,1473 @@
+{
+ "build": "hb0d2e87_3",
+ "build_number": 3,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "_openmp_mutex",
+  "leptonica >=1.82.0,<1.83.0a0",
+  "libarchive >=3.8.1,<3.9.0a0",
+  "libgcc-ng >=11.2.0",
+  "libstdcxx-ng >=11.2.0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "bin/tesseract",
+  "etc/conda/activate.d/tesseract_activate.ps1",
+  "etc/conda/activate.d/tesseract_activate.sh",
+  "etc/conda/deactivate.d/tesseract_deactivate.ps1",
+  "etc/conda/deactivate.d/tesseract_deactivate.sh",
+  "include/tesseract/baseapi.h",
+  "include/tesseract/capi.h",
+  "include/tesseract/export.h",
+  "include/tesseract/ltrresultiterator.h",
+  "include/tesseract/ocrclass.h",
+  "include/tesseract/osdetect.h",
+  "include/tesseract/pageiterator.h",
+  "include/tesseract/publictypes.h",
+  "include/tesseract/renderer.h",
+  "include/tesseract/resultiterator.h",
+  "include/tesseract/unichar.h",
+  "include/tesseract/version.h",
+  "lib/libtesseract.a",
+  "lib/libtesseract.so",
+  "lib/libtesseract.so.5",
+  "lib/libtesseract.so.5.0.2",
+  "lib/pkgconfig/tesseract.pc",
+  "share/tessdata/afr.traineddata",
+  "share/tessdata/amh.traineddata",
+  "share/tessdata/ara.traineddata",
+  "share/tessdata/asm.traineddata",
+  "share/tessdata/aze.traineddata",
+  "share/tessdata/aze_cyrl.traineddata",
+  "share/tessdata/bel.traineddata",
+  "share/tessdata/ben.traineddata",
+  "share/tessdata/bod.traineddata",
+  "share/tessdata/bos.traineddata",
+  "share/tessdata/bre.traineddata",
+  "share/tessdata/bul.traineddata",
+  "share/tessdata/cat.traineddata",
+  "share/tessdata/ceb.traineddata",
+  "share/tessdata/ces.traineddata",
+  "share/tessdata/chi_sim.traineddata",
+  "share/tessdata/chi_sim_vert.traineddata",
+  "share/tessdata/chi_tra.traineddata",
+  "share/tessdata/chi_tra_vert.traineddata",
+  "share/tessdata/chr.traineddata",
+  "share/tessdata/configs/alto",
+  "share/tessdata/configs/ambigs.train",
+  "share/tessdata/configs/api_config",
+  "share/tessdata/configs/bigram",
+  "share/tessdata/configs/box.train",
+  "share/tessdata/configs/box.train.stderr",
+  "share/tessdata/configs/digits",
+  "share/tessdata/configs/get.images",
+  "share/tessdata/configs/hocr",
+  "share/tessdata/configs/inter",
+  "share/tessdata/configs/kannada",
+  "share/tessdata/configs/linebox",
+  "share/tessdata/configs/logfile",
+  "share/tessdata/configs/lstm.train",
+  "share/tessdata/configs/lstmbox",
+  "share/tessdata/configs/lstmdebug",
+  "share/tessdata/configs/makebox",
+  "share/tessdata/configs/pdf",
+  "share/tessdata/configs/quiet",
+  "share/tessdata/configs/rebox",
+  "share/tessdata/configs/strokewidth",
+  "share/tessdata/configs/tsv",
+  "share/tessdata/configs/txt",
+  "share/tessdata/configs/unlv",
+  "share/tessdata/configs/wordstrbox",
+  "share/tessdata/cos.traineddata",
+  "share/tessdata/cym.traineddata",
+  "share/tessdata/dan.traineddata",
+  "share/tessdata/deu.traineddata",
+  "share/tessdata/div.traineddata",
+  "share/tessdata/dzo.traineddata",
+  "share/tessdata/ell.traineddata",
+  "share/tessdata/eng.traineddata",
+  "share/tessdata/enm.traineddata",
+  "share/tessdata/epo.traineddata",
+  "share/tessdata/equ.traineddata",
+  "share/tessdata/est.traineddata",
+  "share/tessdata/eus.traineddata",
+  "share/tessdata/fao.traineddata",
+  "share/tessdata/fas.traineddata",
+  "share/tessdata/fil.traineddata",
+  "share/tessdata/fin.traineddata",
+  "share/tessdata/fra.traineddata",
+  "share/tessdata/frk.traineddata",
+  "share/tessdata/frm.traineddata",
+  "share/tessdata/fry.traineddata",
+  "share/tessdata/gla.traineddata",
+  "share/tessdata/gle.traineddata",
+  "share/tessdata/glg.traineddata",
+  "share/tessdata/grc.traineddata",
+  "share/tessdata/guj.traineddata",
+  "share/tessdata/hat.traineddata",
+  "share/tessdata/heb.traineddata",
+  "share/tessdata/hin.traineddata",
+  "share/tessdata/hrv.traineddata",
+  "share/tessdata/hun.traineddata",
+  "share/tessdata/hye.traineddata",
+  "share/tessdata/iku.traineddata",
+  "share/tessdata/ind.traineddata",
+  "share/tessdata/isl.traineddata",
+  "share/tessdata/ita.traineddata",
+  "share/tessdata/ita_old.traineddata",
+  "share/tessdata/jav.traineddata",
+  "share/tessdata/jpn.traineddata",
+  "share/tessdata/jpn_vert.traineddata",
+  "share/tessdata/kan.traineddata",
+  "share/tessdata/kat.traineddata",
+  "share/tessdata/kat_old.traineddata",
+  "share/tessdata/kaz.traineddata",
+  "share/tessdata/khm.traineddata",
+  "share/tessdata/kir.traineddata",
+  "share/tessdata/kmr.traineddata",
+  "share/tessdata/kor.traineddata",
+  "share/tessdata/kor_vert.traineddata",
+  "share/tessdata/lao.traineddata",
+  "share/tessdata/lat.traineddata",
+  "share/tessdata/lav.traineddata",
+  "share/tessdata/lit.traineddata",
+  "share/tessdata/ltz.traineddata",
+  "share/tessdata/mal.traineddata",
+  "share/tessdata/mar.traineddata",
+  "share/tessdata/mkd.traineddata",
+  "share/tessdata/mlt.traineddata",
+  "share/tessdata/mon.traineddata",
+  "share/tessdata/mri.traineddata",
+  "share/tessdata/msa.traineddata",
+  "share/tessdata/mya.traineddata",
+  "share/tessdata/nep.traineddata",
+  "share/tessdata/nld.traineddata",
+  "share/tessdata/nor.traineddata",
+  "share/tessdata/oci.traineddata",
+  "share/tessdata/ori.traineddata",
+  "share/tessdata/osd.traineddata",
+  "share/tessdata/pan.traineddata",
+  "share/tessdata/pdf.ttf",
+  "share/tessdata/pol.traineddata",
+  "share/tessdata/por.traineddata",
+  "share/tessdata/pus.traineddata",
+  "share/tessdata/que.traineddata",
+  "share/tessdata/ron.traineddata",
+  "share/tessdata/rus.traineddata",
+  "share/tessdata/san.traineddata",
+  "share/tessdata/sin.traineddata",
+  "share/tessdata/slk.traineddata",
+  "share/tessdata/slv.traineddata",
+  "share/tessdata/snd.traineddata",
+  "share/tessdata/spa.traineddata",
+  "share/tessdata/spa_old.traineddata",
+  "share/tessdata/sqi.traineddata",
+  "share/tessdata/srp.traineddata",
+  "share/tessdata/srp_latn.traineddata",
+  "share/tessdata/sun.traineddata",
+  "share/tessdata/swa.traineddata",
+  "share/tessdata/swe.traineddata",
+  "share/tessdata/syr.traineddata",
+  "share/tessdata/tam.traineddata",
+  "share/tessdata/tat.traineddata",
+  "share/tessdata/tel.traineddata",
+  "share/tessdata/tessconfigs/batch",
+  "share/tessdata/tessconfigs/batch.nochop",
+  "share/tessdata/tessconfigs/matdemo",
+  "share/tessdata/tessconfigs/msdemo",
+  "share/tessdata/tessconfigs/nobatch",
+  "share/tessdata/tessconfigs/segdemo",
+  "share/tessdata/tgk.traineddata",
+  "share/tessdata/tha.traineddata",
+  "share/tessdata/tir.traineddata",
+  "share/tessdata/ton.traineddata",
+  "share/tessdata/tur.traineddata",
+  "share/tessdata/uig.traineddata",
+  "share/tessdata/ukr.traineddata",
+  "share/tessdata/urd.traineddata",
+  "share/tessdata/uzb.traineddata",
+  "share/tessdata/uzb_cyrl.traineddata",
+  "share/tessdata/vie.traineddata",
+  "share/tessdata/yid.traineddata",
+  "share/tessdata/yor.traineddata"
+ ],
+ "fn": "tesseract-5.2.0-hb0d2e87_3.conda",
+ "license": "Apache-2.0",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "b2ff9761ab066782b8ac131196279356",
+ "name": "tesseract",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "bin/tesseract",
+    "path_type": "hardlink",
+    "sha256": "d02de7509ecdf53cc3f0d7cc2f1db6158a20f6a46deb0b9433ce8da955d5f247",
+    "sha256_in_prefix": "d02de7509ecdf53cc3f0d7cc2f1db6158a20f6a46deb0b9433ce8da955d5f247",
+    "size_in_bytes": 55392
+   },
+   {
+    "_path": "etc/conda/activate.d/tesseract_activate.ps1",
+    "path_type": "hardlink",
+    "sha256": "551ce398b58378bef86fb0d06ff40dfac84ff935e3c7d687a19601371cb723a1",
+    "sha256_in_prefix": "551ce398b58378bef86fb0d06ff40dfac84ff935e3c7d687a19601371cb723a1",
+    "size_in_bytes": 84
+   },
+   {
+    "_path": "etc/conda/activate.d/tesseract_activate.sh",
+    "path_type": "hardlink",
+    "sha256": "d0736f3294756e42b1a1a864705d84276155707ef4546204180329a196693f18",
+    "sha256_in_prefix": "d0736f3294756e42b1a1a864705d84276155707ef4546204180329a196693f18",
+    "size_in_bytes": 53
+   },
+   {
+    "_path": "etc/conda/deactivate.d/tesseract_deactivate.ps1",
+    "path_type": "hardlink",
+    "sha256": "d448ec0c354d44eb477c49d41718608c4408af7053b0d37872263384b5d26f56",
+    "sha256_in_prefix": "d448ec0c354d44eb477c49d41718608c4408af7053b0d37872263384b5d26f56",
+    "size_in_bytes": 112
+   },
+   {
+    "_path": "etc/conda/deactivate.d/tesseract_deactivate.sh",
+    "path_type": "hardlink",
+    "sha256": "17c2dadd65650f4de995d4cf6adf40481d8d0869c90e61d99d20145ddf55367b",
+    "sha256_in_prefix": "17c2dadd65650f4de995d4cf6adf40481d8d0869c90e61d99d20145ddf55367b",
+    "size_in_bytes": 22
+   },
+   {
+    "_path": "include/tesseract/baseapi.h",
+    "path_type": "hardlink",
+    "sha256": "8ce1430c684e20108077c583f96976a527ff6d8679843de13788469b57d40ea1",
+    "sha256_in_prefix": "8ce1430c684e20108077c583f96976a527ff6d8679843de13788469b57d40ea1",
+    "size_in_bytes": 31674
+   },
+   {
+    "_path": "include/tesseract/capi.h",
+    "path_type": "hardlink",
+    "sha256": "7101ef2fa1adcd225cdd20f5c347f0736df0f74f760683de9a74a039adfd9aad",
+    "sha256_in_prefix": "7101ef2fa1adcd225cdd20f5c347f0736df0f74f760683de9a74a039adfd9aad",
+    "size_in_bytes": 20963
+   },
+   {
+    "_path": "include/tesseract/export.h",
+    "path_type": "hardlink",
+    "sha256": "b894104a670bf5db67c859489236ed6dae7be62deb98747eba6792d8343a1b3f",
+    "sha256_in_prefix": "b894104a670bf5db67c859489236ed6dae7be62deb98747eba6792d8343a1b3f",
+    "size_in_bytes": 1214
+   },
+   {
+    "_path": "include/tesseract/ltrresultiterator.h",
+    "path_type": "hardlink",
+    "sha256": "3ce20126f70f90cb4504d2ceed7ab05382d208e49cc7f713eaaeddc5558c2106",
+    "sha256_in_prefix": "3ce20126f70f90cb4504d2ceed7ab05382d208e49cc7f713eaaeddc5558c2106",
+    "size_in_bytes": 10291
+   },
+   {
+    "_path": "include/tesseract/ocrclass.h",
+    "path_type": "hardlink",
+    "sha256": "a135300cc52f50795a1c4f49419d208c63ea0c740f6c5d5bc863a71db4165715",
+    "sha256_in_prefix": "a135300cc52f50795a1c4f49419d208c63ea0c740f6c5d5bc863a71db4165715",
+    "size_in_bytes": 7177
+   },
+   {
+    "_path": "include/tesseract/osdetect.h",
+    "path_type": "hardlink",
+    "sha256": "1a5e6bb94e1b04810540aa957d409f3f245f307149d8525e7573e702c911e30c",
+    "sha256_in_prefix": "1a5e6bb94e1b04810540aa957d409f3f245f307149d8525e7573e702c911e30c",
+    "size_in_bytes": 4511
+   },
+   {
+    "_path": "include/tesseract/pageiterator.h",
+    "path_type": "hardlink",
+    "sha256": "42532e36d93074244c3c7cae13428d29da29b18bcf1b4c17a649d5f51203ec07",
+    "sha256_in_prefix": "42532e36d93074244c3c7cae13428d29da29b18bcf1b4c17a649d5f51203ec07",
+    "size_in_bytes": 15156
+   },
+   {
+    "_path": "include/tesseract/publictypes.h",
+    "path_type": "hardlink",
+    "sha256": "33d1c27b4bbbc1cfe05d9df2952bd0d8f924e06965a105756c0acbb6cef2ce43",
+    "sha256_in_prefix": "33d1c27b4bbbc1cfe05d9df2952bd0d8f924e06965a105756c0acbb6cef2ce43",
+    "size_in_bytes": 12079
+   },
+   {
+    "_path": "include/tesseract/renderer.h",
+    "path_type": "hardlink",
+    "sha256": "38d7ef848d4cf08a20e34c82ea422fc5bf58e1846c297b88f41cf30eb34b0173",
+    "sha256_in_prefix": "38d7ef848d4cf08a20e34c82ea422fc5bf58e1846c297b88f41cf30eb34b0173",
+    "size_in_bytes": 9938
+   },
+   {
+    "_path": "include/tesseract/resultiterator.h",
+    "path_type": "hardlink",
+    "sha256": "7c3b1b8112b0e167b564866191afb7bdb1c0c6e537c3d48469391a1def968d66",
+    "sha256_in_prefix": "7c3b1b8112b0e167b564866191afb7bdb1c0c6e537c3d48469391a1def968d66",
+    "size_in_bytes": 9484
+   },
+   {
+    "_path": "include/tesseract/unichar.h",
+    "path_type": "hardlink",
+    "sha256": "e037b51c0ef8a50cd7ce16b47f017cb1d02d882edfc60dbe159fad9c21988672",
+    "sha256_in_prefix": "e037b51c0ef8a50cd7ce16b47f017cb1d02d882edfc60dbe159fad9c21988672",
+    "size_in_bytes": 6305
+   },
+   {
+    "_path": "include/tesseract/version.h",
+    "path_type": "hardlink",
+    "sha256": "6c020d9dc6f0c1b2ddd524868c370aa131aa33524bcc880b45f3fc408a116861",
+    "sha256_in_prefix": "6c020d9dc6f0c1b2ddd524868c370aa131aa33524bcc880b45f3fc408a116861",
+    "size_in_bytes": 1110
+   },
+   {
+    "_path": "lib/libtesseract.a",
+    "file_mode": "binary",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/home/task_175741631384762/conda-bld/tesseract_1757416493798/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "12505a1a475df2daff0a417d4a1cdbd5f1bdc101c5ba32ebbae1ade713bf3ae5",
+    "sha256_in_prefix": "0ac0a2ceb729e107a8e20c4fcccf6c4ac87be714e5cbb0e7e3123d3c406d63f9",
+    "size_in_bytes": 8609882
+   },
+   {
+    "_path": "lib/libtesseract.so",
+    "path_type": "softlink",
+    "sha256": "854897dbbd2c49c39fd054bc9ceef3d6aa37bec1f21a5f2616c1b14ae0babf97",
+    "size_in_bytes": 3971080
+   },
+   {
+    "_path": "lib/libtesseract.so.5",
+    "path_type": "softlink",
+    "sha256": "854897dbbd2c49c39fd054bc9ceef3d6aa37bec1f21a5f2616c1b14ae0babf97",
+    "size_in_bytes": 3971080
+   },
+   {
+    "_path": "lib/libtesseract.so.5.0.2",
+    "file_mode": "binary",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/home/task_175741631384762/conda-bld/tesseract_1757416493798/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "854897dbbd2c49c39fd054bc9ceef3d6aa37bec1f21a5f2616c1b14ae0babf97",
+    "sha256_in_prefix": "1e53b9612f5bd7f2fa63b7cf1cb2576f521a6bd0a2f42b0e9338f81c88318600",
+    "size_in_bytes": 3971080
+   },
+   {
+    "_path": "lib/pkgconfig/tesseract.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/home/task_175741631384762/conda-bld/tesseract_1757416493798/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "cff311500bcc048faa15032f3f7e3ca0f6b25da70eda27fdaeae13327ee4c9d4",
+    "sha256_in_prefix": "3bae65bd0048e2c3fc616429c3e56125554833f2b7565d4aea1141b466a7b687",
+    "size_in_bytes": 976
+   },
+   {
+    "_path": "share/tessdata/afr.traineddata",
+    "path_type": "hardlink",
+    "sha256": "126d480bfae95be2a911ed4916465e27bde75fea2da631e21b96762e5f239646",
+    "sha256_in_prefix": "126d480bfae95be2a911ed4916465e27bde75fea2da631e21b96762e5f239646",
+    "size_in_bytes": 2652786
+   },
+   {
+    "_path": "share/tessdata/amh.traineddata",
+    "path_type": "hardlink",
+    "sha256": "3ec3311833a108e07d58a1152b00c0cf1848752e4f85769d46e8ca2b718a2ccc",
+    "sha256_in_prefix": "3ec3311833a108e07d58a1152b00c0cf1848752e4f85769d46e8ca2b718a2ccc",
+    "size_in_bytes": 5470094
+   },
+   {
+    "_path": "share/tessdata/ara.traineddata",
+    "path_type": "hardlink",
+    "sha256": "e3206d3dc87fd50c24a0fb9f01838615911d25168f4e64415244b67d2bb3e729",
+    "sha256_in_prefix": "e3206d3dc87fd50c24a0fb9f01838615911d25168f4e64415244b67d2bb3e729",
+    "size_in_bytes": 1432056
+   },
+   {
+    "_path": "share/tessdata/asm.traineddata",
+    "path_type": "hardlink",
+    "sha256": "299c7f6135ac72ca4820d4c39e3cf65b32b24127fc78c4938d11153adbb9fa77",
+    "sha256_in_prefix": "299c7f6135ac72ca4820d4c39e3cf65b32b24127fc78c4938d11153adbb9fa77",
+    "size_in_bytes": 2045427
+   },
+   {
+    "_path": "share/tessdata/aze.traineddata",
+    "path_type": "hardlink",
+    "sha256": "a365310848aecb739f19369cb3831d4660fcd9345d798e91a3042455f9ccc9f0",
+    "sha256_in_prefix": "a365310848aecb739f19369cb3831d4660fcd9345d798e91a3042455f9ccc9f0",
+    "size_in_bytes": 3524799
+   },
+   {
+    "_path": "share/tessdata/aze_cyrl.traineddata",
+    "path_type": "hardlink",
+    "sha256": "2e96ab67817819e14a3a2d6250261130457c8e78dde3077841ab391fe003551c",
+    "sha256_in_prefix": "2e96ab67817819e14a3a2d6250261130457c8e78dde3077841ab391fe003551c",
+    "size_in_bytes": 1943672
+   },
+   {
+    "_path": "share/tessdata/bel.traineddata",
+    "path_type": "hardlink",
+    "sha256": "9c6668a0b202f3dcfe074b64620d108e1902ca7498a40b5a11b4a3da6112d58f",
+    "sha256_in_prefix": "9c6668a0b202f3dcfe074b64620d108e1902ca7498a40b5a11b4a3da6112d58f",
+    "size_in_bytes": 3692098
+   },
+   {
+    "_path": "share/tessdata/ben.traineddata",
+    "path_type": "hardlink",
+    "sha256": "31163084c279aaebd376216f0c3d5c17ad4b5fee8db49dae79c20000b5de5964",
+    "sha256_in_prefix": "31163084c279aaebd376216f0c3d5c17ad4b5fee8db49dae79c20000b5de5964",
+    "size_in_bytes": 855841
+   },
+   {
+    "_path": "share/tessdata/bod.traineddata",
+    "path_type": "hardlink",
+    "sha256": "1aab1db8dae337dfc8fa0f94a1c137c47e4c7857c3e6b30093ec726cef912a0b",
+    "sha256_in_prefix": "1aab1db8dae337dfc8fa0f94a1c137c47e4c7857c3e6b30093ec726cef912a0b",
+    "size_in_bytes": 1966440
+   },
+   {
+    "_path": "share/tessdata/bos.traineddata",
+    "path_type": "hardlink",
+    "sha256": "6cc8cc87cf1afbfa6a41febb725dbadb14bed96a46685906440a6eb8a7892f04",
+    "sha256_in_prefix": "6cc8cc87cf1afbfa6a41febb725dbadb14bed96a46685906440a6eb8a7892f04",
+    "size_in_bytes": 2498242
+   },
+   {
+    "_path": "share/tessdata/bre.traineddata",
+    "path_type": "hardlink",
+    "sha256": "db8b31f76b986d63b82dfff9e84e252bf5f7dc53d9128167aaab18b3ec96dd49",
+    "sha256_in_prefix": "db8b31f76b986d63b82dfff9e84e252bf5f7dc53d9128167aaab18b3ec96dd49",
+    "size_in_bytes": 6335007
+   },
+   {
+    "_path": "share/tessdata/bul.traineddata",
+    "path_type": "hardlink",
+    "sha256": "aebc9b0fcc8cfaf8a9f38a02bb7b85052bd850744696a2c11cf0081820e5b21e",
+    "sha256_in_prefix": "aebc9b0fcc8cfaf8a9f38a02bb7b85052bd850744696a2c11cf0081820e5b21e",
+    "size_in_bytes": 1675212
+   },
+   {
+    "_path": "share/tessdata/cat.traineddata",
+    "path_type": "hardlink",
+    "sha256": "250db73cd5b380d2798581295dc12f20d0828cdb335a65d833d12dfdbf57117d",
+    "sha256_in_prefix": "250db73cd5b380d2798581295dc12f20d0828cdb335a65d833d12dfdbf57117d",
+    "size_in_bytes": 1146012
+   },
+   {
+    "_path": "share/tessdata/ceb.traineddata",
+    "path_type": "hardlink",
+    "sha256": "346a39de801495c93ece6656d018d7d19d298af7db42d82ebae99dfe8ee14961",
+    "sha256_in_prefix": "346a39de801495c93ece6656d018d7d19d298af7db42d82ebae99dfe8ee14961",
+    "size_in_bytes": 716214
+   },
+   {
+    "_path": "share/tessdata/ces.traineddata",
+    "path_type": "hardlink",
+    "sha256": "934bcaf97ef3348413263331131c9fa7f55f30db333c711929c124fb635f7e1b",
+    "sha256_in_prefix": "934bcaf97ef3348413263331131c9fa7f55f30db333c711929c124fb635f7e1b",
+    "size_in_bytes": 3795684
+   },
+   {
+    "_path": "share/tessdata/chi_sim.traineddata",
+    "path_type": "hardlink",
+    "sha256": "a5fcb6f0db1e1d6d8522f39db4e848f05984669172e584e8d76b6b3141e1f730",
+    "sha256_in_prefix": "a5fcb6f0db1e1d6d8522f39db4e848f05984669172e584e8d76b6b3141e1f730",
+    "size_in_bytes": 2469156
+   },
+   {
+    "_path": "share/tessdata/chi_sim_vert.traineddata",
+    "path_type": "hardlink",
+    "sha256": "20590de84725bab69cde93bd6e8ed360a13cc5421a7e7364ddeb93e9af53d6da",
+    "sha256_in_prefix": "20590de84725bab69cde93bd6e8ed360a13cc5421a7e7364ddeb93e9af53d6da",
+    "size_in_bytes": 1927902
+   },
+   {
+    "_path": "share/tessdata/chi_tra.traineddata",
+    "path_type": "hardlink",
+    "sha256": "529c5b5797d64b126065cd55f2bb4c7fd7b15790798091b1ff259941a829330b",
+    "sha256_in_prefix": "529c5b5797d64b126065cd55f2bb4c7fd7b15790798091b1ff259941a829330b",
+    "size_in_bytes": 2366642
+   },
+   {
+    "_path": "share/tessdata/chi_tra_vert.traineddata",
+    "path_type": "hardlink",
+    "sha256": "1df02a4b210e5c217b783819538b63e9dfe6904e2b5e53b62664f1b9f7a989d0",
+    "sha256_in_prefix": "1df02a4b210e5c217b783819538b63e9dfe6904e2b5e53b62664f1b9f7a989d0",
+    "size_in_bytes": 1824756
+   },
+   {
+    "_path": "share/tessdata/chr.traineddata",
+    "path_type": "hardlink",
+    "sha256": "a4da60d844ebb9dbaeb8843a92290083c1fd275b167fc9c9686d790ccd311fab",
+    "sha256_in_prefix": "a4da60d844ebb9dbaeb8843a92290083c1fd275b167fc9c9686d790ccd311fab",
+    "size_in_bytes": 374944
+   },
+   {
+    "_path": "share/tessdata/configs/alto",
+    "path_type": "hardlink",
+    "sha256": "23a038ff290c7471a1a8aa4b5d23e310b0bf49f718480dad6b619a7d06eca330",
+    "sha256_in_prefix": "23a038ff290c7471a1a8aa4b5d23e310b0bf49f718480dad6b619a7d06eca330",
+    "size_in_bytes": 23
+   },
+   {
+    "_path": "share/tessdata/configs/ambigs.train",
+    "path_type": "hardlink",
+    "sha256": "717e534fd4330ed3f9bdb006f0465aa2633cca866786a8f8d469dbd4b01c10c2",
+    "sha256_in_prefix": "717e534fd4330ed3f9bdb006f0465aa2633cca866786a8f8d469dbd4b01c10c2",
+    "size_in_bytes": 146
+   },
+   {
+    "_path": "share/tessdata/configs/api_config",
+    "path_type": "hardlink",
+    "sha256": "2929bc0f1d2ba77f28cfc230f7b835b2b54038c0f9d2e8e4c5ada43803c999fd",
+    "sha256_in_prefix": "2929bc0f1d2ba77f28cfc230f7b835b2b54038c0f9d2e8e4c5ada43803c999fd",
+    "size_in_bytes": 26
+   },
+   {
+    "_path": "share/tessdata/configs/bigram",
+    "path_type": "hardlink",
+    "sha256": "65e6583abc617a34d4091285181f2493d312c296a85629ac3c092d3b93b6e554",
+    "sha256_in_prefix": "65e6583abc617a34d4091285181f2493d312c296a85629ac3c092d3b93b6e554",
+    "size_in_bytes": 129
+   },
+   {
+    "_path": "share/tessdata/configs/box.train",
+    "path_type": "hardlink",
+    "sha256": "a421355e3488bf3fdfc14a1bdcca08c6f6414ec92c53f0eea22317c868c1a623",
+    "sha256_in_prefix": "a421355e3488bf3fdfc14a1bdcca08c6f6414ec92c53f0eea22317c868c1a623",
+    "size_in_bytes": 311
+   },
+   {
+    "_path": "share/tessdata/configs/box.train.stderr",
+    "path_type": "hardlink",
+    "sha256": "3e62cd37d2383abf0c6dfa5ba39fd1187fcff6856c4f4f27ea1554cb4c1874d2",
+    "sha256_in_prefix": "3e62cd37d2383abf0c6dfa5ba39fd1187fcff6856c4f4f27ea1554cb4c1874d2",
+    "size_in_bytes": 311
+   },
+   {
+    "_path": "share/tessdata/configs/digits",
+    "path_type": "hardlink",
+    "sha256": "e757d95bb1e51444860ea10d7f2c8bb8a0c9c4ccc58a0e8c67e8dc2933a56e2e",
+    "sha256_in_prefix": "e757d95bb1e51444860ea10d7f2c8bb8a0c9c4ccc58a0e8c67e8dc2933a56e2e",
+    "size_in_bytes": 37
+   },
+   {
+    "_path": "share/tessdata/configs/get.images",
+    "path_type": "hardlink",
+    "sha256": "28c774c157a2f48d835a1d58f5a35dd70106c136e176572ee43bbf46f3d65c92",
+    "sha256_in_prefix": "28c774c157a2f48d835a1d58f5a35dd70106c136e176572ee43bbf46f3d65c92",
+    "size_in_bytes": 24
+   },
+   {
+    "_path": "share/tessdata/configs/hocr",
+    "path_type": "hardlink",
+    "sha256": "d6a7ec7c5143317a59fce2393054f6b7a8261824b934e7426fdd24febc929ad6",
+    "sha256_in_prefix": "d6a7ec7c5143317a59fce2393054f6b7a8261824b934e7426fdd24febc929ad6",
+    "size_in_bytes": 40
+   },
+   {
+    "_path": "share/tessdata/configs/inter",
+    "path_type": "hardlink",
+    "sha256": "46303bf83668e446f4966d1ebf7418ad9f0c5e08836bc59d98cae3bbfc3aee9d",
+    "sha256_in_prefix": "46303bf83668e446f4966d1ebf7418ad9f0c5e08836bc59d98cae3bbfc3aee9d",
+    "size_in_bytes": 59
+   },
+   {
+    "_path": "share/tessdata/configs/kannada",
+    "path_type": "hardlink",
+    "sha256": "7d34fec99283142a3a22d157dc5cc8824b93ee923e576e6bfd1b026039c2e8f0",
+    "sha256_in_prefix": "7d34fec99283142a3a22d157dc5cc8824b93ee923e576e6bfd1b026039c2e8f0",
+    "size_in_bytes": 101
+   },
+   {
+    "_path": "share/tessdata/configs/linebox",
+    "path_type": "hardlink",
+    "sha256": "eb0279527b009a53432a9e1dde85bf42814901393546bc365bb61837f83355c9",
+    "sha256_in_prefix": "eb0279527b009a53432a9e1dde85bf42814901393546bc365bb61837f83355c9",
+    "size_in_bytes": 70
+   },
+   {
+    "_path": "share/tessdata/configs/logfile",
+    "path_type": "hardlink",
+    "sha256": "5eed5e41e5fbbf0862836c0e4cda7821f8e08441645858ec6821ab41d926e195",
+    "sha256_in_prefix": "5eed5e41e5fbbf0862836c0e4cda7821f8e08441645858ec6821ab41d926e195",
+    "size_in_bytes": 25
+   },
+   {
+    "_path": "share/tessdata/configs/lstm.train",
+    "path_type": "hardlink",
+    "sha256": "3d1f8e5ab4e41467fdd938dc4d266eea081b477f8d74ab6b198dd1d854b5301c",
+    "sha256_in_prefix": "3d1f8e5ab4e41467fdd938dc4d266eea081b477f8d74ab6b198dd1d854b5301c",
+    "size_in_bytes": 282
+   },
+   {
+    "_path": "share/tessdata/configs/lstmbox",
+    "path_type": "hardlink",
+    "sha256": "61255d1b7c9df76b673ff43d2d91cda7f4c3c2e7d7f0643a71b212739833017e",
+    "sha256_in_prefix": "61255d1b7c9df76b673ff43d2d91cda7f4c3c2e7d7f0643a71b212739833017e",
+    "size_in_bytes": 26
+   },
+   {
+    "_path": "share/tessdata/configs/lstmdebug",
+    "path_type": "hardlink",
+    "sha256": "62d40d7a7d80315e10cdca2561d2ddf2981f53dfdbd567513b04d36f3add7f4e",
+    "sha256_in_prefix": "62d40d7a7d80315e10cdca2561d2ddf2981f53dfdbd567513b04d36f3add7f4e",
+    "size_in_bytes": 98
+   },
+   {
+    "_path": "share/tessdata/configs/makebox",
+    "path_type": "hardlink",
+    "sha256": "a8fe20a2bc9ff1e9e8ed06d56845336c978627b8e965600abd63f1f412c18ffe",
+    "sha256_in_prefix": "a8fe20a2bc9ff1e9e8ed06d56845336c978627b8e965600abd63f1f412c18ffe",
+    "size_in_bytes": 26
+   },
+   {
+    "_path": "share/tessdata/configs/pdf",
+    "path_type": "hardlink",
+    "sha256": "54d56e81dfefe289b0d2e4c7bc9bbe662711f5b8255c128b73bcd66efb6bba1a",
+    "sha256_in_prefix": "54d56e81dfefe289b0d2e4c7bc9bbe662711f5b8255c128b73bcd66efb6bba1a",
+    "size_in_bytes": 22
+   },
+   {
+    "_path": "share/tessdata/configs/quiet",
+    "path_type": "hardlink",
+    "sha256": "8a93fad8251f61b5f17b8628203a0e068c71e0907cd63012ab22afb7b560fce3",
+    "sha256_in_prefix": "8a93fad8251f61b5f17b8628203a0e068c71e0907cd63012ab22afb7b560fce3",
+    "size_in_bytes": 21
+   },
+   {
+    "_path": "share/tessdata/configs/rebox",
+    "path_type": "hardlink",
+    "sha256": "73ca35d7d71084fb88e2eb9a5c53ad91682754b3aecb918dece7591ec22a0b26",
+    "sha256_in_prefix": "73ca35d7d71084fb88e2eb9a5c53ad91682754b3aecb918dece7591ec22a0b26",
+    "size_in_bytes": 65
+   },
+   {
+    "_path": "share/tessdata/configs/strokewidth",
+    "path_type": "hardlink",
+    "sha256": "ffb140aadd3e26d0d9b3b355d592b50cff8b2c3ce0394b4a6de4fabc1c0942c9",
+    "sha256_in_prefix": "ffb140aadd3e26d0d9b3b355d592b50cff8b2c3ce0394b4a6de4fabc1c0942c9",
+    "size_in_bytes": 377
+   },
+   {
+    "_path": "share/tessdata/configs/tsv",
+    "path_type": "hardlink",
+    "sha256": "59d079bb75d8b3d7c839a3564580cb559e362c93a9d70f234e421c0c3e767e04",
+    "sha256_in_prefix": "59d079bb75d8b3d7c839a3564580cb559e362c93a9d70f234e421c0c3e767e04",
+    "size_in_bytes": 22
+   },
+   {
+    "_path": "share/tessdata/configs/txt",
+    "path_type": "hardlink",
+    "sha256": "7489fb4951fd181914271408577809f8747445adb9d498332b96928afd72a650",
+    "sha256_in_prefix": "7489fb4951fd181914271408577809f8747445adb9d498332b96928afd72a650",
+    "size_in_bytes": 166
+   },
+   {
+    "_path": "share/tessdata/configs/unlv",
+    "path_type": "hardlink",
+    "sha256": "1b02e7801de71f0757a26ba6d749e9182a0d9971929966bebb67f99db8733f40",
+    "sha256_in_prefix": "1b02e7801de71f0757a26ba6d749e9182a0d9971929966bebb67f99db8733f40",
+    "size_in_bytes": 45
+   },
+   {
+    "_path": "share/tessdata/configs/wordstrbox",
+    "path_type": "hardlink",
+    "sha256": "9d1787cdce085ad36dc9d6ba6b2702ac262beaf06a0bb4a0b84355f6458261e5",
+    "sha256_in_prefix": "9d1787cdce085ad36dc9d6ba6b2702ac262beaf06a0bb4a0b84355f6458261e5",
+    "size_in_bytes": 29
+   },
+   {
+    "_path": "share/tessdata/cos.traineddata",
+    "path_type": "hardlink",
+    "sha256": "018952d1b4b3d4fd6ee5ebbacf90603c9cef6221951359937c274fe1f190f8d3",
+    "sha256_in_prefix": "018952d1b4b3d4fd6ee5ebbacf90603c9cef6221951359937c274fe1f190f8d3",
+    "size_in_bytes": 2299099
+   },
+   {
+    "_path": "share/tessdata/cym.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7f6ee3374749645a7c92dfe773f5c3d6492194d371712ecfd775edc53c363fb4",
+    "sha256_in_prefix": "7f6ee3374749645a7c92dfe773f5c3d6492194d371712ecfd775edc53c363fb4",
+    "size_in_bytes": 2208919
+   },
+   {
+    "_path": "share/tessdata/dan.traineddata",
+    "path_type": "hardlink",
+    "sha256": "acb1fd074487a31d1294fcdfd7d7c673467ffd8aeacb2ccd61ebcbf04eb4e2fa",
+    "sha256_in_prefix": "acb1fd074487a31d1294fcdfd7d7c673467ffd8aeacb2ccd61ebcbf04eb4e2fa",
+    "size_in_bytes": 2580059
+   },
+   {
+    "_path": "share/tessdata/deu.traineddata",
+    "path_type": "hardlink",
+    "sha256": "19d219bbb6672c869d20a9636c6816a81eb9a71796cb93ebe0cb1530e2cdb22d",
+    "sha256_in_prefix": "19d219bbb6672c869d20a9636c6816a81eb9a71796cb93ebe0cb1530e2cdb22d",
+    "size_in_bytes": 1525436
+   },
+   {
+    "_path": "share/tessdata/div.traineddata",
+    "path_type": "hardlink",
+    "sha256": "06051412588963b34b663cc59a468dbf10753329f015ccd574ee711e8c6b84c3",
+    "sha256_in_prefix": "06051412588963b34b663cc59a468dbf10753329f015ccd574ee711e8c6b84c3",
+    "size_in_bytes": 1774535
+   },
+   {
+    "_path": "share/tessdata/dzo.traineddata",
+    "path_type": "hardlink",
+    "sha256": "364d244fad3f8d4438c9f7ee7642b9b876a4620cf76c0115619b979d6bfef1fa",
+    "sha256_in_prefix": "364d244fad3f8d4438c9f7ee7642b9b876a4620cf76c0115619b979d6bfef1fa",
+    "size_in_bytes": 449596
+   },
+   {
+    "_path": "share/tessdata/ell.traineddata",
+    "path_type": "hardlink",
+    "sha256": "4fba8a0b461038d51f1c20d043d4f2ac38c4e778f1b90830847f7bd8fa3ba726",
+    "sha256_in_prefix": "4fba8a0b461038d51f1c20d043d4f2ac38c4e778f1b90830847f7bd8fa3ba726",
+    "size_in_bytes": 1419514
+   },
+   {
+    "_path": "share/tessdata/eng.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+    "sha256_in_prefix": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+    "size_in_bytes": 4113088
+   },
+   {
+    "_path": "share/tessdata/enm.traineddata",
+    "path_type": "hardlink",
+    "sha256": "d312ab5aafc9f99a78082c75e035b0873d2da6cb6d95cde03e219c1b26750034",
+    "sha256_in_prefix": "d312ab5aafc9f99a78082c75e035b0873d2da6cb6d95cde03e219c1b26750034",
+    "size_in_bytes": 3101551
+   },
+   {
+    "_path": "share/tessdata/epo.traineddata",
+    "path_type": "hardlink",
+    "sha256": "71181a6a07af3812aeedfa1aa993623424f4b8a6aac3e271b36ec11774e674d9",
+    "sha256_in_prefix": "71181a6a07af3812aeedfa1aa993623424f4b8a6aac3e271b36ec11774e674d9",
+    "size_in_bytes": 4728393
+   },
+   {
+    "_path": "share/tessdata/equ.traineddata",
+    "path_type": "hardlink",
+    "sha256": "8f660323d8a7b7a0e8d2fae1a3439e6e470222bfbb990b2ab7fe9e1fb4791c0b",
+    "sha256_in_prefix": "8f660323d8a7b7a0e8d2fae1a3439e6e470222bfbb990b2ab7fe9e1fb4791c0b",
+    "size_in_bytes": 2251950
+   },
+   {
+    "_path": "share/tessdata/est.traineddata",
+    "path_type": "hardlink",
+    "sha256": "515d4a773682b286369511e83fe412bcff16a92a886f99c761c1d760a7e30456",
+    "sha256_in_prefix": "515d4a773682b286369511e83fe412bcff16a92a886f99c761c1d760a7e30456",
+    "size_in_bytes": 4458101
+   },
+   {
+    "_path": "share/tessdata/eus.traineddata",
+    "path_type": "hardlink",
+    "sha256": "40e7418296c355d9fd9ca843d115c51e740089e576e887443e61704823cd6624",
+    "sha256_in_prefix": "40e7418296c355d9fd9ca843d115c51e740089e576e887443e61704823cd6624",
+    "size_in_bytes": 5175921
+   },
+   {
+    "_path": "share/tessdata/fao.traineddata",
+    "path_type": "hardlink",
+    "sha256": "0ed46203c283c952b7de0530d1c6e6ac9a25a79773fb89cadd149275ffea9a80",
+    "sha256_in_prefix": "0ed46203c283c952b7de0530d1c6e6ac9a25a79773fb89cadd149275ffea9a80",
+    "size_in_bytes": 3439772
+   },
+   {
+    "_path": "share/tessdata/fas.traineddata",
+    "path_type": "hardlink",
+    "sha256": "db1c0a91208aff00d3cf1ed2c1d23f76419afd5f024688b4f71adc3f2ce4a505",
+    "sha256_in_prefix": "db1c0a91208aff00d3cf1ed2c1d23f76419afd5f024688b4f71adc3f2ce4a505",
+    "size_in_bytes": 431500
+   },
+   {
+    "_path": "share/tessdata/fil.traineddata",
+    "path_type": "hardlink",
+    "sha256": "2b17f68014ab44b88b5e2334ebcd0ce0090d9af7c6fbef6fab22e0bbd9a934dd",
+    "sha256_in_prefix": "2b17f68014ab44b88b5e2334ebcd0ce0090d9af7c6fbef6fab22e0bbd9a934dd",
+    "size_in_bytes": 1841715
+   },
+   {
+    "_path": "share/tessdata/fin.traineddata",
+    "path_type": "hardlink",
+    "sha256": "61a04cd62b507c3d9ae0e1cda399e6715ebf49dea9df47897c8acdcd3bd3e13c",
+    "sha256_in_prefix": "61a04cd62b507c3d9ae0e1cda399e6715ebf49dea9df47897c8acdcd3bd3e13c",
+    "size_in_bytes": 7865732
+   },
+   {
+    "_path": "share/tessdata/fra.traineddata",
+    "path_type": "hardlink",
+    "sha256": "ced037562e8c80c13122dece28dd477d399af80911a28791a66a63ac1e3445ca",
+    "sha256_in_prefix": "ced037562e8c80c13122dece28dd477d399af80911a28791a66a63ac1e3445ca",
+    "size_in_bytes": 1130365
+   },
+   {
+    "_path": "share/tessdata/frk.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7cd1b541e9d3884b9546a7d292c4f349cdb45ff646b4b43166dfc5099a8ad1a1",
+    "sha256_in_prefix": "7cd1b541e9d3884b9546a7d292c4f349cdb45ff646b4b43166dfc5099a8ad1a1",
+    "size_in_bytes": 6423052
+   },
+   {
+    "_path": "share/tessdata/frm.traineddata",
+    "path_type": "hardlink",
+    "sha256": "3fe6eed7108136a85dbbf53baf23d9fb435afe1262323f5fba7711b6c6048728",
+    "sha256_in_prefix": "3fe6eed7108136a85dbbf53baf23d9fb435afe1262323f5fba7711b6c6048728",
+    "size_in_bytes": 2024948
+   },
+   {
+    "_path": "share/tessdata/fry.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7c9dbc47ef3848e33b623d1b927dd4d998ed39ff750fbc0f14aeb0f627b5da15",
+    "sha256_in_prefix": "7c9dbc47ef3848e33b623d1b927dd4d998ed39ff750fbc0f14aeb0f627b5da15",
+    "size_in_bytes": 1906018
+   },
+   {
+    "_path": "share/tessdata/gla.traineddata",
+    "path_type": "hardlink",
+    "sha256": "cb7b206d9f56b601d1666683ea8a516c8bb9c04362dbb874fc9665b339b72adf",
+    "sha256_in_prefix": "cb7b206d9f56b601d1666683ea8a516c8bb9c04362dbb874fc9665b339b72adf",
+    "size_in_bytes": 3068307
+   },
+   {
+    "_path": "share/tessdata/gle.traineddata",
+    "path_type": "hardlink",
+    "sha256": "2fe9ba6119aac7e2a20d6cfb69ed91afe9520f41bc7e3a903f84280f2663858d",
+    "sha256_in_prefix": "2fe9ba6119aac7e2a20d6cfb69ed91afe9520f41bc7e3a903f84280f2663858d",
+    "size_in_bytes": 1181824
+   },
+   {
+    "_path": "share/tessdata/glg.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7947619c5544d86849f563bd737ad90dbea9f5319fbd838c4747a7a1cd40b260",
+    "sha256_in_prefix": "7947619c5544d86849f563bd737ad90dbea9f5319fbd838c4747a7a1cd40b260",
+    "size_in_bytes": 2554555
+   },
+   {
+    "_path": "share/tessdata/grc.traineddata",
+    "path_type": "hardlink",
+    "sha256": "57b735557eeb67503803cf9f99786dd0b62417931352601952a0b1a23b6c4759",
+    "sha256_in_prefix": "57b735557eeb67503803cf9f99786dd0b62417931352601952a0b1a23b6c4759",
+    "size_in_bytes": 2246328
+   },
+   {
+    "_path": "share/tessdata/guj.traineddata",
+    "path_type": "hardlink",
+    "sha256": "fa69658614b4946a9afae8853d67e0689838803dfa3d12c2e35ec53ee6f8df34",
+    "sha256_in_prefix": "fa69658614b4946a9afae8853d67e0689838803dfa3d12c2e35ec53ee6f8df34",
+    "size_in_bytes": 1418394
+   },
+   {
+    "_path": "share/tessdata/hat.traineddata",
+    "path_type": "hardlink",
+    "sha256": "842e489a0e0eb12c72b5cb12e9e6624aae5928de1d097d76445474c263ce8b5a",
+    "sha256_in_prefix": "842e489a0e0eb12c72b5cb12e9e6624aae5928de1d097d76445474c263ce8b5a",
+    "size_in_bytes": 1976902
+   },
+   {
+    "_path": "share/tessdata/heb.traineddata",
+    "path_type": "hardlink",
+    "sha256": "11f9e43ab227f786352a50f75c94c2e9906f1baba86d93276da19da7ce0904db",
+    "sha256_in_prefix": "11f9e43ab227f786352a50f75c94c2e9906f1baba86d93276da19da7ce0904db",
+    "size_in_bytes": 961404
+   },
+   {
+    "_path": "share/tessdata/hin.traineddata",
+    "path_type": "hardlink",
+    "sha256": "4c73ffc59d497c186b19d1e90f5d721d678ea6b2e277b719bee4e2af12271825",
+    "sha256_in_prefix": "4c73ffc59d497c186b19d1e90f5d721d678ea6b2e277b719bee4e2af12271825",
+    "size_in_bytes": 1122751
+   },
+   {
+    "_path": "share/tessdata/hrv.traineddata",
+    "path_type": "hardlink",
+    "sha256": "9e515d9832ce259dbab550b1cc6b998f8b929faf2edacaaca981b05adb130571",
+    "sha256_in_prefix": "9e515d9832ce259dbab550b1cc6b998f8b929faf2edacaaca981b05adb130571",
+    "size_in_bytes": 4103348
+   },
+   {
+    "_path": "share/tessdata/hun.traineddata",
+    "path_type": "hardlink",
+    "sha256": "35067e7cfe102dcdc953f9a758fdfaa6296b17a1ee6d874ee780fa306430b9fb",
+    "sha256_in_prefix": "35067e7cfe102dcdc953f9a758fdfaa6296b17a1ee6d874ee780fa306430b9fb",
+    "size_in_bytes": 5296273
+   },
+   {
+    "_path": "share/tessdata/hye.traineddata",
+    "path_type": "hardlink",
+    "sha256": "b701d0d95799a716143dedb0197504e56f27a1bb133d6607ff5778c6988cb67c",
+    "sha256_in_prefix": "b701d0d95799a716143dedb0197504e56f27a1bb133d6607ff5778c6988cb67c",
+    "size_in_bytes": 3463717
+   },
+   {
+    "_path": "share/tessdata/iku.traineddata",
+    "path_type": "hardlink",
+    "sha256": "81ef16ee0fa0a3548c8a2d1ff10786e3278b6720e51cefd9a81a506f52660223",
+    "sha256_in_prefix": "81ef16ee0fa0a3548c8a2d1ff10786e3278b6720e51cefd9a81a506f52660223",
+    "size_in_bytes": 2802266
+   },
+   {
+    "_path": "share/tessdata/ind.traineddata",
+    "path_type": "hardlink",
+    "sha256": "69786901da87ab8766c1ea7fbb10b28f2110c14da3f6c8f2735df131fba95d88",
+    "sha256_in_prefix": "69786901da87ab8766c1ea7fbb10b28f2110c14da3f6c8f2735df131fba95d88",
+    "size_in_bytes": 1122661
+   },
+   {
+    "_path": "share/tessdata/isl.traineddata",
+    "path_type": "hardlink",
+    "sha256": "5ec828c363f3f0062c3caf08216677cf5f3c0c981b05fab445123a16b98f10a9",
+    "sha256_in_prefix": "5ec828c363f3f0062c3caf08216677cf5f3c0c981b05fab445123a16b98f10a9",
+    "size_in_bytes": 2278973
+   },
+   {
+    "_path": "share/tessdata/ita.traineddata",
+    "path_type": "hardlink",
+    "sha256": "b8f89e1e785118dac4d51ae042c029a64edb5c3ee42ef73027a6d412748d8827",
+    "sha256_in_prefix": "b8f89e1e785118dac4d51ae042c029a64edb5c3ee42ef73027a6d412748d8827",
+    "size_in_bytes": 2701314
+   },
+   {
+    "_path": "share/tessdata/ita_old.traineddata",
+    "path_type": "hardlink",
+    "sha256": "ee85de25acf70d5eeefdb3012424814a18ab368183099cc2c3f2fe2d3dce3b02",
+    "sha256_in_prefix": "ee85de25acf70d5eeefdb3012424814a18ab368183099cc2c3f2fe2d3dce3b02",
+    "size_in_bytes": 3286123
+   },
+   {
+    "_path": "share/tessdata/jav.traineddata",
+    "path_type": "hardlink",
+    "sha256": "46107b6bed3bf2d9617e5e192e52524e368242543fead1a7175c363dddd400f2",
+    "sha256_in_prefix": "46107b6bed3bf2d9617e5e192e52524e368242543fead1a7175c363dddd400f2",
+    "size_in_bytes": 2982741
+   },
+   {
+    "_path": "share/tessdata/jpn.traineddata",
+    "path_type": "hardlink",
+    "sha256": "1f5de9236d2e85f5fdf4b3c500f2d4926f8d9449f28f5394472d9e8d83b91b4d",
+    "sha256_in_prefix": "1f5de9236d2e85f5fdf4b3c500f2d4926f8d9449f28f5394472d9e8d83b91b4d",
+    "size_in_bytes": 2471260
+   },
+   {
+    "_path": "share/tessdata/jpn_vert.traineddata",
+    "path_type": "hardlink",
+    "sha256": "bf1e2640954691797e2dc14f38533e601b59ee37958698ae0f0b81dc6f09c71b",
+    "sha256_in_prefix": "bf1e2640954691797e2dc14f38533e601b59ee37958698ae0f0b81dc6f09c71b",
+    "size_in_bytes": 3037480
+   },
+   {
+    "_path": "share/tessdata/kan.traineddata",
+    "path_type": "hardlink",
+    "sha256": "bd31e6b6ae93271e3bcf5383d306d8eefbb91542937cd6d735a5930c970e61d8",
+    "sha256_in_prefix": "bd31e6b6ae93271e3bcf5383d306d8eefbb91542937cd6d735a5930c970e61d8",
+    "size_in_bytes": 3608331
+   },
+   {
+    "_path": "share/tessdata/kat.traineddata",
+    "path_type": "hardlink",
+    "sha256": "557abb6f1c68bc1b286f1bdd00bb6b82f85a427a91899807dab6c2f6c7986731",
+    "sha256_in_prefix": "557abb6f1c68bc1b286f1bdd00bb6b82f85a427a91899807dab6c2f6c7986731",
+    "size_in_bytes": 2524769
+   },
+   {
+    "_path": "share/tessdata/kat_old.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7b77290303d5d88db6adc5b679d1eb876e3c62f64c8999e919bcb4608af379bc",
+    "sha256_in_prefix": "7b77290303d5d88db6adc5b679d1eb876e3c62f64c8999e919bcb4608af379bc",
+    "size_in_bytes": 423167
+   },
+   {
+    "_path": "share/tessdata/kaz.traineddata",
+    "path_type": "hardlink",
+    "sha256": "fcc01eed3815a42b9c6321c4c9d3606f39b166cbf95ade98b7d8d12063eae53d",
+    "sha256_in_prefix": "fcc01eed3815a42b9c6321c4c9d3606f39b166cbf95ade98b7d8d12063eae53d",
+    "size_in_bytes": 4734644
+   },
+   {
+    "_path": "share/tessdata/khm.traineddata",
+    "path_type": "hardlink",
+    "sha256": "47f110575341b322052f3becbefee61a3ecf1ef549352b5d4d33d28afe30d099",
+    "sha256_in_prefix": "47f110575341b322052f3becbefee61a3ecf1ef549352b5d4d33d28afe30d099",
+    "size_in_bytes": 1446926
+   },
+   {
+    "_path": "share/tessdata/kir.traineddata",
+    "path_type": "hardlink",
+    "sha256": "9777956300900b528d26932cf80693f95e75143433fb851d567194bcc38a31ae",
+    "sha256_in_prefix": "9777956300900b528d26932cf80693f95e75143433fb851d567194bcc38a31ae",
+    "size_in_bytes": 9928497
+   },
+   {
+    "_path": "share/tessdata/kmr.traineddata",
+    "path_type": "hardlink",
+    "sha256": "a3ef2daa828399ca8d6ae69edfa21ed21aa5abb3f868e2024d3235406312e7b6",
+    "sha256_in_prefix": "a3ef2daa828399ca8d6ae69edfa21ed21aa5abb3f868e2024d3235406312e7b6",
+    "size_in_bytes": 3568615
+   },
+   {
+    "_path": "share/tessdata/kor.traineddata",
+    "path_type": "hardlink",
+    "sha256": "6b85e11d9bbf07863b97b3523b1b112844c43e713df8b66418a081fd1060b3b2",
+    "sha256_in_prefix": "6b85e11d9bbf07863b97b3523b1b112844c43e713df8b66418a081fd1060b3b2",
+    "size_in_bytes": 1677415
+   },
+   {
+    "_path": "share/tessdata/kor_vert.traineddata",
+    "path_type": "hardlink",
+    "sha256": "c28f19dee36927baba5215fb793a3c00fff3ef2cfbcaa100122401d8f4374869",
+    "sha256_in_prefix": "c28f19dee36927baba5215fb793a3c00fff3ef2cfbcaa100122401d8f4374869",
+    "size_in_bytes": 1113715
+   },
+   {
+    "_path": "share/tessdata/lao.traineddata",
+    "path_type": "hardlink",
+    "sha256": "20124962e93e68121e02c49a949d1f9df5db87dd62e5e4aa578362ca532444f8",
+    "sha256_in_prefix": "20124962e93e68121e02c49a949d1f9df5db87dd62e5e4aa578362ca532444f8",
+    "size_in_bytes": 6386744
+   },
+   {
+    "_path": "share/tessdata/lat.traineddata",
+    "path_type": "hardlink",
+    "sha256": "3859d8ba60404f4b79830622625bbc76fb4ee2808eac1ad360ffa77f0a533328",
+    "sha256_in_prefix": "3859d8ba60404f4b79830622625bbc76fb4ee2808eac1ad360ffa77f0a533328",
+    "size_in_bytes": 3187463
+   },
+   {
+    "_path": "share/tessdata/lav.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7d9eaf22254b381f18b806cd6cb647862a397a7221adbce3e22cc421793a8847",
+    "sha256_in_prefix": "7d9eaf22254b381f18b806cd6cb647862a397a7221adbce3e22cc421793a8847",
+    "size_in_bytes": 2717247
+   },
+   {
+    "_path": "share/tessdata/lit.traineddata",
+    "path_type": "hardlink",
+    "sha256": "1e383df5b055583bc01cb5764ecdf74c540753f2cb3f8205e7105361da4bc989",
+    "sha256_in_prefix": "1e383df5b055583bc01cb5764ecdf74c540753f2cb3f8205e7105361da4bc989",
+    "size_in_bytes": 3154896
+   },
+   {
+    "_path": "share/tessdata/ltz.traineddata",
+    "path_type": "hardlink",
+    "sha256": "5516a78efa30c050da7eb0727fec3de59670c19735c00678a67fdad98e4b3ec1",
+    "sha256_in_prefix": "5516a78efa30c050da7eb0727fec3de59670c19735c00678a67fdad98e4b3ec1",
+    "size_in_bytes": 2606426
+   },
+   {
+    "_path": "share/tessdata/mal.traineddata",
+    "path_type": "hardlink",
+    "sha256": "bd05cbf1b197e7810d2903419aedb06f9ef77bfedf50b358673c1d18d707cdb4",
+    "sha256_in_prefix": "bd05cbf1b197e7810d2903419aedb06f9ef77bfedf50b358673c1d18d707cdb4",
+    "size_in_bytes": 5275996
+   },
+   {
+    "_path": "share/tessdata/mar.traineddata",
+    "path_type": "hardlink",
+    "sha256": "0ba3f2d116972e72fe9e176bc84c38e81dfb6670f4ed1f7f6c8e16a27da7cb61",
+    "sha256_in_prefix": "0ba3f2d116972e72fe9e176bc84c38e81dfb6670f4ed1f7f6c8e16a27da7cb61",
+    "size_in_bytes": 2118233
+   },
+   {
+    "_path": "share/tessdata/mkd.traineddata",
+    "path_type": "hardlink",
+    "sha256": "58622bf154830fa62103359938564aeb8112b929759e22a48224f3ecfaac34c6",
+    "sha256_in_prefix": "58622bf154830fa62103359938564aeb8112b929759e22a48224f3ecfaac34c6",
+    "size_in_bytes": 1600188
+   },
+   {
+    "_path": "share/tessdata/mlt.traineddata",
+    "path_type": "hardlink",
+    "sha256": "3040b443d5d49e4183da0eaaf58d1033c3a616153d35d2342a56777f9bbb31c7",
+    "sha256_in_prefix": "3040b443d5d49e4183da0eaaf58d1033c3a616153d35d2342a56777f9bbb31c7",
+    "size_in_bytes": 2308796
+   },
+   {
+    "_path": "share/tessdata/mon.traineddata",
+    "path_type": "hardlink",
+    "sha256": "a151a3806d61ac43619cd383896d551ba5c3b07388ffec6fc83c8c604d677570",
+    "sha256_in_prefix": "a151a3806d61ac43619cd383896d551ba5c3b07388ffec6fc83c8c604d677570",
+    "size_in_bytes": 2137042
+   },
+   {
+    "_path": "share/tessdata/mri.traineddata",
+    "path_type": "hardlink",
+    "sha256": "8552be985e8fa0210d6d815d736151d645089b590a56f2d92391fb864e8bf9c9",
+    "sha256_in_prefix": "8552be985e8fa0210d6d815d736151d645089b590a56f2d92391fb864e8bf9c9",
+    "size_in_bytes": 862973
+   },
+   {
+    "_path": "share/tessdata/msa.traineddata",
+    "path_type": "hardlink",
+    "sha256": "e41a3e5febfec50c90371eb1cbb17a48b10cad387900e3420b1f134c1b766cba",
+    "sha256_in_prefix": "e41a3e5febfec50c90371eb1cbb17a48b10cad387900e3420b1f134c1b766cba",
+    "size_in_bytes": 1747801
+   },
+   {
+    "_path": "share/tessdata/mya.traineddata",
+    "path_type": "hardlink",
+    "sha256": "02aa6c25cfe9e583fa7b5d4131eac948f962308983f0f397df077dea58212b03",
+    "sha256_in_prefix": "02aa6c25cfe9e583fa7b5d4131eac948f962308983f0f397df077dea58212b03",
+    "size_in_bytes": 4640561
+   },
+   {
+    "_path": "share/tessdata/nep.traineddata",
+    "path_type": "hardlink",
+    "sha256": "280ba9450b4f21afbf5985e0de87857b75a972577c50ef0603c141ddde4f1cb8",
+    "sha256_in_prefix": "280ba9450b4f21afbf5985e0de87857b75a972577c50ef0603c141ddde4f1cb8",
+    "size_in_bytes": 1002911
+   },
+   {
+    "_path": "share/tessdata/nld.traineddata",
+    "path_type": "hardlink",
+    "sha256": "ced0e5e046a84c908a6aa7accbef9a232c4a5d9a8276691b81c6ee64d02963f6",
+    "sha256_in_prefix": "ced0e5e046a84c908a6aa7accbef9a232c4a5d9a8276691b81c6ee64d02963f6",
+    "size_in_bytes": 6050296
+   },
+   {
+    "_path": "share/tessdata/nor.traineddata",
+    "path_type": "hardlink",
+    "sha256": "0451eb4f8049ae78196806bf878a389a2f40f1386fe038568cf4441226ba6ef2",
+    "sha256_in_prefix": "0451eb4f8049ae78196806bf878a389a2f40f1386fe038568cf4441226ba6ef2",
+    "size_in_bytes": 3610079
+   },
+   {
+    "_path": "share/tessdata/oci.traineddata",
+    "path_type": "hardlink",
+    "sha256": "747b9be4c5b80b4c730ce4f426a3b85060a1bb0de54cd566fcbdcb7f407940c9",
+    "sha256_in_prefix": "747b9be4c5b80b4c730ce4f426a3b85060a1bb0de54cd566fcbdcb7f407940c9",
+    "size_in_bytes": 6322087
+   },
+   {
+    "_path": "share/tessdata/ori.traineddata",
+    "path_type": "hardlink",
+    "sha256": "36f3135e61d501a3acfad41f5fe60b8e791274fff4c5375c969fdcca980cdbac",
+    "sha256_in_prefix": "36f3135e61d501a3acfad41f5fe60b8e791274fff4c5375c969fdcca980cdbac",
+    "size_in_bytes": 1480066
+   },
+   {
+    "_path": "share/tessdata/osd.traineddata",
+    "path_type": "hardlink",
+    "sha256": "9cf5d576fcc47564f11265841e5ca839001e7e6f38ff7f7aacf46d15a96b00ff",
+    "sha256_in_prefix": "9cf5d576fcc47564f11265841e5ca839001e7e6f38ff7f7aacf46d15a96b00ff",
+    "size_in_bytes": 10562727
+   },
+   {
+    "_path": "share/tessdata/pan.traineddata",
+    "path_type": "hardlink",
+    "sha256": "1ec0907fc3534065ea9ae190c6bb7ec9e5c74fd9d2fa996aaec7407f11ad8131",
+    "sha256_in_prefix": "1ec0907fc3534065ea9ae190c6bb7ec9e5c74fd9d2fa996aaec7407f11ad8131",
+    "size_in_bytes": 497721
+   },
+   {
+    "_path": "share/tessdata/pdf.ttf",
+    "path_type": "hardlink",
+    "sha256": "c7845420925a23d88ed830a63957b8af85a66a8daf8d9fc90e843673b2ef1a59",
+    "sha256_in_prefix": "c7845420925a23d88ed830a63957b8af85a66a8daf8d9fc90e843673b2ef1a59",
+    "size_in_bytes": 572
+   },
+   {
+    "_path": "share/tessdata/pol.traineddata",
+    "path_type": "hardlink",
+    "sha256": "c4476cdbc0e33d898d32345122b7be1cbf85ace15f920f06c7714756e1ef79b2",
+    "sha256_in_prefix": "c4476cdbc0e33d898d32345122b7be1cbf85ace15f920f06c7714756e1ef79b2",
+    "size_in_bytes": 4765518
+   },
+   {
+    "_path": "share/tessdata/por.traineddata",
+    "path_type": "hardlink",
+    "sha256": "c4932b937207a9514b7514d518b931a99938c02a28a5a5a553f8599ed58b7deb",
+    "sha256_in_prefix": "c4932b937207a9514b7514d518b931a99938c02a28a5a5a553f8599ed58b7deb",
+    "size_in_bytes": 1982756
+   },
+   {
+    "_path": "share/tessdata/pus.traineddata",
+    "path_type": "hardlink",
+    "sha256": "f15550bfe3a20ca781cf5afb7b2af6ee769c6521cf4bb990848e72856b484600",
+    "sha256_in_prefix": "f15550bfe3a20ca781cf5afb7b2af6ee769c6521cf4bb990848e72856b484600",
+    "size_in_bytes": 1772087
+   },
+   {
+    "_path": "share/tessdata/que.traineddata",
+    "path_type": "hardlink",
+    "sha256": "9a3f78b010254ae237a7ca89e65e6d0c349221e437ac1575df1877e63a76bf57",
+    "sha256_in_prefix": "9a3f78b010254ae237a7ca89e65e6d0c349221e437ac1575df1877e63a76bf57",
+    "size_in_bytes": 5026336
+   },
+   {
+    "_path": "share/tessdata/ron.traineddata",
+    "path_type": "hardlink",
+    "sha256": "9adfde6b51ba4b97efd10ea37c3070fd3fc2bad7815e81f5c3c198cd96216cc9",
+    "sha256_in_prefix": "9adfde6b51ba4b97efd10ea37c3070fd3fc2bad7815e81f5c3c198cd96216cc9",
+    "size_in_bytes": 2376323
+   },
+   {
+    "_path": "share/tessdata/rus.traineddata",
+    "path_type": "hardlink",
+    "sha256": "e16e5e036cce1d9ec2b00063cf8b54472625b9e14d893a169e2b0dedeb4df225",
+    "sha256_in_prefix": "e16e5e036cce1d9ec2b00063cf8b54472625b9e14d893a169e2b0dedeb4df225",
+    "size_in_bytes": 3861738
+   },
+   {
+    "_path": "share/tessdata/san.traineddata",
+    "path_type": "hardlink",
+    "sha256": "a399958921c64e7d2319369ade1e74b4db2577744ac5bfeabd16663cf743b91c",
+    "sha256_in_prefix": "a399958921c64e7d2319369ade1e74b4db2577744ac5bfeabd16663cf743b91c",
+    "size_in_bytes": 12404677
+   },
+   {
+    "_path": "share/tessdata/sin.traineddata",
+    "path_type": "hardlink",
+    "sha256": "bc75c6df2375a30c9f7e759fa7d4b58ae3ecf9ce72668a702d01acb13e551422",
+    "sha256_in_prefix": "bc75c6df2375a30c9f7e759fa7d4b58ae3ecf9ce72668a702d01acb13e551422",
+    "size_in_bytes": 1727413
+   },
+   {
+    "_path": "share/tessdata/slk.traineddata",
+    "path_type": "hardlink",
+    "sha256": "fbcc400a9c74c6a13d922fcb1211b655d1b165387b675ed75cd2dbd756b974a5",
+    "sha256_in_prefix": "fbcc400a9c74c6a13d922fcb1211b655d1b165387b675ed75cd2dbd756b974a5",
+    "size_in_bytes": 4427661
+   },
+   {
+    "_path": "share/tessdata/slv.traineddata",
+    "path_type": "hardlink",
+    "sha256": "b937632c17ce5fdf20535d25feec044da10a0c4c8234f4302d5606fd671cf60d",
+    "sha256_in_prefix": "b937632c17ce5fdf20535d25feec044da10a0c4c8234f4302d5606fd671cf60d",
+    "size_in_bytes": 3003829
+   },
+   {
+    "_path": "share/tessdata/snd.traineddata",
+    "path_type": "hardlink",
+    "sha256": "f25cae3b325b0a6dc4dd5d8aeb3ac40b129a18bdd92666317022ee198f7878a7",
+    "sha256_in_prefix": "f25cae3b325b0a6dc4dd5d8aeb3ac40b129a18bdd92666317022ee198f7878a7",
+    "size_in_bytes": 1694035
+   },
+   {
+    "_path": "share/tessdata/spa.traineddata",
+    "path_type": "hardlink",
+    "sha256": "6f2e04d02774a18f01bed44b1111f2cd7f3ba7ac9dc4373cd3f898a40ea6b464",
+    "sha256_in_prefix": "6f2e04d02774a18f01bed44b1111f2cd7f3ba7ac9dc4373cd3f898a40ea6b464",
+    "size_in_bytes": 2294433
+   },
+   {
+    "_path": "share/tessdata/spa_old.traineddata",
+    "path_type": "hardlink",
+    "sha256": "11d89a6763ff134ef8f7e41b995974d36fba5d1a807156d3202d7bf991bb1823",
+    "sha256_in_prefix": "11d89a6763ff134ef8f7e41b995974d36fba5d1a807156d3202d7bf991bb1823",
+    "size_in_bytes": 2894755
+   },
+   {
+    "_path": "share/tessdata/sqi.traineddata",
+    "path_type": "hardlink",
+    "sha256": "1d89621d9afe8ddf35b403ecf8951edea52c3a960d241f287b1a7b2c5ba8daac",
+    "sha256_in_prefix": "1d89621d9afe8ddf35b403ecf8951edea52c3a960d241f287b1a7b2c5ba8daac",
+    "size_in_bytes": 1874705
+   },
+   {
+    "_path": "share/tessdata/srp.traineddata",
+    "path_type": "hardlink",
+    "sha256": "aa41ae3d9cc705e60d398ab38a5c3cc8b772c0d420c7d4f0859beb13d0e321b6",
+    "sha256_in_prefix": "aa41ae3d9cc705e60d398ab38a5c3cc8b772c0d420c7d4f0859beb13d0e321b6",
+    "size_in_bytes": 2149931
+   },
+   {
+    "_path": "share/tessdata/srp_latn.traineddata",
+    "path_type": "hardlink",
+    "sha256": "54b2e001bd8a336bdffc249c1487b8b7cb712f0a031f2551930ba050ebefa2a0",
+    "sha256_in_prefix": "54b2e001bd8a336bdffc249c1487b8b7cb712f0a031f2551930ba050ebefa2a0",
+    "size_in_bytes": 3281787
+   },
+   {
+    "_path": "share/tessdata/sun.traineddata",
+    "path_type": "hardlink",
+    "sha256": "fa939213b005b3477a1032b7222f63cd0b0ac486f83fd9554caf653d6e6c6ffe",
+    "sha256_in_prefix": "fa939213b005b3477a1032b7222f63cd0b0ac486f83fd9554caf653d6e6c6ffe",
+    "size_in_bytes": 1369500
+   },
+   {
+    "_path": "share/tessdata/swa.traineddata",
+    "path_type": "hardlink",
+    "sha256": "395439d1ec308535066cbaea9b15e0e4cc81f8609170af76ab7e7e8d3ec42f3e",
+    "sha256_in_prefix": "395439d1ec308535066cbaea9b15e0e4cc81f8609170af76ab7e7e8d3ec42f3e",
+    "size_in_bytes": 2167651
+   },
+   {
+    "_path": "share/tessdata/swe.traineddata",
+    "path_type": "hardlink",
+    "sha256": "f7304988d41f833efebcc2d529df54b1903ecebbc3da1faabd19a0fddd4fe586",
+    "sha256_in_prefix": "f7304988d41f833efebcc2d529df54b1903ecebbc3da1faabd19a0fddd4fe586",
+    "size_in_bytes": 4167034
+   },
+   {
+    "_path": "share/tessdata/syr.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7435b43466da8343619bdc43c4da8dc8581f21aab3337fa1bd22ed8a8c10af04",
+    "sha256_in_prefix": "7435b43466da8343619bdc43c4da8dc8581f21aab3337fa1bd22ed8a8c10af04",
+    "size_in_bytes": 2207208
+   },
+   {
+    "_path": "share/tessdata/tam.traineddata",
+    "path_type": "hardlink",
+    "sha256": "d02fbec24be4b07e32e80d0ccfc3b6b67a3c5d61c9d0a7c8532677990912c6ec",
+    "sha256_in_prefix": "d02fbec24be4b07e32e80d0ccfc3b6b67a3c5d61c9d0a7c8532677990912c6ec",
+    "size_in_bytes": 3237963
+   },
+   {
+    "_path": "share/tessdata/tat.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7ad946d753f4b9688e4e4bcf525a931f486da4aaa9020e32b6a7262718bdf093",
+    "sha256_in_prefix": "7ad946d753f4b9688e4e4bcf525a931f486da4aaa9020e32b6a7262718bdf093",
+    "size_in_bytes": 1072896
+   },
+   {
+    "_path": "share/tessdata/tel.traineddata",
+    "path_type": "hardlink",
+    "sha256": "d10691fddd5b67802e1c12800ebb321d3b8bcd8d24a2ac3ff206f93188c04ab5",
+    "sha256_in_prefix": "d10691fddd5b67802e1c12800ebb321d3b8bcd8d24a2ac3ff206f93188c04ab5",
+    "size_in_bytes": 2769654
+   },
+   {
+    "_path": "share/tessdata/tessconfigs/batch",
+    "path_type": "hardlink",
+    "sha256": "d91107c3a8c1c311b00c64aee56cbce4d48894c6e5762165f1ec7871c7b7bf4e",
+    "sha256_in_prefix": "d91107c3a8c1c311b00c64aee56cbce4d48894c6e5762165f1ec7871c7b7bf4e",
+    "size_in_bytes": 49
+   },
+   {
+    "_path": "share/tessdata/tessconfigs/batch.nochop",
+    "path_type": "hardlink",
+    "sha256": "5acabb534cfd4fd8fe111c854955e1ffa9390619ef43775b1a5fbaf5283f68bb",
+    "sha256_in_prefix": "5acabb534cfd4fd8fe111c854955e1ffa9390619ef43775b1a5fbaf5283f68bb",
+    "size_in_bytes": 37
+   },
+   {
+    "_path": "share/tessdata/tessconfigs/matdemo",
+    "path_type": "hardlink",
+    "sha256": "d098cdf6ffe691ccc9dfa4490603f6ae33cdd313010cedfa50007ebde3ddd2d0",
+    "sha256_in_prefix": "d098cdf6ffe691ccc9dfa4490603f6ae33cdd313010cedfa50007ebde3ddd2d0",
+    "size_in_bytes": 243
+   },
+   {
+    "_path": "share/tessdata/tessconfigs/msdemo",
+    "path_type": "hardlink",
+    "sha256": "0ed753a05ea60766f4269d81873b6390e937ea2df1758de91c57db7e92429555",
+    "sha256_in_prefix": "0ed753a05ea60766f4269d81873b6390e937ea2df1758de91c57db7e92429555",
+    "size_in_bytes": 368
+   },
+   {
+    "_path": "share/tessdata/tessconfigs/nobatch",
+    "path_type": "hardlink",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "sha256_in_prefix": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "size_in_bytes": 1
+   },
+   {
+    "_path": "share/tessdata/tessconfigs/segdemo",
+    "path_type": "hardlink",
+    "sha256": "7ec19f77f8c76b4dfb33ec8b13e11d7685ae5c9cf6eca4e7333cce0513ddac56",
+    "sha256_in_prefix": "7ec19f77f8c76b4dfb33ec8b13e11d7685ae5c9cf6eca4e7333cce0513ddac56",
+    "size_in_bytes": 295
+   },
+   {
+    "_path": "share/tessdata/tgk.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7b32ed1374649b9b44b9a20ed07f1e86c1e1004c3bd11ce182496a47a18cb321",
+    "sha256_in_prefix": "7b32ed1374649b9b44b9a20ed07f1e86c1e1004c3bd11ce182496a47a18cb321",
+    "size_in_bytes": 2602685
+   },
+   {
+    "_path": "share/tessdata/tha.traineddata",
+    "path_type": "hardlink",
+    "sha256": "294227cc2d1292b0acb28d61d4115c88252b96d466ca90b417cf4cf0c67bf07c",
+    "sha256_in_prefix": "294227cc2d1292b0acb28d61d4115c88252b96d466ca90b417cf4cf0c67bf07c",
+    "size_in_bytes": 1072600
+   },
+   {
+    "_path": "share/tessdata/tir.traineddata",
+    "path_type": "hardlink",
+    "sha256": "73d7430c22a062b061f603a2c1d70c4ea4aa092f7a932a97921926e15b4fdb3d",
+    "sha256_in_prefix": "73d7430c22a062b061f603a2c1d70c4ea4aa092f7a932a97921926e15b4fdb3d",
+    "size_in_bytes": 378822
+   },
+   {
+    "_path": "share/tessdata/ton.traineddata",
+    "path_type": "hardlink",
+    "sha256": "23d36448a3c59499da59502419ffcaa279056fa369a0fa2c798e066321d01bd1",
+    "sha256_in_prefix": "23d36448a3c59499da59502419ffcaa279056fa369a0fa2c798e066321d01bd1",
+    "size_in_bytes": 947249
+   },
+   {
+    "_path": "share/tessdata/tur.traineddata",
+    "path_type": "hardlink",
+    "sha256": "7393381111e1152420fc4092cb44eef4237580d21b92bf30d7d221aad192c6b7",
+    "sha256_in_prefix": "7393381111e1152420fc4092cb44eef4237580d21b92bf30d7d221aad192c6b7",
+    "size_in_bytes": 4550554
+   },
+   {
+    "_path": "share/tessdata/uig.traineddata",
+    "path_type": "hardlink",
+    "sha256": "163b360268c39fc69e0c0dc9299c06dfe7a6c51ef8f33766da75022217b69b22",
+    "sha256_in_prefix": "163b360268c39fc69e0c0dc9299c06dfe7a6c51ef8f33766da75022217b69b22",
+    "size_in_bytes": 2794272
+   },
+   {
+    "_path": "share/tessdata/ukr.traineddata",
+    "path_type": "hardlink",
+    "sha256": "d59e53e2bded32f4445f124b4b00240fcac7e8044c003ab822ccb94f0b3db59b",
+    "sha256_in_prefix": "d59e53e2bded32f4445f124b4b00240fcac7e8044c003ab822ccb94f0b3db59b",
+    "size_in_bytes": 3825102
+   },
+   {
+    "_path": "share/tessdata/urd.traineddata",
+    "path_type": "hardlink",
+    "sha256": "62e8250ce2a994106e313a82e26a516a39e2cf159d0ce3c5b5008387fd0d555f",
+    "sha256_in_prefix": "62e8250ce2a994106e313a82e26a516a39e2cf159d0ce3c5b5008387fd0d555f",
+    "size_in_bytes": 1398718
+   },
+   {
+    "_path": "share/tessdata/uzb.traineddata",
+    "path_type": "hardlink",
+    "sha256": "0e39021eefe692906b50d9bd22e580fa57fe43fa35db6846ad8b6369ddc21ea8",
+    "sha256_in_prefix": "0e39021eefe692906b50d9bd22e580fa57fe43fa35db6846ad8b6369ddc21ea8",
+    "size_in_bytes": 6470703
+   },
+   {
+    "_path": "share/tessdata/uzb_cyrl.traineddata",
+    "path_type": "hardlink",
+    "sha256": "a2fe0b3f0eb4a5e46252470160ad51cc5f3c4c0f390ba67d1911beb0dbe80cc8",
+    "sha256_in_prefix": "a2fe0b3f0eb4a5e46252470160ad51cc5f3c4c0f390ba67d1911beb0dbe80cc8",
+    "size_in_bytes": 1563501
+   },
+   {
+    "_path": "share/tessdata/vie.traineddata",
+    "path_type": "hardlink",
+    "sha256": "79df64caf7bcfb2a27df5042ecb6121e196eada34da774956995747636d5bfa1",
+    "sha256_in_prefix": "79df64caf7bcfb2a27df5042ecb6121e196eada34da774956995747636d5bfa1",
+    "size_in_bytes": 531275
+   },
+   {
+    "_path": "share/tessdata/yid.traineddata",
+    "path_type": "hardlink",
+    "sha256": "f9a3d74076460a505dc0c6b59a0f5bd1108c6436d570954223b3695988d1666d",
+    "sha256_in_prefix": "f9a3d74076460a505dc0c6b59a0f5bd1108c6436d570954223b3695988d1666d",
+    "size_in_bytes": 545606
+   },
+   {
+    "_path": "share/tessdata/yor.traineddata",
+    "path_type": "hardlink",
+    "sha256": "17ab3855f1ba9056183759a84e4c11cebf417a7d3c8c2cdcc37537d7fbffba3d",
+    "sha256_in_prefix": "17ab3855f1ba9056183759a84e4c11cebf417a7d3c8c2cdcc37537d7fbffba3d",
+    "size_in_bytes": 963400
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "1e0d39a9c94ff9db130674f4f289d641ec9e710eb010022224f11ef8cf2da41e",
+ "size": 176062752,
+ "subdir": "linux-64",
+ "timestamp": 1757416678000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/tesseract-5.2.0-hb0d2e87_3.conda",
+ "version": "5.2.0"
+}

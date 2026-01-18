@@ -1,0 +1,52 @@
+{
+ "build": "h153f514_2",
+ "build_number": 2,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [
+  "binutils_impl_linux-64 2.44"
+ ],
+ "depends": [
+  "__glibc >=2.28,<3.0.a0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "bin/x86_64-conda-linux-gnu-ld",
+  "x86_64-conda-linux-gnu/bin/ld"
+ ],
+ "fn": "ld_impl_linux-64-2.44-h153f514_2.conda",
+ "license": "GPL-3.0-only",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "dffdc9a0e09d04051d4bd758e104f4b3",
+ "name": "ld_impl_linux-64",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "bin/x86_64-conda-linux-gnu-ld",
+    "file_mode": "binary",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/home/task_175993962606213/conda-bld/binutils_split_1759940008676/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_pl",
+    "sha256": "90dfaa28b5712e535a19d6f3ce561762556229c454c777708ccd158b169240ff",
+    "sha256_in_prefix": "eeadc308ffb15250828f3d8a8b62db085755d7f6625fccd633290fce38917584",
+    "size_in_bytes": 2673304
+   },
+   {
+    "_path": "x86_64-conda-linux-gnu/bin/ld",
+    "path_type": "softlink",
+    "sha256": "90dfaa28b5712e535a19d6f3ce561762556229c454c777708ccd158b169240ff",
+    "size_in_bytes": 2673304
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "89bc181d3d5976e5d7a763329c8877031e36ae5a3e9eabe7475e3cb1f55f5822",
+ "size": 688236,
+ "subdir": "linux-64",
+ "timestamp": 1759940114000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/ld_impl_linux-64-2.44-h153f514_2.conda",
+ "version": "2.44"
+}

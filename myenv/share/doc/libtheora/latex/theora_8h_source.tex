@@ -1,0 +1,219 @@
+\doxysection{theora.\+h}
+\label{theora_8h_source}\index{theora.h@{theora.h}}
+\textbf{ Go to the documentation of this file.}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/********************************************************************}}
+\DoxyCodeLine{2 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{3 \textcolor{comment}{ * THIS FILE IS PART OF THE OggTheora SOFTWARE CODEC SOURCE CODE.   *}}
+\DoxyCodeLine{4 \textcolor{comment}{ * USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS     *}}
+\DoxyCodeLine{5 \textcolor{comment}{ * GOVERNED BY A BSD-\/STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *}}
+\DoxyCodeLine{6 \textcolor{comment}{ * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *}}
+\DoxyCodeLine{7 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{8 \textcolor{comment}{ * THE Theora SOURCE CODE IS COPYRIGHT (C) 2002-\/2009                *}}
+\DoxyCodeLine{9 \textcolor{comment}{ * by the Xiph.Org Foundation https://www.xiph.org/                 *}}
+\DoxyCodeLine{10 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{11 \textcolor{comment}{ ********************************************************************}}
+\DoxyCodeLine{12 \textcolor{comment}{}}
+\DoxyCodeLine{13 \textcolor{comment}{  function:}}
+\DoxyCodeLine{14 \textcolor{comment}{}}
+\DoxyCodeLine{15 \textcolor{comment}{ ********************************************************************/}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#ifndef OGG\_THEORA\_HEADER}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#define OGG\_THEORA\_HEADER}}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#ifdef \_\_cplusplus}}
+\DoxyCodeLine{21 \textcolor{keyword}{extern} \textcolor{stringliteral}{"{}C"{}}}
+\DoxyCodeLine{22 \{}
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/* \_\_cplusplus */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#include <stddef.h>}     \textcolor{comment}{/* for size\_t */}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#include <ogg/ogg.h>}}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{120 \textcolor{comment}{/*  @\{ */}}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{146 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{}
+\DoxyCodeLine{147     \textcolor{keywordtype}{int}   y\_width;      }
+\DoxyCodeLine{148     \textcolor{keywordtype}{int}   y\_height;     }
+\DoxyCodeLine{149     \textcolor{keywordtype}{int}   y\_stride;     }
+\DoxyCodeLine{151     \textcolor{keywordtype}{int}   uv\_width;     }
+\DoxyCodeLine{152     \textcolor{keywordtype}{int}   uv\_height;    }
+\DoxyCodeLine{153     \textcolor{keywordtype}{int}   uv\_stride;    }
+\DoxyCodeLine{154     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *y;   }
+\DoxyCodeLine{155     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *u;   }
+\DoxyCodeLine{156     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *v;   }
+\DoxyCodeLine{158 \} yuv\_buffer;}
+\DoxyCodeLine{159 }
+\DoxyCodeLine{163 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{164   OC\_CS\_UNSPECIFIED,    }
+\DoxyCodeLine{165   OC\_CS\_ITU\_REC\_470M,   }
+\DoxyCodeLine{166   OC\_CS\_ITU\_REC\_470BG,  }
+\DoxyCodeLine{167   OC\_CS\_NSPACES         }
+\DoxyCodeLine{168 \} theora\_colorspace;}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{177 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{178   OC\_PF\_420,    }
+\DoxyCodeLine{179   OC\_PF\_RSVD,   }
+\DoxyCodeLine{180   OC\_PF\_422,    }
+\DoxyCodeLine{181   OC\_PF\_444     }
+\DoxyCodeLine{182 \} theora\_pixelformat;}
+\DoxyCodeLine{183 }
+\DoxyCodeLine{205 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{}
+\DoxyCodeLine{206   ogg\_uint32\_t  width;             }
+\DoxyCodeLine{207   ogg\_uint32\_t  height;           }
+\DoxyCodeLine{208   ogg\_uint32\_t  frame\_width; }
+\DoxyCodeLine{209   ogg\_uint32\_t  frame\_height;       }
+\DoxyCodeLine{210   ogg\_uint32\_t  offset\_x;       }
+\DoxyCodeLine{211   ogg\_uint32\_t  offset\_y;       }
+\DoxyCodeLine{212   ogg\_uint32\_t  fps\_numerator;         }
+\DoxyCodeLine{213   ogg\_uint32\_t  fps\_denominator;    }
+\DoxyCodeLine{214   ogg\_uint32\_t  aspect\_numerator;   }
+\DoxyCodeLine{215   ogg\_uint32\_t  aspect\_denominator; }
+\DoxyCodeLine{216   theora\_colorspace colorspace;          }
+\DoxyCodeLine{217   \textcolor{keywordtype}{int}           target\_bitrate;       }
+\DoxyCodeLine{218   \textcolor{keywordtype}{int}           quality;  }
+\DoxyCodeLine{219   \textcolor{keywordtype}{int}           quick\_p;  }
+\DoxyCodeLine{221   \textcolor{comment}{/* decode only */}}
+\DoxyCodeLine{222   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} version\_major;}
+\DoxyCodeLine{223   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} version\_minor;}
+\DoxyCodeLine{224   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} version\_subminor;}
+\DoxyCodeLine{225 }
+\DoxyCodeLine{226   \textcolor{keywordtype}{void} *codec\_setup;}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{228   \textcolor{comment}{/* encode only */}}
+\DoxyCodeLine{229   \textcolor{keywordtype}{int}           dropframes\_p;}
+\DoxyCodeLine{230   \textcolor{keywordtype}{int}           keyframe\_auto\_p;}
+\DoxyCodeLine{231   ogg\_uint32\_t  keyframe\_frequency;}
+\DoxyCodeLine{232   ogg\_uint32\_t  keyframe\_frequency\_force;  \textcolor{comment}{/* also used for decode init to}}
+\DoxyCodeLine{233 \textcolor{comment}{                                              get granpos shift correct */}}
+\DoxyCodeLine{234   ogg\_uint32\_t  keyframe\_data\_target\_bitrate;}
+\DoxyCodeLine{235   ogg\_int32\_t   keyframe\_auto\_threshold;}
+\DoxyCodeLine{236   ogg\_uint32\_t  keyframe\_mindistance;}
+\DoxyCodeLine{237   ogg\_int32\_t   noise\_sensitivity;}
+\DoxyCodeLine{238   ogg\_int32\_t   sharpness;}
+\DoxyCodeLine{239 }
+\DoxyCodeLine{240   theora\_pixelformat pixelformat;  }
+\DoxyCodeLine{242 \} theora\_info;}
+\DoxyCodeLine{243 }
+\DoxyCodeLine{246 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{247   theora\_info *i;}
+\DoxyCodeLine{248   ogg\_int64\_t granulepos;}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250   \textcolor{keywordtype}{void} *internal\_encode;}
+\DoxyCodeLine{251   \textcolor{keywordtype}{void} *internal\_decode;}
+\DoxyCodeLine{252 }
+\DoxyCodeLine{253 \} theora\_state;}
+\DoxyCodeLine{254 }
+\DoxyCodeLine{274 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }theora\_comment\{}
+\DoxyCodeLine{275   \textcolor{keywordtype}{char} **user\_comments;         }
+\DoxyCodeLine{276   \textcolor{keywordtype}{int}   *comment\_lengths;       }
+\DoxyCodeLine{277   \textcolor{keywordtype}{int}    comments;              }
+\DoxyCodeLine{278   \textcolor{keywordtype}{char}  *vendor;                }
+\DoxyCodeLine{280 \} theora\_comment;}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282 }
+\DoxyCodeLine{284 \textcolor{comment}{/* \(\backslash\)anchor decctlcodes\_old}}
+\DoxyCodeLine{285 \textcolor{comment}{ * These are the available request codes for theora\_control()}}
+\DoxyCodeLine{286 \textcolor{comment}{ * when called with a decoder instance.}}
+\DoxyCodeLine{287 \textcolor{comment}{ * By convention decoder control codes are odd, to distinguish}}
+\DoxyCodeLine{288 \textcolor{comment}{ * them from \(\backslash\)ref encctlcodes\_old "{}encoder control codes"{} which}}
+\DoxyCodeLine{289 \textcolor{comment}{ * are even.}}
+\DoxyCodeLine{290 \textcolor{comment}{ *}}
+\DoxyCodeLine{291 \textcolor{comment}{ * Note that since the 1.0 release, both the legacy and the final}}
+\DoxyCodeLine{292 \textcolor{comment}{ * implementation accept all the same control codes, but only the}}
+\DoxyCodeLine{293 \textcolor{comment}{ * final API declares the newer codes.}}
+\DoxyCodeLine{294 \textcolor{comment}{ *}}
+\DoxyCodeLine{295 \textcolor{comment}{ * Keep any experimental or vendor-\/specific values above \(\backslash\)c 0x8000.*/}}
+\DoxyCodeLine{296 }
+\DoxyCodeLine{305 \textcolor{preprocessor}{\#define TH\_DECCTL\_GET\_PPLEVEL\_MAX (1)}}
+\DoxyCodeLine{306 }
+\DoxyCodeLine{312 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_PPLEVEL (3)}}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{326 \textcolor{preprocessor}{\#define TH\_ENCCTL\_SET\_KEYFRAME\_FREQUENCY\_FORCE (4)}}
+\DoxyCodeLine{327 }
+\DoxyCodeLine{335 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_GRANPOS (5)}}
+\DoxyCodeLine{336 }
+\DoxyCodeLine{352 \textcolor{preprocessor}{\#define TH\_ENCCTL\_SET\_QUANT\_PARAMS (2)}}
+\DoxyCodeLine{353 }
+\DoxyCodeLine{381 \textcolor{preprocessor}{\#define TH\_ENCCTL\_SET\_VP3\_COMPATIBLE (10)}}
+\DoxyCodeLine{382 }
+\DoxyCodeLine{396 \textcolor{preprocessor}{\#define TH\_ENCCTL\_GET\_SPLEVEL\_MAX (12)}}
+\DoxyCodeLine{397 }
+\DoxyCodeLine{411 \textcolor{preprocessor}{\#define TH\_ENCCTL\_SET\_SPLEVEL (14)}}
+\DoxyCodeLine{412 }
+\DoxyCodeLine{415 \textcolor{preprocessor}{\#define OC\_FAULT       -\/1       }}
+\DoxyCodeLine{416 \textcolor{preprocessor}{\#define OC\_EINVAL      -\/10      }}
+\DoxyCodeLine{417 \textcolor{preprocessor}{\#define OC\_DISABLED    -\/11      }}
+\DoxyCodeLine{418 \textcolor{preprocessor}{\#define OC\_BADHEADER   -\/20      }}
+\DoxyCodeLine{419 \textcolor{preprocessor}{\#define OC\_NOTFORMAT   -\/21      }}
+\DoxyCodeLine{420 \textcolor{preprocessor}{\#define OC\_VERSION     -\/22      }}
+\DoxyCodeLine{421 \textcolor{preprocessor}{\#define OC\_IMPL        -\/23      }}
+\DoxyCodeLine{422 \textcolor{preprocessor}{\#define OC\_BADPACKET   -\/24      }}
+\DoxyCodeLine{423 \textcolor{preprocessor}{\#define OC\_NEWPACKET   -\/25      }}
+\DoxyCodeLine{424 \textcolor{preprocessor}{\#define OC\_DUPFRAME    1        }}
+\DoxyCodeLine{430 \textcolor{keyword}{extern} \textcolor{keyword}{const} \textcolor{keywordtype}{char} *theora\_version\_string(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{431 }
+\DoxyCodeLine{441 \textcolor{keyword}{extern} ogg\_uint32\_t theora\_version\_number(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{442 }
+\DoxyCodeLine{449 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_encode\_init(theora\_state *th, theora\_info *ti);}
+\DoxyCodeLine{450 }
+\DoxyCodeLine{461 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_encode\_YUVin(theora\_state *t, yuv\_buffer *yuv);}
+\DoxyCodeLine{462 }
+\DoxyCodeLine{475 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_encode\_packetout( theora\_state *t, \textcolor{keywordtype}{int} last\_p,}
+\DoxyCodeLine{476                                     ogg\_packet *op);}
+\DoxyCodeLine{477 }
+\DoxyCodeLine{488 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_encode\_header(theora\_state *t, ogg\_packet *op);}
+\DoxyCodeLine{489 }
+\DoxyCodeLine{505 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_encode\_comment(theora\_comment *tc, ogg\_packet *op);}
+\DoxyCodeLine{506 }
+\DoxyCodeLine{517 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_encode\_tables(theora\_state *t, ogg\_packet *op);}
+\DoxyCodeLine{518 }
+\DoxyCodeLine{560 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_decode\_header(theora\_info *ci, theora\_comment *cc,}
+\DoxyCodeLine{561                                 ogg\_packet *op);}
+\DoxyCodeLine{562 }
+\DoxyCodeLine{571 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_decode\_init(theora\_state *th, theora\_info *c);}
+\DoxyCodeLine{572 }
+\DoxyCodeLine{580 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_decode\_packetin(theora\_state *th,ogg\_packet *op);}
+\DoxyCodeLine{581 }
+\DoxyCodeLine{592 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_decode\_YUVout(theora\_state *th,yuv\_buffer *yuv);}
+\DoxyCodeLine{593 }
+\DoxyCodeLine{606 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_packet\_isheader(ogg\_packet *op);}
+\DoxyCodeLine{607 }
+\DoxyCodeLine{618 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_packet\_iskeyframe(ogg\_packet *op);}
+\DoxyCodeLine{619 }
+\DoxyCodeLine{645 \textcolor{keywordtype}{int} theora\_granule\_shift(theora\_info *ti);}
+\DoxyCodeLine{646 }
+\DoxyCodeLine{663 \textcolor{keyword}{extern} ogg\_int64\_t theora\_granule\_frame(theora\_state *th,ogg\_int64\_t granulepos);}
+\DoxyCodeLine{664 }
+\DoxyCodeLine{678 \textcolor{keyword}{extern} \textcolor{keywordtype}{double} theora\_granule\_time(theora\_state *th,ogg\_int64\_t granulepos);}
+\DoxyCodeLine{679 }
+\DoxyCodeLine{686 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} theora\_info\_init(theora\_info *c);}
+\DoxyCodeLine{687 }
+\DoxyCodeLine{693 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} theora\_info\_clear(theora\_info *c);}
+\DoxyCodeLine{694 }
+\DoxyCodeLine{699 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} theora\_clear(theora\_state *t);}
+\DoxyCodeLine{700 }
+\DoxyCodeLine{705 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} theora\_comment\_init(theora\_comment *tc);}
+\DoxyCodeLine{706 }
+\DoxyCodeLine{719 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} theora\_comment\_add(theora\_comment *tc, \textcolor{keywordtype}{char} *comment);}
+\DoxyCodeLine{720 }
+\DoxyCodeLine{733 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} theora\_comment\_add\_tag(theora\_comment *tc,}
+\DoxyCodeLine{734                                        \textcolor{keywordtype}{char} *tag, \textcolor{keywordtype}{char} *value);}
+\DoxyCodeLine{735 }
+\DoxyCodeLine{750 \textcolor{keyword}{extern} \textcolor{keywordtype}{char} *theora\_comment\_query(theora\_comment *tc, \textcolor{keywordtype}{char} *tag, \textcolor{keywordtype}{int} count);}
+\DoxyCodeLine{751 }
+\DoxyCodeLine{761 \textcolor{keyword}{extern} \textcolor{keywordtype}{int}   theora\_comment\_query\_count(theora\_comment *tc, \textcolor{keywordtype}{char} *tag);}
+\DoxyCodeLine{762 }
+\DoxyCodeLine{767 \textcolor{keyword}{extern} \textcolor{keywordtype}{void}  theora\_comment\_clear(theora\_comment *tc);}
+\DoxyCodeLine{768 }
+\DoxyCodeLine{777 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} theora\_control(theora\_state *th,\textcolor{keywordtype}{int} req,\textcolor{keywordtype}{void} *buf,\textcolor{keywordtype}{size\_t} buf\_sz);}
+\DoxyCodeLine{778 }
+\DoxyCodeLine{779 \textcolor{comment}{/* @\} */} \textcolor{comment}{/* end oldfuncs doxygen group */}}
+\DoxyCodeLine{780 }
+\DoxyCodeLine{781 \textcolor{preprocessor}{\#ifdef \_\_cplusplus}}
+\DoxyCodeLine{782 \}}
+\DoxyCodeLine{783 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/* \_\_cplusplus */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{784 }
+\DoxyCodeLine{785 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/* OGG\_THEORA\_HEADER */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

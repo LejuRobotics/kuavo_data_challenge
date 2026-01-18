@@ -1,0 +1,1005 @@
+{
+ "build": "h32ad74f_1",
+ "build_number": 1,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "__glibc >=2.28,<3.0.a0",
+  "libgcc-ng >=11.2.0",
+  "libogg >=1.3.5,<1.4.0a0",
+  "libogg >=1.3.5,<2.0a0",
+  "libvorbis >=1.3.7,<2.0a0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "include/theora/codec.h",
+  "include/theora/theora.h",
+  "include/theora/theoradec.h",
+  "include/theora/theoraenc.h",
+  "lib/libtheora.a",
+  "lib/libtheora.so",
+  "lib/libtheora.so.1",
+  "lib/libtheora.so.1.4.1",
+  "lib/libtheoradec.a",
+  "lib/libtheoradec.so",
+  "lib/libtheoradec.so.2",
+  "lib/libtheoradec.so.2.1.1",
+  "lib/libtheoraenc.a",
+  "lib/libtheoraenc.so",
+  "lib/libtheoraenc.so.2",
+  "lib/libtheoraenc.so.2.2.1",
+  "lib/pkgconfig/theora.pc",
+  "lib/pkgconfig/theoradec.pc",
+  "lib/pkgconfig/theoraenc.pc",
+  "share/doc/libtheora/color.html",
+  "share/doc/libtheora/doxygen-build.stamp",
+  "share/doc/libtheora/draft-ietf-avt-rtp-theora-00.txt",
+  "share/doc/libtheora/draft-ietf-avt-rtp-theora-00.xml",
+  "share/doc/libtheora/html/annotated.html",
+  "share/doc/libtheora/html/bc_s.png",
+  "share/doc/libtheora/html/bdwn.png",
+  "share/doc/libtheora/html/classes.html",
+  "share/doc/libtheora/html/closed.png",
+  "share/doc/libtheora/html/codec_8h.html",
+  "share/doc/libtheora/html/codec_8h_source.html",
+  "share/doc/libtheora/html/dir_0f91760d62c578de767c41a0aaae5482.html",
+  "share/doc/libtheora/html/dir_d44c64559bbebec7f509842c48db8b23.html",
+  "share/doc/libtheora/html/doc.png",
+  "share/doc/libtheora/html/doxygen.css",
+  "share/doc/libtheora/html/doxygen.svg",
+  "share/doc/libtheora/html/dynsections.js",
+  "share/doc/libtheora/html/files.html",
+  "share/doc/libtheora/html/folderclosed.png",
+  "share/doc/libtheora/html/folderopen.png",
+  "share/doc/libtheora/html/functions.html",
+  "share/doc/libtheora/html/functions_vars.html",
+  "share/doc/libtheora/html/globals.html",
+  "share/doc/libtheora/html/globals_defs.html",
+  "share/doc/libtheora/html/globals_enum.html",
+  "share/doc/libtheora/html/globals_eval.html",
+  "share/doc/libtheora/html/globals_func.html",
+  "share/doc/libtheora/html/globals_type.html",
+  "share/doc/libtheora/html/globals_vars.html",
+  "share/doc/libtheora/html/group__basefuncs.html",
+  "share/doc/libtheora/html/group__decfuncs.html",
+  "share/doc/libtheora/html/group__encfuncs.html",
+  "share/doc/libtheora/html/group__oldfuncs.html",
+  "share/doc/libtheora/html/index.html",
+  "share/doc/libtheora/html/jquery.js",
+  "share/doc/libtheora/html/menu.js",
+  "share/doc/libtheora/html/menudata.js",
+  "share/doc/libtheora/html/modules.html",
+  "share/doc/libtheora/html/nav_f.png",
+  "share/doc/libtheora/html/nav_g.png",
+  "share/doc/libtheora/html/nav_h.png",
+  "share/doc/libtheora/html/open.png",
+  "share/doc/libtheora/html/splitbar.png",
+  "share/doc/libtheora/html/structth__comment.html",
+  "share/doc/libtheora/html/structth__huff__code.html",
+  "share/doc/libtheora/html/structth__img__plane.html",
+  "share/doc/libtheora/html/structth__info.html",
+  "share/doc/libtheora/html/structth__quant__info.html",
+  "share/doc/libtheora/html/structth__quant__ranges.html",
+  "share/doc/libtheora/html/structth__stripe__callback.html",
+  "share/doc/libtheora/html/structtheora__comment.html",
+  "share/doc/libtheora/html/structtheora__info.html",
+  "share/doc/libtheora/html/structtheora__state.html",
+  "share/doc/libtheora/html/structyuv__buffer.html",
+  "share/doc/libtheora/html/sync_off.png",
+  "share/doc/libtheora/html/sync_on.png",
+  "share/doc/libtheora/html/tab_a.png",
+  "share/doc/libtheora/html/tab_b.png",
+  "share/doc/libtheora/html/tab_h.png",
+  "share/doc/libtheora/html/tab_s.png",
+  "share/doc/libtheora/html/tabs.css",
+  "share/doc/libtheora/html/theora_8h.html",
+  "share/doc/libtheora/html/theora_8h_source.html",
+  "share/doc/libtheora/html/theoradec_8h.html",
+  "share/doc/libtheora/html/theoradec_8h_source.html",
+  "share/doc/libtheora/html/theoraenc_8h.html",
+  "share/doc/libtheora/html/theoraenc_8h_source.html",
+  "share/doc/libtheora/latex/Makefile",
+  "share/doc/libtheora/latex/annotated.tex",
+  "share/doc/libtheora/latex/codec_8h.tex",
+  "share/doc/libtheora/latex/codec_8h_source.tex",
+  "share/doc/libtheora/latex/dir_0f91760d62c578de767c41a0aaae5482.tex",
+  "share/doc/libtheora/latex/dir_d44c64559bbebec7f509842c48db8b23.tex",
+  "share/doc/libtheora/latex/doxygen.sty",
+  "share/doc/libtheora/latex/files.tex",
+  "share/doc/libtheora/latex/group__basefuncs.tex",
+  "share/doc/libtheora/latex/group__decfuncs.tex",
+  "share/doc/libtheora/latex/group__encfuncs.tex",
+  "share/doc/libtheora/latex/group__oldfuncs.tex",
+  "share/doc/libtheora/latex/index.tex",
+  "share/doc/libtheora/latex/longtable_doxygen.sty",
+  "share/doc/libtheora/latex/modules.tex",
+  "share/doc/libtheora/latex/refman.tex",
+  "share/doc/libtheora/latex/structth__comment.tex",
+  "share/doc/libtheora/latex/structth__huff__code.tex",
+  "share/doc/libtheora/latex/structth__img__plane.tex",
+  "share/doc/libtheora/latex/structth__info.tex",
+  "share/doc/libtheora/latex/structth__quant__info.tex",
+  "share/doc/libtheora/latex/structth__quant__ranges.tex",
+  "share/doc/libtheora/latex/structth__stripe__callback.tex",
+  "share/doc/libtheora/latex/structtheora__comment.tex",
+  "share/doc/libtheora/latex/structtheora__info.tex",
+  "share/doc/libtheora/latex/structtheora__state.tex",
+  "share/doc/libtheora/latex/structyuv__buffer.tex",
+  "share/doc/libtheora/latex/tabu_doxygen.sty",
+  "share/doc/libtheora/latex/theora_8h.tex",
+  "share/doc/libtheora/latex/theora_8h_source.tex",
+  "share/doc/libtheora/latex/theoradec_8h.tex",
+  "share/doc/libtheora/latex/theoradec_8h_source.tex",
+  "share/doc/libtheora/latex/theoraenc_8h.tex",
+  "share/doc/libtheora/latex/theoraenc_8h_source.tex",
+  "share/doc/libtheora/vp3-format.txt"
+ ],
+ "fn": "libtheora-1.2.0-h32ad74f_1.conda",
+ "license": "BSD-3-Clause",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "0d5bb1727883fd3fb0d4e7bedaa8d0b0",
+ "name": "libtheora",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "include/theora/codec.h",
+    "path_type": "hardlink",
+    "sha256": "9d55acfd9a46ccbd0f2c3e95c5fcc68595442e0b6317ef95c6d3488396841155",
+    "sha256_in_prefix": "9d55acfd9a46ccbd0f2c3e95c5fcc68595442e0b6317ef95c6d3488396841155",
+    "size_in_bytes": 26199
+   },
+   {
+    "_path": "include/theora/theora.h",
+    "path_type": "hardlink",
+    "sha256": "6ab9415acebc2021934ac8513ce57af278961068bf1873090baf3092d10e475e",
+    "sha256_in_prefix": "6ab9415acebc2021934ac8513ce57af278961068bf1873090baf3092d10e475e",
+    "size_in_bytes": 33393
+   },
+   {
+    "_path": "include/theora/theoradec.h",
+    "path_type": "hardlink",
+    "sha256": "f7d8da45d904978d7200a868d4b7a941bd8a8d6c535709265c82dc6bf4faba10",
+    "sha256_in_prefix": "f7d8da45d904978d7200a868d4b7a941bd8a8d6c535709265c82dc6bf4faba10",
+    "size_in_bytes": 16251
+   },
+   {
+    "_path": "include/theora/theoraenc.h",
+    "path_type": "hardlink",
+    "sha256": "925d17994dab723b99262ef06c5adfc9c3d39a81ba83b0faa76ed1f3fbdf3e41",
+    "sha256_in_prefix": "925d17994dab723b99262ef06c5adfc9c3d39a81ba83b0faa76ed1f3fbdf3e41",
+    "size_in_bytes": 29308
+   },
+   {
+    "_path": "lib/libtheora.a",
+    "path_type": "hardlink",
+    "sha256": "b1a064833c00a0233d9b89f1725e316e96a98ff06c72a37430915f636d6c6d39",
+    "sha256_in_prefix": "b1a064833c00a0233d9b89f1725e316e96a98ff06c72a37430915f636d6c6d39",
+    "size_in_bytes": 431546
+   },
+   {
+    "_path": "lib/libtheora.so",
+    "path_type": "softlink",
+    "sha256": "d7e31823dee64d3d2312ce01a81c35957c4668932f31d0b0987a8675e0e5205c",
+    "size_in_bytes": 294968
+   },
+   {
+    "_path": "lib/libtheora.so.1",
+    "path_type": "softlink",
+    "sha256": "d7e31823dee64d3d2312ce01a81c35957c4668932f31d0b0987a8675e0e5205c",
+    "size_in_bytes": 294968
+   },
+   {
+    "_path": "lib/libtheora.so.1.4.1",
+    "path_type": "hardlink",
+    "sha256": "d7e31823dee64d3d2312ce01a81c35957c4668932f31d0b0987a8675e0e5205c",
+    "sha256_in_prefix": "d7e31823dee64d3d2312ce01a81c35957c4668932f31d0b0987a8675e0e5205c",
+    "size_in_bytes": 294968
+   },
+   {
+    "_path": "lib/libtheoradec.a",
+    "path_type": "hardlink",
+    "sha256": "cd30a559c2e04fec08677c9c45b46e2c0d861532bae98f7f7afcab780458bc41",
+    "sha256_in_prefix": "cd30a559c2e04fec08677c9c45b46e2c0d861532bae98f7f7afcab780458bc41",
+    "size_in_bytes": 159748
+   },
+   {
+    "_path": "lib/libtheoradec.so",
+    "path_type": "softlink",
+    "sha256": "c24f7b7debf7acb80a8de5ee33860e74b8bfca0fdb5c623bb286ca277a7ca932",
+    "size_in_bytes": 109672
+   },
+   {
+    "_path": "lib/libtheoradec.so.2",
+    "path_type": "softlink",
+    "sha256": "c24f7b7debf7acb80a8de5ee33860e74b8bfca0fdb5c623bb286ca277a7ca932",
+    "size_in_bytes": 109672
+   },
+   {
+    "_path": "lib/libtheoradec.so.2.1.1",
+    "path_type": "hardlink",
+    "sha256": "c24f7b7debf7acb80a8de5ee33860e74b8bfca0fdb5c623bb286ca277a7ca932",
+    "sha256_in_prefix": "c24f7b7debf7acb80a8de5ee33860e74b8bfca0fdb5c623bb286ca277a7ca932",
+    "size_in_bytes": 109672
+   },
+   {
+    "_path": "lib/libtheoraenc.a",
+    "path_type": "hardlink",
+    "sha256": "dcbba0cb2d7e2cccf670be512ec22d988b7ef969ed62f3edd04c8f25f4ff8caa",
+    "sha256_in_prefix": "dcbba0cb2d7e2cccf670be512ec22d988b7ef969ed62f3edd04c8f25f4ff8caa",
+    "size_in_bytes": 364694
+   },
+   {
+    "_path": "lib/libtheoraenc.so",
+    "path_type": "softlink",
+    "sha256": "0a9d504b8f70185d5096afff8b453bf7e1f1407ae156e78ee68bcbf076a24922",
+    "size_in_bytes": 251880
+   },
+   {
+    "_path": "lib/libtheoraenc.so.2",
+    "path_type": "softlink",
+    "sha256": "0a9d504b8f70185d5096afff8b453bf7e1f1407ae156e78ee68bcbf076a24922",
+    "size_in_bytes": 251880
+   },
+   {
+    "_path": "lib/libtheoraenc.so.2.2.1",
+    "path_type": "hardlink",
+    "sha256": "0a9d504b8f70185d5096afff8b453bf7e1f1407ae156e78ee68bcbf076a24922",
+    "sha256_in_prefix": "0a9d504b8f70185d5096afff8b453bf7e1f1407ae156e78ee68bcbf076a24922",
+    "size_in_bytes": 251880
+   },
+   {
+    "_path": "lib/pkgconfig/theora.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/home/task_175758838808497/conda-bld/libtheora_1757588415361/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "4c0b3bdccc8a7e80ee473b8c7f9e8130244745f9e6f63e6c1ac568ef3f35d103",
+    "sha256_in_prefix": "087e90bbdff436ff1392a9a25f428ba7eeb38b2a669723b47f8ea30c1cf5cb5c",
+    "size_in_bytes": 522
+   },
+   {
+    "_path": "lib/pkgconfig/theoradec.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/home/task_175758838808497/conda-bld/libtheora_1757588415361/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "252b5e4263c69c200e339b5086564e9767273db607741366ba432f83082c476e",
+    "sha256_in_prefix": "1a4dfe68f701afa03ac187737500b1e9905ec0896693758a6cea51e172d115d1",
+    "size_in_bytes": 538
+   },
+   {
+    "_path": "lib/pkgconfig/theoraenc.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/home/task_175758838808497/conda-bld/libtheora_1757588415361/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "ff8f0bd076d89588cd8a49f8dcd232cdc0abeaa910778ae37b1057e785e56185",
+    "sha256_in_prefix": "0212fcd0bca819a05f3d4538b11ed39bee474bc3a1eac6381908e507b20f1644",
+    "size_in_bytes": 549
+   },
+   {
+    "_path": "share/doc/libtheora/color.html",
+    "path_type": "hardlink",
+    "sha256": "29a23dd506332a3a2f5b9914e9a0606022374071d55e5a79379ee92f9bf32bc2",
+    "sha256_in_prefix": "29a23dd506332a3a2f5b9914e9a0606022374071d55e5a79379ee92f9bf32bc2",
+    "size_in_bytes": 18376
+   },
+   {
+    "_path": "share/doc/libtheora/doxygen-build.stamp",
+    "path_type": "hardlink",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size_in_bytes": 0
+   },
+   {
+    "_path": "share/doc/libtheora/draft-ietf-avt-rtp-theora-00.txt",
+    "path_type": "hardlink",
+    "sha256": "f9af8ce850507eb104b613b18ac81d0b86c5871ba70dca37117ab8363e11dffb",
+    "sha256_in_prefix": "f9af8ce850507eb104b613b18ac81d0b86c5871ba70dca37117ab8363e11dffb",
+    "size_in_bytes": 50477
+   },
+   {
+    "_path": "share/doc/libtheora/draft-ietf-avt-rtp-theora-00.xml",
+    "path_type": "hardlink",
+    "sha256": "31b2173a5a69884bb4c5607129eac50650a54dd120da371f2026ba9d56852d15",
+    "sha256_in_prefix": "31b2173a5a69884bb4c5607129eac50650a54dd120da371f2026ba9d56852d15",
+    "size_in_bytes": 50705
+   },
+   {
+    "_path": "share/doc/libtheora/html/annotated.html",
+    "path_type": "hardlink",
+    "sha256": "fffbf96af779fe210a354d22e9d0c6cb365376e666dc9408bd2ad228720ef15d",
+    "sha256_in_prefix": "fffbf96af779fe210a354d22e9d0c6cb365376e666dc9408bd2ad228720ef15d",
+    "size_in_bytes": 5597
+   },
+   {
+    "_path": "share/doc/libtheora/html/bc_s.png",
+    "path_type": "hardlink",
+    "sha256": "9e7ed0ef70f99bb7f763a48ddd95d5990e103bb145eedfd0a76d19c122374be2",
+    "sha256_in_prefix": "9e7ed0ef70f99bb7f763a48ddd95d5990e103bb145eedfd0a76d19c122374be2",
+    "size_in_bytes": 676
+   },
+   {
+    "_path": "share/doc/libtheora/html/bdwn.png",
+    "path_type": "hardlink",
+    "sha256": "782b30d237bdbeddfde4aed01f007264cc116b2d4be2f398a7cb74ec7a5bc58b",
+    "sha256_in_prefix": "782b30d237bdbeddfde4aed01f007264cc116b2d4be2f398a7cb74ec7a5bc58b",
+    "size_in_bytes": 147
+   },
+   {
+    "_path": "share/doc/libtheora/html/classes.html",
+    "path_type": "hardlink",
+    "sha256": "b1e681c343891621f0b462b80661bc1f7b16ec4b2e1d54de2b374b29eb31eabc",
+    "sha256_in_prefix": "b1e681c343891621f0b462b80661bc1f7b16ec4b2e1d54de2b374b29eb31eabc",
+    "size_in_bytes": 3096
+   },
+   {
+    "_path": "share/doc/libtheora/html/closed.png",
+    "path_type": "hardlink",
+    "sha256": "c98c02adc57337f58c40aae15bbac05a3ccb364e5adb1d610a16452e92f17830",
+    "sha256_in_prefix": "c98c02adc57337f58c40aae15bbac05a3ccb364e5adb1d610a16452e92f17830",
+    "size_in_bytes": 132
+   },
+   {
+    "_path": "share/doc/libtheora/html/codec_8h.html",
+    "path_type": "hardlink",
+    "sha256": "bc3dd851d64d0933a97cdb9f0b14aee95a0053734a634bd72d8567b41d119c97",
+    "sha256_in_prefix": "bc3dd851d64d0933a97cdb9f0b14aee95a0053734a634bd72d8567b41d119c97",
+    "size_in_bytes": 65984
+   },
+   {
+    "_path": "share/doc/libtheora/html/codec_8h_source.html",
+    "path_type": "hardlink",
+    "sha256": "fc55d1aaea2523a3b753517515d46bc4af76559207003b80c3b92f58c78b6d3a",
+    "sha256_in_prefix": "fc55d1aaea2523a3b753517515d46bc4af76559207003b80c3b92f58c78b6d3a",
+    "size_in_bytes": 61033
+   },
+   {
+    "_path": "share/doc/libtheora/html/dir_0f91760d62c578de767c41a0aaae5482.html",
+    "path_type": "hardlink",
+    "sha256": "858f15e1e61d9dfbb76daee04a4bb156bcf291cfbb0170cfee26998cdf1652cb",
+    "sha256_in_prefix": "858f15e1e61d9dfbb76daee04a4bb156bcf291cfbb0170cfee26998cdf1652cb",
+    "size_in_bytes": 4236
+   },
+   {
+    "_path": "share/doc/libtheora/html/dir_d44c64559bbebec7f509842c48db8b23.html",
+    "path_type": "hardlink",
+    "sha256": "2f8a57b24d94735816459d84a54253b0f9b584aa08c07dfa115f170ab28684d4",
+    "sha256_in_prefix": "2f8a57b24d94735816459d84a54253b0f9b584aa08c07dfa115f170ab28684d4",
+    "size_in_bytes": 2579
+   },
+   {
+    "_path": "share/doc/libtheora/html/doc.png",
+    "path_type": "hardlink",
+    "sha256": "5cd4cb41607a30d7820cc20ea76b4a3b8f57d3d2b7d102b58c8e13ad95e83aa1",
+    "sha256_in_prefix": "5cd4cb41607a30d7820cc20ea76b4a3b8f57d3d2b7d102b58c8e13ad95e83aa1",
+    "size_in_bytes": 746
+   },
+   {
+    "_path": "share/doc/libtheora/html/doxygen.css",
+    "path_type": "hardlink",
+    "sha256": "2e122217b58e3ac24e7f3610a3871c3f1faf80bf7cac8432239e70af3d49c247",
+    "sha256_in_prefix": "2e122217b58e3ac24e7f3610a3871c3f1faf80bf7cac8432239e70af3d49c247",
+    "size_in_bytes": 33676
+   },
+   {
+    "_path": "share/doc/libtheora/html/doxygen.svg",
+    "path_type": "hardlink",
+    "sha256": "624656a65fdcbd051f0260b529b64292d734f4132b7b6f16fa4af6d74c403156",
+    "sha256_in_prefix": "624656a65fdcbd051f0260b529b64292d734f4132b7b6f16fa4af6d74c403156",
+    "size_in_bytes": 15382
+   },
+   {
+    "_path": "share/doc/libtheora/html/dynsections.js",
+    "path_type": "hardlink",
+    "sha256": "d94a7a53c0c38cd6520d86fdaf3ff6ac2e579a361c5db0f79ccba66a390ce052",
+    "sha256_in_prefix": "d94a7a53c0c38cd6520d86fdaf3ff6ac2e579a361c5db0f79ccba66a390ce052",
+    "size_in_bytes": 4452
+   },
+   {
+    "_path": "share/doc/libtheora/html/files.html",
+    "path_type": "hardlink",
+    "sha256": "8d78c82328ace0cc56fb188c57646645ecd63d910da053e183a32aa6cc2a9f8f",
+    "sha256_in_prefix": "8d78c82328ace0cc56fb188c57646645ecd63d910da053e183a32aa6cc2a9f8f",
+    "size_in_bytes": 4324
+   },
+   {
+    "_path": "share/doc/libtheora/html/folderclosed.png",
+    "path_type": "hardlink",
+    "sha256": "a6ca13a1c87edcfbfc91317896452c31a9d49c4768f1b4b46ac32e0907e00a73",
+    "sha256_in_prefix": "a6ca13a1c87edcfbfc91317896452c31a9d49c4768f1b4b46ac32e0907e00a73",
+    "size_in_bytes": 616
+   },
+   {
+    "_path": "share/doc/libtheora/html/folderopen.png",
+    "path_type": "hardlink",
+    "sha256": "680166339ff62595dd2d2eed3a79fb9fa0c2e8250e89539f6d678aa2e5e51e26",
+    "sha256_in_prefix": "680166339ff62595dd2d2eed3a79fb9fa0c2e8250e89539f6d678aa2e5e51e26",
+    "size_in_bytes": 597
+   },
+   {
+    "_path": "share/doc/libtheora/html/functions.html",
+    "path_type": "hardlink",
+    "sha256": "2f770a9727094e54a61da687b5dd1f917212b5d0ec0636982a3a7f4fde77fe4b",
+    "sha256_in_prefix": "2f770a9727094e54a61da687b5dd1f917212b5d0ec0636982a3a7f4fde77fe4b",
+    "size_in_bytes": 13045
+   },
+   {
+    "_path": "share/doc/libtheora/html/functions_vars.html",
+    "path_type": "hardlink",
+    "sha256": "6bf8eb93cd0db3faea0829f1aa6c55a68dea1cbc10da2fbaf6f1b7c4e9885c85",
+    "sha256_in_prefix": "6bf8eb93cd0db3faea0829f1aa6c55a68dea1cbc10da2fbaf6f1b7c4e9885c85",
+    "size_in_bytes": 12937
+   },
+   {
+    "_path": "share/doc/libtheora/html/globals.html",
+    "path_type": "hardlink",
+    "sha256": "a90b241c8177c7e87aa15a3f28d3c3a4e486d25103e2872afaf6b9fe2184fca9",
+    "sha256_in_prefix": "a90b241c8177c7e87aa15a3f28d3c3a4e486d25103e2872afaf6b9fe2184fca9",
+    "size_in_bytes": 20029
+   },
+   {
+    "_path": "share/doc/libtheora/html/globals_defs.html",
+    "path_type": "hardlink",
+    "sha256": "96059610869e4fc2acd7384093f5dcea5b7aa24bbb1848da4e223e44915709aa",
+    "sha256_in_prefix": "96059610869e4fc2acd7384093f5dcea5b7aa24bbb1848da4e223e44915709aa",
+    "size_in_bytes": 8846
+   },
+   {
+    "_path": "share/doc/libtheora/html/globals_enum.html",
+    "path_type": "hardlink",
+    "sha256": "5ff85339a52cc9f0764d6f6609648d4a66e99f930b891381fdd0bc25f07a7e9d",
+    "sha256_in_prefix": "5ff85339a52cc9f0764d6f6609648d4a66e99f930b891381fdd0bc25f07a7e9d",
+    "size_in_bytes": 2313
+   },
+   {
+    "_path": "share/doc/libtheora/html/globals_eval.html",
+    "path_type": "hardlink",
+    "sha256": "b68560989ae2aa3d5a599e08c32bfb4de95a0d9128a7385ad38a0b78ba6c92c4",
+    "sha256_in_prefix": "b68560989ae2aa3d5a599e08c32bfb4de95a0d9128a7385ad38a0b78ba6c92c4",
+    "size_in_bytes": 4387
+   },
+   {
+    "_path": "share/doc/libtheora/html/globals_func.html",
+    "path_type": "hardlink",
+    "sha256": "2626473cc5d16fb844befaf7da6709d7d9304701027aa5eb7439001a4479e3d6",
+    "sha256_in_prefix": "2626473cc5d16fb844befaf7da6709d7d9304701027aa5eb7439001a4479e3d6",
+    "size_in_bytes": 8687
+   },
+   {
+    "_path": "share/doc/libtheora/html/globals_type.html",
+    "path_type": "hardlink",
+    "sha256": "1f2e1ae0d8f3c50d500974fec02b0f6eb5511ee8bd62338402011e86a32322e8",
+    "sha256_in_prefix": "1f2e1ae0d8f3c50d500974fec02b0f6eb5511ee8bd62338402011e86a32322e8",
+    "size_in_bytes": 2802
+   },
+   {
+    "_path": "share/doc/libtheora/html/globals_vars.html",
+    "path_type": "hardlink",
+    "sha256": "8c811452c81ee48a99d0500fe3ad2f3001e975aed35b8c86bf3dd5f2d3fa98eb",
+    "sha256_in_prefix": "8c811452c81ee48a99d0500fe3ad2f3001e975aed35b8c86bf3dd5f2d3fa98eb",
+    "size_in_bytes": 2095
+   },
+   {
+    "_path": "share/doc/libtheora/html/group__basefuncs.html",
+    "path_type": "hardlink",
+    "sha256": "4c215745b22185d2e9c16602ed52cfd12e83f9f810ea1f9871b2f3fd99d50944",
+    "sha256_in_prefix": "4c215745b22185d2e9c16602ed52cfd12e83f9f810ea1f9871b2f3fd99d50944",
+    "size_in_bytes": 1987
+   },
+   {
+    "_path": "share/doc/libtheora/html/group__decfuncs.html",
+    "path_type": "hardlink",
+    "sha256": "42f9f05403e240bcecdcdb2a2a15a965d01850b802b5f6a86b5fb3d05fca9738",
+    "sha256_in_prefix": "42f9f05403e240bcecdcdb2a2a15a965d01850b802b5f6a86b5fb3d05fca9738",
+    "size_in_bytes": 1957
+   },
+   {
+    "_path": "share/doc/libtheora/html/group__encfuncs.html",
+    "path_type": "hardlink",
+    "sha256": "ee2f0e3c57e9d2084b19b1bfe43e3707cca0ee53004b21c90856568d280ce329",
+    "sha256_in_prefix": "ee2f0e3c57e9d2084b19b1bfe43e3707cca0ee53004b21c90856568d280ce329",
+    "size_in_bytes": 1957
+   },
+   {
+    "_path": "share/doc/libtheora/html/group__oldfuncs.html",
+    "path_type": "hardlink",
+    "sha256": "0cf1156e1cd5823011b553ad86c685b3fc560d1248efa5be56c0ce2e02b64fbe",
+    "sha256_in_prefix": "0cf1156e1cd5823011b553ad86c685b3fc560d1248efa5be56c0ce2e02b64fbe",
+    "size_in_bytes": 2660
+   },
+   {
+    "_path": "share/doc/libtheora/html/index.html",
+    "path_type": "hardlink",
+    "sha256": "dc84a46d4064a54845c2fbf6066939b7df0493589b1b0f151d422f19a3890688",
+    "sha256_in_prefix": "dc84a46d4064a54845c2fbf6066939b7df0493589b1b0f151d422f19a3890688",
+    "size_in_bytes": 4047
+   },
+   {
+    "_path": "share/doc/libtheora/html/jquery.js",
+    "path_type": "hardlink",
+    "sha256": "cbaceab3ee0a51f3868bd8c060e03e18ae0b341d2e636666c87040f82a984cd2",
+    "sha256_in_prefix": "cbaceab3ee0a51f3868bd8c060e03e18ae0b341d2e636666c87040f82a984cd2",
+    "size_in_bytes": 176813
+   },
+   {
+    "_path": "share/doc/libtheora/html/menu.js",
+    "path_type": "hardlink",
+    "sha256": "47a5c5d9d8d63513444f3209c59af9390e5bf808db1fb0db8e9ef963eb33a277",
+    "sha256_in_prefix": "47a5c5d9d8d63513444f3209c59af9390e5bf808db1fb0db8e9ef963eb33a277",
+    "size_in_bytes": 5866
+   },
+   {
+    "_path": "share/doc/libtheora/html/menudata.js",
+    "path_type": "hardlink",
+    "sha256": "21f29308d577557aaa635b0ddd9582c53bd416133b48538c016f9ea2377c4f68",
+    "sha256_in_prefix": "21f29308d577557aaa635b0ddd9582c53bd416133b48538c016f9ea2377c4f68",
+    "size_in_bytes": 4065
+   },
+   {
+    "_path": "share/doc/libtheora/html/modules.html",
+    "path_type": "hardlink",
+    "sha256": "c9063b9ede3261b9ca8ae00582be644751ef21fcbf885ba1935dccfa74affd47",
+    "sha256_in_prefix": "c9063b9ede3261b9ca8ae00582be644751ef21fcbf885ba1935dccfa74affd47",
+    "size_in_bytes": 2950
+   },
+   {
+    "_path": "share/doc/libtheora/html/nav_f.png",
+    "path_type": "hardlink",
+    "sha256": "4bdc6a72666e1b300fdfc5ecf102714c9fd57df76fdf47139f8dbf8ae5986364",
+    "sha256_in_prefix": "4bdc6a72666e1b300fdfc5ecf102714c9fd57df76fdf47139f8dbf8ae5986364",
+    "size_in_bytes": 153
+   },
+   {
+    "_path": "share/doc/libtheora/html/nav_g.png",
+    "path_type": "hardlink",
+    "sha256": "3171164c16baa5953c17821a7ce5feac673c05a56b287453ce3a0bf5048f0999",
+    "sha256_in_prefix": "3171164c16baa5953c17821a7ce5feac673c05a56b287453ce3a0bf5048f0999",
+    "size_in_bytes": 95
+   },
+   {
+    "_path": "share/doc/libtheora/html/nav_h.png",
+    "path_type": "hardlink",
+    "sha256": "b7711604d6cdeaf3cdfd661fa21fc5bf18de929671c801f00415eaecd35abda3",
+    "sha256_in_prefix": "b7711604d6cdeaf3cdfd661fa21fc5bf18de929671c801f00415eaecd35abda3",
+    "size_in_bytes": 98
+   },
+   {
+    "_path": "share/doc/libtheora/html/open.png",
+    "path_type": "hardlink",
+    "sha256": "a04665e9dd0ef5ef2c6ddf02b4a12472984485adb027fd12ae6c60ffd203b1a4",
+    "sha256_in_prefix": "a04665e9dd0ef5ef2c6ddf02b4a12472984485adb027fd12ae6c60ffd203b1a4",
+    "size_in_bytes": 123
+   },
+   {
+    "_path": "share/doc/libtheora/html/splitbar.png",
+    "path_type": "hardlink",
+    "sha256": "1c555557ca84ba3598f52c281780dd7e22655db21ac383712e62d4540a1bc525",
+    "sha256_in_prefix": "1c555557ca84ba3598f52c281780dd7e22655db21ac383712e62d4540a1bc525",
+    "size_in_bytes": 314
+   },
+   {
+    "_path": "share/doc/libtheora/html/structth__comment.html",
+    "path_type": "hardlink",
+    "sha256": "61d4d593228eaec0fe3952274cc80d5ce76f2c836c7768945dab3a4c525fd63f",
+    "sha256_in_prefix": "61d4d593228eaec0fe3952274cc80d5ce76f2c836c7768945dab3a4c525fd63f",
+    "size_in_bytes": 8507
+   },
+   {
+    "_path": "share/doc/libtheora/html/structth__huff__code.html",
+    "path_type": "hardlink",
+    "sha256": "d1928d5e8867d5b08382a5273181316641ce6dfff838a699a599256ef3d8a61f",
+    "sha256_in_prefix": "d1928d5e8867d5b08382a5273181316641ce6dfff838a699a599256ef3d8a61f",
+    "size_in_bytes": 5740
+   },
+   {
+    "_path": "share/doc/libtheora/html/structth__img__plane.html",
+    "path_type": "hardlink",
+    "sha256": "51f5637bb54e57d0ebc9b8333ab9984aefc52ed4bc4c3536baf1e6be9584903b",
+    "sha256_in_prefix": "51f5637bb54e57d0ebc9b8333ab9984aefc52ed4bc4c3536baf1e6be9584903b",
+    "size_in_bytes": 7607
+   },
+   {
+    "_path": "share/doc/libtheora/html/structth__info.html",
+    "path_type": "hardlink",
+    "sha256": "47afe3b9526041b34aa2971c0a30f17725bfe5c1f13c6f435d6d48d7f6b8af12",
+    "sha256_in_prefix": "47afe3b9526041b34aa2971c0a30f17725bfe5c1f13c6f435d6d48d7f6b8af12",
+    "size_in_bytes": 29477
+   },
+   {
+    "_path": "share/doc/libtheora/html/structth__quant__info.html",
+    "path_type": "hardlink",
+    "sha256": "c0c9c9c69ae7ab1f5d98b5c8e31fd2ddfddeb1ff094d60a5c10ed248e53844b7",
+    "sha256_in_prefix": "c0c9c9c69ae7ab1f5d98b5c8e31fd2ddfddeb1ff094d60a5c10ed248e53844b7",
+    "size_in_bytes": 11250
+   },
+   {
+    "_path": "share/doc/libtheora/html/structth__quant__ranges.html",
+    "path_type": "hardlink",
+    "sha256": "f19332389d22859d2bbe4880334bb52c3a4f571ff2aee306e8843e7a2f059fe7",
+    "sha256_in_prefix": "f19332389d22859d2bbe4880334bb52c3a4f571ff2aee306e8843e7a2f059fe7",
+    "size_in_bytes": 6936
+   },
+   {
+    "_path": "share/doc/libtheora/html/structth__stripe__callback.html",
+    "path_type": "hardlink",
+    "sha256": "2f57210e09f13a08458c6f84c43c9ffce9cd5ca5ea59aef9acc3eec11a6cbbb5",
+    "sha256_in_prefix": "2f57210e09f13a08458c6f84c43c9ffce9cd5ca5ea59aef9acc3eec11a6cbbb5",
+    "size_in_bytes": 5623
+   },
+   {
+    "_path": "share/doc/libtheora/html/structtheora__comment.html",
+    "path_type": "hardlink",
+    "sha256": "d150e10f2ec6a571892e3f30d9d401c4b716ecc2ea22fbd5db70843619e8cd56",
+    "sha256_in_prefix": "d150e10f2ec6a571892e3f30d9d401c4b716ecc2ea22fbd5db70843619e8cd56",
+    "size_in_bytes": 8212
+   },
+   {
+    "_path": "share/doc/libtheora/html/structtheora__info.html",
+    "path_type": "hardlink",
+    "sha256": "f6c1facd0ef66bf2a41f22eed3e7deb7ec665dc791d0534140ef07f77cbf5016",
+    "sha256_in_prefix": "f6c1facd0ef66bf2a41f22eed3e7deb7ec665dc791d0534140ef07f77cbf5016",
+    "size_in_bytes": 31542
+   },
+   {
+    "_path": "share/doc/libtheora/html/structtheora__state.html",
+    "path_type": "hardlink",
+    "sha256": "9b6783c3f986ba0fed33f6bdfd277b07e3ab953d9db6689d93d0017bc5145c02",
+    "sha256_in_prefix": "9b6783c3f986ba0fed33f6bdfd277b07e3ab953d9db6689d93d0017bc5145c02",
+    "size_in_bytes": 6177
+   },
+   {
+    "_path": "share/doc/libtheora/html/structyuv__buffer.html",
+    "path_type": "hardlink",
+    "sha256": "a7d9e37493786759d69759f941bf51c71a81aae65a118b93c2df95976c5920d2",
+    "sha256_in_prefix": "a7d9e37493786759d69759f941bf51c71a81aae65a118b93c2df95976c5920d2",
+    "size_in_bytes": 13968
+   },
+   {
+    "_path": "share/doc/libtheora/html/sync_off.png",
+    "path_type": "hardlink",
+    "sha256": "39bcba0c183ec442cc90fe27a2dbafd4e1c791aff374b5326ba16880a16d9826",
+    "sha256_in_prefix": "39bcba0c183ec442cc90fe27a2dbafd4e1c791aff374b5326ba16880a16d9826",
+    "size_in_bytes": 853
+   },
+   {
+    "_path": "share/doc/libtheora/html/sync_on.png",
+    "path_type": "hardlink",
+    "sha256": "9abb731904dd1f8eb00aaea66bfef72d5252931d84cc01cfabde3bea854b5b14",
+    "sha256_in_prefix": "9abb731904dd1f8eb00aaea66bfef72d5252931d84cc01cfabde3bea854b5b14",
+    "size_in_bytes": 845
+   },
+   {
+    "_path": "share/doc/libtheora/html/tab_a.png",
+    "path_type": "hardlink",
+    "sha256": "5ddd37bdced843340e0679b6b4e7ed2fe318fd0cef76d160543722e0c3eac11f",
+    "sha256_in_prefix": "5ddd37bdced843340e0679b6b4e7ed2fe318fd0cef76d160543722e0c3eac11f",
+    "size_in_bytes": 142
+   },
+   {
+    "_path": "share/doc/libtheora/html/tab_b.png",
+    "path_type": "hardlink",
+    "sha256": "901ae15db25905dca7a17b81c6d51869fd12ea569fc4b072d217786b4b4d73bd",
+    "sha256_in_prefix": "901ae15db25905dca7a17b81c6d51869fd12ea569fc4b072d217786b4b4d73bd",
+    "size_in_bytes": 169
+   },
+   {
+    "_path": "share/doc/libtheora/html/tab_h.png",
+    "path_type": "hardlink",
+    "sha256": "e4b9bd9425bc87b33d6b1911e6398673939aa2f15ac505b9a1ab029b8452dd08",
+    "sha256_in_prefix": "e4b9bd9425bc87b33d6b1911e6398673939aa2f15ac505b9a1ab029b8452dd08",
+    "size_in_bytes": 177
+   },
+   {
+    "_path": "share/doc/libtheora/html/tab_s.png",
+    "path_type": "hardlink",
+    "sha256": "69f392daa28adc942272615ff2db16bcf084f01ec9fcc2f7f6a632b2bba8c468",
+    "sha256_in_prefix": "69f392daa28adc942272615ff2db16bcf084f01ec9fcc2f7f6a632b2bba8c468",
+    "size_in_bytes": 184
+   },
+   {
+    "_path": "share/doc/libtheora/html/tabs.css",
+    "path_type": "hardlink",
+    "sha256": "8993af337b2a021b957e2f0494ff5d5f467143f63213bd6589fe60252a1c1037",
+    "sha256_in_prefix": "8993af337b2a021b957e2f0494ff5d5f467143f63213bd6589fe60252a1c1037",
+    "size_in_bytes": 9957
+   },
+   {
+    "_path": "share/doc/libtheora/html/theora_8h.html",
+    "path_type": "hardlink",
+    "sha256": "2eac48fe3d916ed2119067f111a3de692d318a9019541696bf7e2a3fd58bdaa2",
+    "sha256_in_prefix": "2eac48fe3d916ed2119067f111a3de692d318a9019541696bf7e2a3fd58bdaa2",
+    "size_in_bytes": 115846
+   },
+   {
+    "_path": "share/doc/libtheora/html/theora_8h_source.html",
+    "path_type": "hardlink",
+    "sha256": "d52ed52b98b15f49e563069cd696b15ed83ab905b75c898bf32ebd7e99e60465",
+    "sha256_in_prefix": "d52ed52b98b15f49e563069cd696b15ed83ab905b75c898bf32ebd7e99e60465",
+    "size_in_bytes": 82292
+   },
+   {
+    "_path": "share/doc/libtheora/html/theoradec_8h.html",
+    "path_type": "hardlink",
+    "sha256": "8542b42a40c30ba2203f07885eb7b14d065723ca0f3e1484697731bf3a27797a",
+    "sha256_in_prefix": "8542b42a40c30ba2203f07885eb7b14d065723ca0f3e1484697731bf3a27797a",
+    "size_in_bytes": 52700
+   },
+   {
+    "_path": "share/doc/libtheora/html/theoradec_8h_source.html",
+    "path_type": "hardlink",
+    "sha256": "8c477b0c41d68bab66499734c7769af29b29385ebe1916748c71635ababfe324",
+    "sha256_in_prefix": "8c477b0c41d68bab66499734c7769af29b29385ebe1916748c71635ababfe324",
+    "size_in_bytes": 22973
+   },
+   {
+    "_path": "share/doc/libtheora/html/theoraenc_8h.html",
+    "path_type": "hardlink",
+    "sha256": "eab7c090d553624f3d89de26f8525f60032b72509d92ec47ca7c260ae034db27",
+    "sha256_in_prefix": "eab7c090d553624f3d89de26f8525f60032b72509d92ec47ca7c260ae034db27",
+    "size_in_bytes": 79066
+   },
+   {
+    "_path": "share/doc/libtheora/html/theoraenc_8h_source.html",
+    "path_type": "hardlink",
+    "sha256": "2a862bd6bc60c9d350c0b22054ede344d63bc97f519ac05ffcc1e9d321d0b720",
+    "sha256_in_prefix": "2a862bd6bc60c9d350c0b22054ede344d63bc97f519ac05ffcc1e9d321d0b720",
+    "size_in_bytes": 22585
+   },
+   {
+    "_path": "share/doc/libtheora/latex/Makefile",
+    "path_type": "hardlink",
+    "sha256": "ecd08cf51eee3eff64e4be8f026dc34eea9764ecf900dc51a5a79be025ba2c04",
+    "sha256_in_prefix": "ecd08cf51eee3eff64e4be8f026dc34eea9764ecf900dc51a5a79be025ba2c04",
+    "size_in_bytes": 775
+   },
+   {
+    "_path": "share/doc/libtheora/latex/annotated.tex",
+    "path_type": "hardlink",
+    "sha256": "1f126b95185a11a9ad0ad63c4122c300e4489e7940dddedc115f75e8a43c4a27",
+    "sha256_in_prefix": "1f126b95185a11a9ad0ad63c4122c300e4489e7940dddedc115f75e8a43c4a27",
+    "size_in_bytes": 1725
+   },
+   {
+    "_path": "share/doc/libtheora/latex/codec_8h.tex",
+    "path_type": "hardlink",
+    "sha256": "9e8c1d52be260a8b42881a7b464497e1e9ce0dca4ba1ee8c9349e0b2e0308894",
+    "sha256_in_prefix": "9e8c1d52be260a8b42881a7b464497e1e9ce0dca4ba1ee8c9349e0b2e0308894",
+    "size_in_bytes": 34609
+   },
+   {
+    "_path": "share/doc/libtheora/latex/codec_8h_source.tex",
+    "path_type": "hardlink",
+    "sha256": "e83f7a5601a9410aec1a2c4811ea6bee1f8a893a35fd7c7afe555eb64c26d1cd",
+    "sha256_in_prefix": "e83f7a5601a9410aec1a2c4811ea6bee1f8a893a35fd7c7afe555eb64c26d1cd",
+    "size_in_bytes": 11102
+   },
+   {
+    "_path": "share/doc/libtheora/latex/dir_0f91760d62c578de767c41a0aaae5482.tex",
+    "path_type": "hardlink",
+    "sha256": "7f37c8dd577dbb79d941b8a3f94b577f0b59d7c396f35e33cb9514a928d40973",
+    "sha256_in_prefix": "7f37c8dd577dbb79d941b8a3f94b577f0b59d7c396f35e33cb9514a928d40973",
+    "size_in_bytes": 800
+   },
+   {
+    "_path": "share/doc/libtheora/latex/dir_d44c64559bbebec7f509842c48db8b23.tex",
+    "path_type": "hardlink",
+    "sha256": "48286d3708cfc53b54f0f486e31056c1457bc3d9414d74ae02808f0d1d4c2021",
+    "sha256_in_prefix": "48286d3708cfc53b54f0f486e31056c1457bc3d9414d74ae02808f0d1d4c2021",
+    "size_in_bytes": 268
+   },
+   {
+    "_path": "share/doc/libtheora/latex/doxygen.sty",
+    "path_type": "hardlink",
+    "sha256": "aded801a3bdb38107bd9902efb8d756c663586c5106daf7eae1393fc53bdc5e5",
+    "sha256_in_prefix": "aded801a3bdb38107bd9902efb8d756c663586c5106daf7eae1393fc53bdc5e5",
+    "size_in_bytes": 15593
+   },
+   {
+    "_path": "share/doc/libtheora/latex/files.tex",
+    "path_type": "hardlink",
+    "sha256": "d0334366534b4a2e0d5a9f1a56bb31f492d0810f5605b2a1766c7a7a71574f10",
+    "sha256_in_prefix": "d0334366534b4a2e0d5a9f1a56bb31f492d0810f5605b2a1766c7a7a71574f10",
+    "size_in_bytes": 640
+   },
+   {
+    "_path": "share/doc/libtheora/latex/group__basefuncs.tex",
+    "path_type": "hardlink",
+    "sha256": "ae5a9141cab9f78ba037288e1460136bcbe4e9ed3eae9a232242fa00a4df467a",
+    "sha256_in_prefix": "ae5a9141cab9f78ba037288e1460136bcbe4e9ed3eae9a232242fa00a4df467a",
+    "size_in_bytes": 162
+   },
+   {
+    "_path": "share/doc/libtheora/latex/group__decfuncs.tex",
+    "path_type": "hardlink",
+    "sha256": "e750a8eab9ede635be864915a9782d8144576e08f819273fe1d6fff1a53319a6",
+    "sha256_in_prefix": "e750a8eab9ede635be864915a9782d8144576e08f819273fe1d6fff1a53319a6",
+    "size_in_bytes": 116
+   },
+   {
+    "_path": "share/doc/libtheora/latex/group__encfuncs.tex",
+    "path_type": "hardlink",
+    "sha256": "e2b95097c8c30547b6fd8b7d6d655d3c4f8f8f3956fdd976e027ed0937afaaec",
+    "sha256_in_prefix": "e2b95097c8c30547b6fd8b7d6d655d3c4f8f8f3956fdd976e027ed0937afaaec",
+    "size_in_bytes": 116
+   },
+   {
+    "_path": "share/doc/libtheora/latex/group__oldfuncs.tex",
+    "path_type": "hardlink",
+    "sha256": "1c1297c3943236201327c75ccab15fd9268000fa09be4621023107a19fc62f76",
+    "sha256_in_prefix": "1c1297c3943236201327c75ccab15fd9268000fa09be4621023107a19fc62f76",
+    "size_in_bytes": 364
+   },
+   {
+    "_path": "share/doc/libtheora/latex/index.tex",
+    "path_type": "hardlink",
+    "sha256": "d52f8e3a6883b67e795a211a8474fb6a2992e45bf79a561681592c406fe530ee",
+    "sha256_in_prefix": "d52f8e3a6883b67e795a211a8474fb6a2992e45bf79a561681592c406fe530ee",
+    "size_in_bytes": 1903
+   },
+   {
+    "_path": "share/doc/libtheora/latex/longtable_doxygen.sty",
+    "path_type": "hardlink",
+    "sha256": "6e13d3aa158fc49dee42561db22582d2cfbf5aef9977cd2644c283ef3c729ecc",
+    "sha256_in_prefix": "6e13d3aa158fc49dee42561db22582d2cfbf5aef9977cd2644c283ef3c729ecc",
+    "size_in_bytes": 12228
+   },
+   {
+    "_path": "share/doc/libtheora/latex/modules.tex",
+    "path_type": "hardlink",
+    "sha256": "d81c4a71b63b12935d1082c55b0170baf5947b4707ff436c6dd217601dec69bd",
+    "sha256_in_prefix": "d81c4a71b63b12935d1082c55b0170baf5947b4707ff436c6dd217601dec69bd",
+    "size_in_bytes": 444
+   },
+   {
+    "_path": "share/doc/libtheora/latex/refman.tex",
+    "path_type": "hardlink",
+    "sha256": "8705d1c245a9d47d83cc5e92ee7835d6f5d2830db353bc37621c1572e525f23c",
+    "sha256_in_prefix": "8705d1c245a9d47d83cc5e92ee7835d6f5d2830db353bc37621c1572e525f23c",
+    "size_in_bytes": 5811
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structth__comment.tex",
+    "path_type": "hardlink",
+    "sha256": "613d17b9ac5eee05903b5d795e7a79f68b9643f197240779978aec82053dfbf0",
+    "sha256_in_prefix": "613d17b9ac5eee05903b5d795e7a79f68b9643f197240779978aec82053dfbf0",
+    "size_in_bytes": 3699
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structth__huff__code.tex",
+    "path_type": "hardlink",
+    "sha256": "dac372365588d7afde979647ecd98cccedea7c820867f09feafbc324f613eaf5",
+    "sha256_in_prefix": "dac372365588d7afde979647ecd98cccedea7c820867f09feafbc324f613eaf5",
+    "size_in_bytes": 2218
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structth__img__plane.tex",
+    "path_type": "hardlink",
+    "sha256": "bc159246e8b97948daf53ee744478c5e88b3686af85e18b2acda399840fe7c6f",
+    "sha256_in_prefix": "bc159246e8b97948daf53ee744478c5e88b3686af85e18b2acda399840fe7c6f",
+    "size_in_bytes": 2764
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structth__info.tex",
+    "path_type": "hardlink",
+    "sha256": "c0663430250ff27d2007fb562d4b60b1fa86a70307dd61f426475166cabf208a",
+    "sha256_in_prefix": "c0663430250ff27d2007fb562d4b60b1fa86a70307dd61f426475166cabf208a",
+    "size_in_bytes": 13657
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structth__quant__info.tex",
+    "path_type": "hardlink",
+    "sha256": "cc09e45abd0f2ba0c3579a396f19f1c3c1f2dce38b570bc1bb575fffce078fb6",
+    "sha256_in_prefix": "cc09e45abd0f2ba0c3579a396f19f1c3c1f2dce38b570bc1bb575fffce078fb6",
+    "size_in_bytes": 5588
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structth__quant__ranges.tex",
+    "path_type": "hardlink",
+    "sha256": "89467db31e96e77e6e818ed8702ae50a572f472861f066976a7330099b97962d",
+    "sha256_in_prefix": "89467db31e96e77e6e818ed8702ae50a572f472861f066976a7330099b97962d",
+    "size_in_bytes": 2498
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structth__stripe__callback.tex",
+    "path_type": "hardlink",
+    "sha256": "5f30aa102dc8baf04d9edddc7055024b1c64439c6b050bea903eae5f4f5bc742",
+    "sha256_in_prefix": "5f30aa102dc8baf04d9edddc7055024b1c64439c6b050bea903eae5f4f5bc742",
+    "size_in_bytes": 1989
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structtheora__comment.tex",
+    "path_type": "hardlink",
+    "sha256": "1ec7d9ad0f5ddc6858cfe8c35511c9051613e65767639f3003c735fb0e195325",
+    "sha256_in_prefix": "1ec7d9ad0f5ddc6858cfe8c35511c9051613e65767639f3003c735fb0e195325",
+    "size_in_bytes": 3452
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structtheora__info.tex",
+    "path_type": "hardlink",
+    "sha256": "7c18b044c3e76076005e1e14a4ca92c3930fb95853dfcf431b91437be016ae39",
+    "sha256_in_prefix": "7c18b044c3e76076005e1e14a4ca92c3930fb95853dfcf431b91437be016ae39",
+    "size_in_bytes": 13880
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structtheora__state.tex",
+    "path_type": "hardlink",
+    "sha256": "a1acdf467fb120ae866becafc339f6a3177b39d49224f9c6175d64e0d2f832f3",
+    "sha256_in_prefix": "a1acdf467fb120ae866becafc339f6a3177b39d49224f9c6175d64e0d2f832f3",
+    "size_in_bytes": 1984
+   },
+   {
+    "_path": "share/doc/libtheora/latex/structyuv__buffer.tex",
+    "path_type": "hardlink",
+    "sha256": "2a1a545c9e6597f044ffec7db1b71c6219fcadfae56aada8008bfacc9e60f426",
+    "sha256_in_prefix": "2a1a545c9e6597f044ffec7db1b71c6219fcadfae56aada8008bfacc9e60f426",
+    "size_in_bytes": 5711
+   },
+   {
+    "_path": "share/doc/libtheora/latex/tabu_doxygen.sty",
+    "path_type": "hardlink",
+    "sha256": "16edc0cc9d9f7fbc18d91c171662ab75dc3906e031c050bab6078d189ff3e62a",
+    "sha256_in_prefix": "16edc0cc9d9f7fbc18d91c171662ab75dc3906e031c050bab6078d189ff3e62a",
+    "size_in_bytes": 114990
+   },
+   {
+    "_path": "share/doc/libtheora/latex/theora_8h.tex",
+    "path_type": "hardlink",
+    "sha256": "e988c2ea9ebdb0e7cc881c3ee7db88cd42e9d99a00546cae31c98a4b7077a20b",
+    "sha256_in_prefix": "e988c2ea9ebdb0e7cc881c3ee7db88cd42e9d99a00546cae31c98a4b7077a20b",
+    "size_in_bytes": 63014
+   },
+   {
+    "_path": "share/doc/libtheora/latex/theora_8h_source.tex",
+    "path_type": "hardlink",
+    "sha256": "d77089c5a299e6e8ef290d7796b740d3d05934d35c78660f2f52277a836c4b46",
+    "sha256_in_prefix": "d77089c5a299e6e8ef290d7796b740d3d05934d35c78660f2f52277a836c4b46",
+    "size_in_bytes": 14819
+   },
+   {
+    "_path": "share/doc/libtheora/latex/theoradec_8h.tex",
+    "path_type": "hardlink",
+    "sha256": "fe0eb7b9bc9f5b3e0d2ef195eda79c35b6a7014f1ad16bcb9403370d1c298243",
+    "sha256_in_prefix": "fe0eb7b9bc9f5b3e0d2ef195eda79c35b6a7014f1ad16bcb9403370d1c298243",
+    "size_in_bytes": 30467
+   },
+   {
+    "_path": "share/doc/libtheora/latex/theoradec_8h_source.tex",
+    "path_type": "hardlink",
+    "sha256": "10c4d33ac782d0e380fcafdf38769c3647b081244e75821e418ec6c6d91aeff8",
+    "sha256_in_prefix": "10c4d33ac782d0e380fcafdf38769c3647b081244e75821e418ec6c6d91aeff8",
+    "size_in_bytes": 5438
+   },
+   {
+    "_path": "share/doc/libtheora/latex/theoraenc_8h.tex",
+    "path_type": "hardlink",
+    "sha256": "ed6305540a829f119d8010a62b5cd9b4be220bf425f3793fed86c2fc4a591463",
+    "sha256_in_prefix": "ed6305540a829f119d8010a62b5cd9b4be220bf425f3793fed86c2fc4a591463",
+    "size_in_bytes": 50220
+   },
+   {
+    "_path": "share/doc/libtheora/latex/theoraenc_8h_source.tex",
+    "path_type": "hardlink",
+    "sha256": "31801e580f39cd4e3120e09938e158ac4e36e09485988a37cd3cd9378e018c2b",
+    "sha256_in_prefix": "31801e580f39cd4e3120e09938e158ac4e36e09485988a37cd3cd9378e018c2b",
+    "size_in_bytes": 5700
+   },
+   {
+    "_path": "share/doc/libtheora/vp3-format.txt",
+    "path_type": "hardlink",
+    "sha256": "ea8394ede57e6715d9567c53667c7a417091aa728dad7370d5cb8a8e77d4e347",
+    "sha256_in_prefix": "ea8394ede57e6715d9567c53667c7a417091aa728dad7370d5cb8a8e77d4e347",
+    "size_in_bytes": 46991
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "ab8a59591e4b049405a46d30f59640a32176d9850a6c900d88fb02f1a1c78415",
+ "size": 427427,
+ "subdir": "linux-64",
+ "timestamp": 1757588456000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/libtheora-1.2.0-h32ad74f_1.conda",
+ "version": "1.2.0"
+}

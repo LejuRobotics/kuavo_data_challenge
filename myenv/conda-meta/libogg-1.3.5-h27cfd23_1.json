@@ -1,0 +1,761 @@
+{
+ "build": "h27cfd23_1",
+ "build_number": 1,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "libgcc-ng >=7.3.0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "include/ogg/config_types.h",
+  "include/ogg/ogg.h",
+  "include/ogg/os_types.h",
+  "lib/libogg.so",
+  "lib/libogg.so.0",
+  "lib/libogg.so.0.8.5",
+  "lib/pkgconfig/ogg.pc",
+  "share/aclocal/ogg.m4",
+  "share/doc/libogg/fish_xiph_org.png",
+  "share/doc/libogg/framing.html",
+  "share/doc/libogg/index.html",
+  "share/doc/libogg/libogg/bitpacking.html",
+  "share/doc/libogg/libogg/datastructures.html",
+  "share/doc/libogg/libogg/decoding.html",
+  "share/doc/libogg/libogg/encoding.html",
+  "share/doc/libogg/libogg/general.html",
+  "share/doc/libogg/libogg/index.html",
+  "share/doc/libogg/libogg/ogg_iovec_t.html",
+  "share/doc/libogg/libogg/ogg_packet.html",
+  "share/doc/libogg/libogg/ogg_packet_clear.html",
+  "share/doc/libogg/libogg/ogg_page.html",
+  "share/doc/libogg/libogg/ogg_page_bos.html",
+  "share/doc/libogg/libogg/ogg_page_checksum_set.html",
+  "share/doc/libogg/libogg/ogg_page_continued.html",
+  "share/doc/libogg/libogg/ogg_page_eos.html",
+  "share/doc/libogg/libogg/ogg_page_granulepos.html",
+  "share/doc/libogg/libogg/ogg_page_packets.html",
+  "share/doc/libogg/libogg/ogg_page_pageno.html",
+  "share/doc/libogg/libogg/ogg_page_serialno.html",
+  "share/doc/libogg/libogg/ogg_page_version.html",
+  "share/doc/libogg/libogg/ogg_stream_check.html",
+  "share/doc/libogg/libogg/ogg_stream_clear.html",
+  "share/doc/libogg/libogg/ogg_stream_destroy.html",
+  "share/doc/libogg/libogg/ogg_stream_eos.html",
+  "share/doc/libogg/libogg/ogg_stream_flush.html",
+  "share/doc/libogg/libogg/ogg_stream_flush_fill.html",
+  "share/doc/libogg/libogg/ogg_stream_init.html",
+  "share/doc/libogg/libogg/ogg_stream_iovecin.html",
+  "share/doc/libogg/libogg/ogg_stream_packetin.html",
+  "share/doc/libogg/libogg/ogg_stream_packetout.html",
+  "share/doc/libogg/libogg/ogg_stream_packetpeek.html",
+  "share/doc/libogg/libogg/ogg_stream_pagein.html",
+  "share/doc/libogg/libogg/ogg_stream_pageout.html",
+  "share/doc/libogg/libogg/ogg_stream_pageout_fill.html",
+  "share/doc/libogg/libogg/ogg_stream_reset.html",
+  "share/doc/libogg/libogg/ogg_stream_reset_serialno.html",
+  "share/doc/libogg/libogg/ogg_stream_state.html",
+  "share/doc/libogg/libogg/ogg_sync_buffer.html",
+  "share/doc/libogg/libogg/ogg_sync_check.html",
+  "share/doc/libogg/libogg/ogg_sync_clear.html",
+  "share/doc/libogg/libogg/ogg_sync_destroy.html",
+  "share/doc/libogg/libogg/ogg_sync_init.html",
+  "share/doc/libogg/libogg/ogg_sync_pageout.html",
+  "share/doc/libogg/libogg/ogg_sync_pageseek.html",
+  "share/doc/libogg/libogg/ogg_sync_reset.html",
+  "share/doc/libogg/libogg/ogg_sync_state.html",
+  "share/doc/libogg/libogg/ogg_sync_wrote.html",
+  "share/doc/libogg/libogg/oggpack_adv.html",
+  "share/doc/libogg/libogg/oggpack_adv1.html",
+  "share/doc/libogg/libogg/oggpack_bits.html",
+  "share/doc/libogg/libogg/oggpack_buffer.html",
+  "share/doc/libogg/libogg/oggpack_bytes.html",
+  "share/doc/libogg/libogg/oggpack_get_buffer.html",
+  "share/doc/libogg/libogg/oggpack_look.html",
+  "share/doc/libogg/libogg/oggpack_look1.html",
+  "share/doc/libogg/libogg/oggpack_read.html",
+  "share/doc/libogg/libogg/oggpack_read1.html",
+  "share/doc/libogg/libogg/oggpack_readinit.html",
+  "share/doc/libogg/libogg/oggpack_reset.html",
+  "share/doc/libogg/libogg/oggpack_write.html",
+  "share/doc/libogg/libogg/oggpack_writealign.html",
+  "share/doc/libogg/libogg/oggpack_writecheck.html",
+  "share/doc/libogg/libogg/oggpack_writeclear.html",
+  "share/doc/libogg/libogg/oggpack_writecopy.html",
+  "share/doc/libogg/libogg/oggpack_writeinit.html",
+  "share/doc/libogg/libogg/oggpack_writetrunc.html",
+  "share/doc/libogg/libogg/overview.html",
+  "share/doc/libogg/libogg/reference.html",
+  "share/doc/libogg/libogg/style.css",
+  "share/doc/libogg/multiplex1.png",
+  "share/doc/libogg/ogg-multiplex.html",
+  "share/doc/libogg/oggstream.html",
+  "share/doc/libogg/packets.png",
+  "share/doc/libogg/pages.png",
+  "share/doc/libogg/rfc3533.txt",
+  "share/doc/libogg/rfc5334.txt",
+  "share/doc/libogg/skeleton.html",
+  "share/doc/libogg/stream.png",
+  "share/doc/libogg/vorbisword2.png",
+  "share/doc/libogg/white-ogg.png",
+  "share/doc/libogg/white-xifish.png"
+ ],
+ "fn": "libogg-1.3.5-h27cfd23_1.conda",
+ "license": "BSD-3-Clause",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "710ee7fdb0ddf7591a5af7ca7eb4d73d",
+ "name": "libogg",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "include/ogg/config_types.h",
+    "path_type": "hardlink",
+    "sha256": "bd424c5670e21bf37fcd039d4e39a9f8f19aa5af7ee720810a07092da6557e60",
+    "sha256_in_prefix": "bd424c5670e21bf37fcd039d4e39a9f8f19aa5af7ee720810a07092da6557e60",
+    "size_in_bytes": 538
+   },
+   {
+    "_path": "include/ogg/ogg.h",
+    "path_type": "hardlink",
+    "sha256": "aad86109c1fdb377738675a63e0b19859e06ada25ae5c59c290ca7263d1dc4ca",
+    "sha256_in_prefix": "aad86109c1fdb377738675a63e0b19859e06ada25ae5c59c290ca7263d1dc4ca",
+    "size_in_bytes": 8373
+   },
+   {
+    "_path": "include/ogg/os_types.h",
+    "path_type": "hardlink",
+    "sha256": "3bbab6a5d31e3c25c6080252b042afb87028e3ffff100e3e0285648b250b70f4",
+    "sha256_in_prefix": "3bbab6a5d31e3c25c6080252b042afb87028e3ffff100e3e0285648b250b70f4",
+    "size_in_bytes": 4781
+   },
+   {
+    "_path": "lib/libogg.so",
+    "path_type": "softlink",
+    "sha256": "356ae006c0359256317d11d192c0feba0846d408cccf3add6e8b5ca6889fce2b",
+    "size_in_bytes": 44048
+   },
+   {
+    "_path": "lib/libogg.so.0",
+    "path_type": "softlink",
+    "sha256": "356ae006c0359256317d11d192c0feba0846d408cccf3add6e8b5ca6889fce2b",
+    "size_in_bytes": 44048
+   },
+   {
+    "_path": "lib/libogg.so.0.8.5",
+    "path_type": "hardlink",
+    "sha256": "356ae006c0359256317d11d192c0feba0846d408cccf3add6e8b5ca6889fce2b",
+    "sha256_in_prefix": "356ae006c0359256317d11d192c0feba0846d408cccf3add6e8b5ca6889fce2b",
+    "size_in_bytes": 44048
+   },
+   {
+    "_path": "lib/pkgconfig/ogg.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/tmp/build/80754af9/libogg_1623063933767/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "bf8e4717044125898c83d8de200e2cee1c54af78980c68bb77a68b007329f22f",
+    "sha256_in_prefix": "c84bad66a25757a841a693f458635c97d007e065664c164773e16d909d50f1b2",
+    "size_in_bytes": 520
+   },
+   {
+    "_path": "share/aclocal/ogg.m4",
+    "path_type": "hardlink",
+    "sha256": "0b228307fb3a3c40c62ab8bc9199b8e56067dabdd003e11ba76850ef7a759486",
+    "sha256_in_prefix": "0b228307fb3a3c40c62ab8bc9199b8e56067dabdd003e11ba76850ef7a759486",
+    "size_in_bytes": 3958
+   },
+   {
+    "_path": "share/doc/libogg/fish_xiph_org.png",
+    "path_type": "hardlink",
+    "sha256": "d9d43ccd360e8a2b5785d0b21061141cbca284c7fc378202fc139c47670ce0d9",
+    "sha256_in_prefix": "d9d43ccd360e8a2b5785d0b21061141cbca284c7fc378202fc139c47670ce0d9",
+    "size_in_bytes": 2536
+   },
+   {
+    "_path": "share/doc/libogg/framing.html",
+    "path_type": "hardlink",
+    "sha256": "f1f021228e4d5acc28c9029f254278402493fefb50e3f936ddd7dda8ee632d96",
+    "sha256_in_prefix": "f1f021228e4d5acc28c9029f254278402493fefb50e3f936ddd7dda8ee632d96",
+    "size_in_bytes": 14507
+   },
+   {
+    "_path": "share/doc/libogg/index.html",
+    "path_type": "hardlink",
+    "sha256": "2321a15771c7ce3714d3599e0e0c9363f4cabc4c2c9d5663e46008cbb4397ac7",
+    "sha256_in_prefix": "2321a15771c7ce3714d3599e0e0c9363f4cabc4c2c9d5663e46008cbb4397ac7",
+    "size_in_bytes": 1839
+   },
+   {
+    "_path": "share/doc/libogg/libogg/bitpacking.html",
+    "path_type": "hardlink",
+    "sha256": "d93c08a69cc781c8d562ab310d64da2a9521d5ecc9ea0e73475ec4648dd9a9da",
+    "sha256_in_prefix": "d93c08a69cc781c8d562ab310d64da2a9521d5ecc9ea0e73475ec4648dd9a9da",
+    "size_in_bytes": 3388
+   },
+   {
+    "_path": "share/doc/libogg/libogg/datastructures.html",
+    "path_type": "hardlink",
+    "sha256": "65d21ac3e27c475261b7f8b87efed11816bc15dd6dfffc1a348e61a94ce769b5",
+    "sha256_in_prefix": "65d21ac3e27c475261b7f8b87efed11816bc15dd6dfffc1a348e61a94ce769b5",
+    "size_in_bytes": 1722
+   },
+   {
+    "_path": "share/doc/libogg/libogg/decoding.html",
+    "path_type": "hardlink",
+    "sha256": "c31843c676dce9195cc0a5d975da45bec59c80c0b94dd70f3abd321d65dc8db3",
+    "sha256_in_prefix": "c31843c676dce9195cc0a5d975da45bec59c80c0b94dd70f3abd321d65dc8db3",
+    "size_in_bytes": 4016
+   },
+   {
+    "_path": "share/doc/libogg/libogg/encoding.html",
+    "path_type": "hardlink",
+    "sha256": "4b7905db8194c46376110c5088beb2ac89164a16037fb886485ba7eb17eb871b",
+    "sha256_in_prefix": "4b7905db8194c46376110c5088beb2ac89164a16037fb886485ba7eb17eb871b",
+    "size_in_bytes": 2889
+   },
+   {
+    "_path": "share/doc/libogg/libogg/general.html",
+    "path_type": "hardlink",
+    "sha256": "1ed941dcb0d8f93cf6578604d8bcac7f649dd3b1bfc87104a0093a5ee5e59b08",
+    "sha256_in_prefix": "1ed941dcb0d8f93cf6578604d8bcac7f649dd3b1bfc87104a0093a5ee5e59b08",
+    "size_in_bytes": 3678
+   },
+   {
+    "_path": "share/doc/libogg/libogg/index.html",
+    "path_type": "hardlink",
+    "sha256": "3c33bdb7714afc7f1c5024ccd1b56114186364892fff2df51847ebdaee97473f",
+    "sha256_in_prefix": "3c33bdb7714afc7f1c5024ccd1b56114186364892fff2df51847ebdaee97473f",
+    "size_in_bytes": 1063
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_iovec_t.html",
+    "path_type": "hardlink",
+    "sha256": "d81bc7343a0470eb727b1141195ecf4e24e188ecc76ae53a5bd05ed11e4ef770",
+    "sha256_in_prefix": "d81bc7343a0470eb727b1141195ecf4e24e188ecc76ae53a5bd05ed11e4ef770",
+    "size_in_bytes": 1395
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_packet.html",
+    "path_type": "hardlink",
+    "sha256": "102ccfa5d0639e9c0fe1e9458a0950f25130e6a41416b05ac3ad423c90cbcf6b",
+    "sha256_in_prefix": "102ccfa5d0639e9c0fe1e9458a0950f25130e6a41416b05ac3ad423c90cbcf6b",
+    "size_in_bytes": 2259
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_packet_clear.html",
+    "path_type": "hardlink",
+    "sha256": "0f2b0dee11ee94b8b1e2fe43cd00e794524fcc4b698667e6e207bf4ed87a1cd2",
+    "sha256_in_prefix": "0f2b0dee11ee94b8b1e2fe43cd00e794524fcc4b698667e6e207bf4ed87a1cd2",
+    "size_in_bytes": 1431
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page.html",
+    "path_type": "hardlink",
+    "sha256": "7c45a7db0abd64c1a1d9d90b0cf711e73b15d29d4a387dbd3769263f73cd0983",
+    "sha256_in_prefix": "7c45a7db0abd64c1a1d9d90b0cf711e73b15d29d4a387dbd3769263f73cd0983",
+    "size_in_bytes": 2219
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_bos.html",
+    "path_type": "hardlink",
+    "sha256": "f9d38306fcbf095f2f02d009d859fdb8abff78647020a90085b1c67dd6352b65",
+    "sha256_in_prefix": "f9d38306fcbf095f2f02d009d859fdb8abff78647020a90085b1c67dd6352b65",
+    "size_in_bytes": 1383
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_checksum_set.html",
+    "path_type": "hardlink",
+    "sha256": "34fd25bd99276e35bdc89ab73d3a2bc2e715465f5a7c2706de3edf9cf5b12285",
+    "sha256_in_prefix": "34fd25bd99276e35bdc89ab73d3a2bc2e715465f5a7c2706de3edf9cf5b12285",
+    "size_in_bytes": 1218
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_continued.html",
+    "path_type": "hardlink",
+    "sha256": "b9630c2af5aa169aacee2333f777eb7ef25532b0ccb7880864c8ed4bb2489a52",
+    "sha256_in_prefix": "b9630c2af5aa169aacee2333f777eb7ef25532b0ccb7880864c8ed4bb2489a52",
+    "size_in_bytes": 1415
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_eos.html",
+    "path_type": "hardlink",
+    "sha256": "b7a8fd9a451515d864a183aa43f5ea6d829f0428a704f21eb4a9be72f8e46068",
+    "sha256_in_prefix": "b7a8fd9a451515d864a183aa43f5ea6d829f0428a704f21eb4a9be72f8e46068",
+    "size_in_bytes": 1380
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_granulepos.html",
+    "path_type": "hardlink",
+    "sha256": "855a7f44ff5f6b9c3c3347127830a3f6126e2e451f55516a857268e1833889bc",
+    "sha256_in_prefix": "855a7f44ff5f6b9c3c3347127830a3f6126e2e451f55516a857268e1833889bc",
+    "size_in_bytes": 1567
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_packets.html",
+    "path_type": "hardlink",
+    "sha256": "961754c92945d622937d876c8b77f536196912cff70223863abb53f408843faf",
+    "sha256_in_prefix": "961754c92945d622937d876c8b77f536196912cff70223863abb53f408843faf",
+    "size_in_bytes": 1851
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_pageno.html",
+    "path_type": "hardlink",
+    "sha256": "e819bc028f61a59bcd8f6624d16f2662bdbc820efd2e1b98a721c37e081dad4e",
+    "sha256_in_prefix": "e819bc028f61a59bcd8f6624d16f2662bdbc820efd2e1b98a721c37e081dad4e",
+    "size_in_bytes": 1345
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_serialno.html",
+    "path_type": "hardlink",
+    "sha256": "0204f66d33cb68d91a1b96396a3c49bafa78a7eab5efe0611fa0badda8fb1855",
+    "sha256_in_prefix": "0204f66d33cb68d91a1b96396a3c49bafa78a7eab5efe0611fa0badda8fb1855",
+    "size_in_bytes": 1398
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_page_version.html",
+    "path_type": "hardlink",
+    "sha256": "0e96be733e3f8682c2c160fb960fd1bdae2ac7500a1e890ef2dbcf58cf14aa42",
+    "sha256_in_prefix": "0e96be733e3f8682c2c160fb960fd1bdae2ac7500a1e890ef2dbcf58cf14aa42",
+    "size_in_bytes": 1519
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_check.html",
+    "path_type": "hardlink",
+    "sha256": "c3f325b8aea4d188ee6317aa1ab749e01ec548e000505692c32fd995d74ac3ac",
+    "sha256_in_prefix": "c3f325b8aea4d188ee6317aa1ab749e01ec548e000505692c32fd995d74ac3ac",
+    "size_in_bytes": 2311
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_clear.html",
+    "path_type": "hardlink",
+    "sha256": "5098b88b6c2d6cc22200df80978825bd63a223a1f4854940f83ffa1791ec4083",
+    "sha256_in_prefix": "5098b88b6c2d6cc22200df80978825bd63a223a1f4854940f83ffa1791ec4083",
+    "size_in_bytes": 1470
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_destroy.html",
+    "path_type": "hardlink",
+    "sha256": "80fedbaef20667a5fbf84f63fbb469dc4d04b75dbc6bcb5e0c430700add5ca1b",
+    "sha256_in_prefix": "80fedbaef20667a5fbf84f63fbb469dc4d04b75dbc6bcb5e0c430700add5ca1b",
+    "size_in_bytes": 1726
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_eos.html",
+    "path_type": "hardlink",
+    "sha256": "7e3c066073eec2a1a3c24b090c82996907b22eddeeceea80d3321a1744ffa79b",
+    "sha256_in_prefix": "7e3c066073eec2a1a3c24b090c82996907b22eddeeceea80d3321a1744ffa79b",
+    "size_in_bytes": 1405
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_flush.html",
+    "path_type": "hardlink",
+    "sha256": "3a561a869e550d17ba119a2460b9c2b6f1dc54128cfa970a84dbb3d74707ac08",
+    "sha256_in_prefix": "3a561a869e550d17ba119a2460b9c2b6f1dc54128cfa970a84dbb3d74707ac08",
+    "size_in_bytes": 2631
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_flush_fill.html",
+    "path_type": "hardlink",
+    "sha256": "0268e9c7866d605ad090c694778fc60ea4dd1cc2a9434c7093119741a0a2a419",
+    "sha256_in_prefix": "0268e9c7866d605ad090c694778fc60ea4dd1cc2a9434c7093119741a0a2a419",
+    "size_in_bytes": 2785
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_init.html",
+    "path_type": "hardlink",
+    "sha256": "b749aa0778597966caa5eb5a3cd8cfd7d89bfa658506b1e0c4720c6b239414fc",
+    "sha256_in_prefix": "b749aa0778597966caa5eb5a3cd8cfd7d89bfa658506b1e0c4720c6b239414fc",
+    "size_in_bytes": 1627
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_iovecin.html",
+    "path_type": "hardlink",
+    "sha256": "c68e4e60ebcb52d57bf6c6f6542e109e230f25c04cdce1dc345731b3f8b0935d",
+    "sha256_in_prefix": "c68e4e60ebcb52d57bf6c6f6542e109e230f25c04cdce1dc345731b3f8b0935d",
+    "size_in_bytes": 2421
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_packetin.html",
+    "path_type": "hardlink",
+    "sha256": "98fbd357c1221ae39646791f468faaf81625f7a652dd167245d2369e984123ec",
+    "sha256_in_prefix": "98fbd357c1221ae39646791f468faaf81625f7a652dd167245d2369e984123ec",
+    "size_in_bytes": 1887
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_packetout.html",
+    "path_type": "hardlink",
+    "sha256": "f281cb3737844d9952c50db18002d4d5762877d22eb5545bc0790fc3081d47ee",
+    "sha256_in_prefix": "f281cb3737844d9952c50db18002d4d5762877d22eb5545bc0790fc3081d47ee",
+    "size_in_bytes": 2954
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_packetpeek.html",
+    "path_type": "hardlink",
+    "sha256": "a7cd3d94ee2f057bf7e0bcc902106f279d84d05b52711ce7608f6e0152f341ca",
+    "sha256_in_prefix": "a7cd3d94ee2f057bf7e0bcc902106f279d84d05b52711ce7608f6e0152f341ca",
+    "size_in_bytes": 2313
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_pagein.html",
+    "path_type": "hardlink",
+    "sha256": "881cb5790eb431b4fe4230544b7b8921de8949cac42be27a89b98961b7f32308",
+    "sha256_in_prefix": "881cb5790eb431b4fe4230544b7b8921de8949cac42be27a89b98961b7f32308",
+    "size_in_bytes": 2184
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_pageout.html",
+    "path_type": "hardlink",
+    "sha256": "8345b9b724e7c6d08f098ff3729a0980d9c16ef9320d963d192b53779aabde2c",
+    "sha256_in_prefix": "8345b9b724e7c6d08f098ff3729a0980d9c16ef9320d963d192b53779aabde2c",
+    "size_in_bytes": 2758
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_pageout_fill.html",
+    "path_type": "hardlink",
+    "sha256": "a6f3549940b22da30d378bccef44df3ae15a1fc1b93858346e606fc605d6253b",
+    "sha256_in_prefix": "a6f3549940b22da30d378bccef44df3ae15a1fc1b93858346e606fc605d6253b",
+    "size_in_bytes": 2986
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_reset.html",
+    "path_type": "hardlink",
+    "sha256": "c2ecc26ea30d99a5f6b63c3befe4fe1049d6523d7851b90d39d29b1093b5a779",
+    "sha256_in_prefix": "c2ecc26ea30d99a5f6b63c3befe4fe1049d6523d7851b90d39d29b1093b5a779",
+    "size_in_bytes": 1385
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_reset_serialno.html",
+    "path_type": "hardlink",
+    "sha256": "324d8621025c4ec6d14ab72034371535363c58dbe8485be949de850fa4ba9c9a",
+    "sha256_in_prefix": "324d8621025c4ec6d14ab72034371535363c58dbe8485be949de850fa4ba9c9a",
+    "size_in_bytes": 1604
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_stream_state.html",
+    "path_type": "hardlink",
+    "sha256": "ec7e2298601f0809ba78d73150493452d4d36f8168c74e37d2a304258bf4bb55",
+    "sha256_in_prefix": "ec7e2298601f0809ba78d73150493452d4d36f8168c74e37d2a304258bf4bb55",
+    "size_in_bytes": 4367
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_buffer.html",
+    "path_type": "hardlink",
+    "sha256": "5a7d37526b8af18d94c31659cef76f7a180d020f693cf4aa232bc70b33d31df4",
+    "sha256_in_prefix": "5a7d37526b8af18d94c31659cef76f7a180d020f693cf4aa232bc70b33d31df4",
+    "size_in_bytes": 2074
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_check.html",
+    "path_type": "hardlink",
+    "sha256": "afbe0f2815179a9e6ec519c455f037c3a7577b88669fee0495267c9873db823b",
+    "sha256_in_prefix": "afbe0f2815179a9e6ec519c455f037c3a7577b88669fee0495267c9873db823b",
+    "size_in_bytes": 2271
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_clear.html",
+    "path_type": "hardlink",
+    "sha256": "ef9ea38a14e96e476011175f06aa9d8b3f00b274fe76f7e4b268e3f0c5e6adc2",
+    "sha256_in_prefix": "ef9ea38a14e96e476011175f06aa9d8b3f00b274fe76f7e4b268e3f0c5e6adc2",
+    "size_in_bytes": 1724
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_destroy.html",
+    "path_type": "hardlink",
+    "sha256": "e0d942c7baf31e801b40f9e9917db4d9b05dd18fd67a023fa6233a24336cd193",
+    "sha256_in_prefix": "e0d942c7baf31e801b40f9e9917db4d9b05dd18fd67a023fa6233a24336cd193",
+    "size_in_bytes": 1738
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_init.html",
+    "path_type": "hardlink",
+    "sha256": "1e6342f88812b08eb3cb4aa99bd16be30cd9500fa7c8ee1f89294c90de53ff75",
+    "sha256_in_prefix": "1e6342f88812b08eb3cb4aa99bd16be30cd9500fa7c8ee1f89294c90de53ff75",
+    "size_in_bytes": 1626
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_pageout.html",
+    "path_type": "hardlink",
+    "sha256": "137a6dc17203a4e7722ee13018b94908b7ae6cbae4c99a04a35c21b1deece00f",
+    "sha256_in_prefix": "137a6dc17203a4e7722ee13018b94908b7ae6cbae4c99a04a35c21b1deece00f",
+    "size_in_bytes": 2532
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_pageseek.html",
+    "path_type": "hardlink",
+    "sha256": "bfc46c77fd5175782485d83e01c6daba1b7fedc2cab5bac5b7853ff235462999",
+    "sha256_in_prefix": "bfc46c77fd5175782485d83e01c6daba1b7fedc2cab5bac5b7853ff235462999",
+    "size_in_bytes": 2006
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_reset.html",
+    "path_type": "hardlink",
+    "sha256": "f47488d87a2c8f326dcbb41aa904b3573374f14056a97867688a879657a63d9b",
+    "sha256_in_prefix": "f47488d87a2c8f326dcbb41aa904b3573374f14056a97867688a879657a63d9b",
+    "size_in_bytes": 1499
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_state.html",
+    "path_type": "hardlink",
+    "sha256": "3124bd45f48bf8d954fb5e035a43b62314d432824902d3f59df98254fc830a38",
+    "sha256_in_prefix": "3124bd45f48bf8d954fb5e035a43b62314d432824902d3f59df98254fc830a38",
+    "size_in_bytes": 2245
+   },
+   {
+    "_path": "share/doc/libogg/libogg/ogg_sync_wrote.html",
+    "path_type": "hardlink",
+    "sha256": "3e07d25d8c93543bafd4577362a4771ab1e5afe70b1c39d4c2f947f69cb86bd4",
+    "sha256_in_prefix": "3e07d25d8c93543bafd4577362a4771ab1e5afe70b1c39d4c2f947f69cb86bd4",
+    "size_in_bytes": 2026
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_adv.html",
+    "path_type": "hardlink",
+    "sha256": "abafc08e3c215c3d1401b103caca66ddc838711dbba517f55591cc9ffb40f095",
+    "sha256_in_prefix": "abafc08e3c215c3d1401b103caca66ddc838711dbba517f55591cc9ffb40f095",
+    "size_in_bytes": 1371
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_adv1.html",
+    "path_type": "hardlink",
+    "sha256": "62d9e90a55a64d871c935288767f661e0d345b3433cbb75ec15aa0ec6848ab98",
+    "sha256_in_prefix": "62d9e90a55a64d871c935288767f661e0d345b3433cbb75ec15aa0ec6848ab98",
+    "size_in_bytes": 1287
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_bits.html",
+    "path_type": "hardlink",
+    "sha256": "e14d59cf603365191bb954eb70b2c303e6454111a828937795dd9aec1f8645cb",
+    "sha256_in_prefix": "e14d59cf603365191bb954eb70b2c303e6454111a828937795dd9aec1f8645cb",
+    "size_in_bytes": 1436
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_buffer.html",
+    "path_type": "hardlink",
+    "sha256": "2f440fe24611d59a79fa8166046fce0a7040feabbe013de2783b35207d1f985f",
+    "sha256_in_prefix": "2f440fe24611d59a79fa8166046fce0a7040feabbe013de2783b35207d1f985f",
+    "size_in_bytes": 1504
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_bytes.html",
+    "path_type": "hardlink",
+    "sha256": "dfd055b6eed2c5a5323568e31cf0cae26652a172043c5110abb2996e2b422623",
+    "sha256_in_prefix": "dfd055b6eed2c5a5323568e31cf0cae26652a172043c5110abb2996e2b422623",
+    "size_in_bytes": 1732
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_get_buffer.html",
+    "path_type": "hardlink",
+    "sha256": "d2c73b8a69d5bdf16906ecf4cda019a070acd2edb5364d9e24d20021ddf368a8",
+    "sha256_in_prefix": "d2c73b8a69d5bdf16906ecf4cda019a070acd2edb5364d9e24d20021ddf368a8",
+    "size_in_bytes": 1426
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_look.html",
+    "path_type": "hardlink",
+    "sha256": "75a6ae0f63ba9868b56d2ca8a16051d007dc8385074e73ad1c079c6e7f97f7df",
+    "sha256_in_prefix": "75a6ae0f63ba9868b56d2ca8a16051d007dc8385074e73ad1c079c6e7f97f7df",
+    "size_in_bytes": 1636
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_look1.html",
+    "path_type": "hardlink",
+    "sha256": "07938ca7b5ca22e3ee5089da9d6ddeb1278d857ac96d4d13beba91530995af4a",
+    "sha256_in_prefix": "07938ca7b5ca22e3ee5089da9d6ddeb1278d857ac96d4d13beba91530995af4a",
+    "size_in_bytes": 1449
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_read.html",
+    "path_type": "hardlink",
+    "sha256": "eddc78ef94ba306b73011ec751774820e80e223aeadb398597b1405969d75ba0",
+    "sha256_in_prefix": "eddc78ef94ba306b73011ec751774820e80e223aeadb398597b1405969d75ba0",
+    "size_in_bytes": 1564
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_read1.html",
+    "path_type": "hardlink",
+    "sha256": "735804005a5f5aaf8144e7f9eeaf151205e853745cb1457b78c51894f97b1d70",
+    "sha256_in_prefix": "735804005a5f5aaf8144e7f9eeaf151205e853745cb1457b78c51894f97b1d70",
+    "size_in_bytes": 1541
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_readinit.html",
+    "path_type": "hardlink",
+    "sha256": "8d2ee945a5cf2f399ebd49e86123bb2dce569c696d1ed84b5915921d03a99947",
+    "sha256_in_prefix": "8d2ee945a5cf2f399ebd49e86123bb2dce569c696d1ed84b5915921d03a99947",
+    "size_in_bytes": 1701
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_reset.html",
+    "path_type": "hardlink",
+    "sha256": "52ae469f094adc8b9b106acc6c678900f9baaabb346ba48d80c678bcad6a6db6",
+    "sha256_in_prefix": "52ae469f094adc8b9b106acc6c678900f9baaabb346ba48d80c678bcad6a6db6",
+    "size_in_bytes": 1375
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_write.html",
+    "path_type": "hardlink",
+    "sha256": "9496f2c26a60304ee6f7246473f115346c6d343ea3d0e6ca8b799af246dc8944",
+    "sha256_in_prefix": "9496f2c26a60304ee6f7246473f115346c6d343ea3d0e6ca8b799af246dc8944",
+    "size_in_bytes": 1663
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_writealign.html",
+    "path_type": "hardlink",
+    "sha256": "97729533fcaab9322291d2f4cb1c0690f6f99fea7140972e36d4711f04dd8b22",
+    "sha256_in_prefix": "97729533fcaab9322291d2f4cb1c0690f6f99fea7140972e36d4711f04dd8b22",
+    "size_in_bytes": 1504
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_writecheck.html",
+    "path_type": "hardlink",
+    "sha256": "cc5613810511fa4e78eddc204ef1397feb100afac60d0fda41ce6349a00306d0",
+    "sha256_in_prefix": "cc5613810511fa4e78eddc204ef1397feb100afac60d0fda41ce6349a00306d0",
+    "size_in_bytes": 2595
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_writeclear.html",
+    "path_type": "hardlink",
+    "sha256": "f6bb89d14aee0e355aacff32b631caf1dc1766d37cb09d67dbea7c7e70d3fcbb",
+    "sha256_in_prefix": "f6bb89d14aee0e355aacff32b631caf1dc1766d37cb09d67dbea7c7e70d3fcbb",
+    "size_in_bytes": 1392
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_writecopy.html",
+    "path_type": "hardlink",
+    "sha256": "379067a2cd0fa58d3d52c5129fde2f7b8f86f2a4b1420d52a21f7a1e90cd838c",
+    "sha256_in_prefix": "379067a2cd0fa58d3d52c5129fde2f7b8f86f2a4b1420d52a21f7a1e90cd838c",
+    "size_in_bytes": 1699
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_writeinit.html",
+    "path_type": "hardlink",
+    "sha256": "11ab081f9180a2f2678f0e066e4f51d4bde905aed6197b2f98e39d0db8ededbc",
+    "sha256_in_prefix": "11ab081f9180a2f2678f0e066e4f51d4bde905aed6197b2f98e39d0db8ededbc",
+    "size_in_bytes": 1501
+   },
+   {
+    "_path": "share/doc/libogg/libogg/oggpack_writetrunc.html",
+    "path_type": "hardlink",
+    "sha256": "a6375db547720a004dc95907b2b1b1d088a932212b0c38feb01ffba0a23f409d",
+    "sha256_in_prefix": "a6375db547720a004dc95907b2b1b1d088a932212b0c38feb01ffba0a23f409d",
+    "size_in_bytes": 1539
+   },
+   {
+    "_path": "share/doc/libogg/libogg/overview.html",
+    "path_type": "hardlink",
+    "sha256": "471e11a5fc1cde8e36d81145958c6d3287d6a3040747bc314779feb259a4b857",
+    "sha256_in_prefix": "471e11a5fc1cde8e36d81145958c6d3287d6a3040747bc314779feb259a4b857",
+    "size_in_bytes": 1135
+   },
+   {
+    "_path": "share/doc/libogg/libogg/reference.html",
+    "path_type": "hardlink",
+    "sha256": "d1d3e209ffff48181fc78ed55f79dcb496b2c233e956fc12fd7bd23b2fd800dc",
+    "sha256_in_prefix": "d1d3e209ffff48181fc78ed55f79dcb496b2c233e956fc12fd7bd23b2fd800dc",
+    "size_in_bytes": 4209
+   },
+   {
+    "_path": "share/doc/libogg/libogg/style.css",
+    "path_type": "hardlink",
+    "sha256": "dce5d3639396566c572515801a5e5599a894bdfe875796c26d44000187840e7d",
+    "sha256_in_prefix": "dce5d3639396566c572515801a5e5599a894bdfe875796c26d44000187840e7d",
+    "size_in_bytes": 279
+   },
+   {
+    "_path": "share/doc/libogg/multiplex1.png",
+    "path_type": "hardlink",
+    "sha256": "758b4c95cf431c5b5f5803c56a2eb5c6f8311656ac253e6e7546a1d3515fa177",
+    "sha256_in_prefix": "758b4c95cf431c5b5f5803c56a2eb5c6f8311656ac253e6e7546a1d3515fa177",
+    "size_in_bytes": 54409
+   },
+   {
+    "_path": "share/doc/libogg/ogg-multiplex.html",
+    "path_type": "hardlink",
+    "sha256": "4e0b75ca7d9361246fb873852b757de605dcbc80373f928ce877aabfc8968b57",
+    "sha256_in_prefix": "4e0b75ca7d9361246fb873852b757de605dcbc80373f928ce877aabfc8968b57",
+    "size_in_bytes": 18925
+   },
+   {
+    "_path": "share/doc/libogg/oggstream.html",
+    "path_type": "hardlink",
+    "sha256": "3065106753f215ed765f0155145417b2c33ddfe049207843f63d01c5e5bba239",
+    "sha256_in_prefix": "3065106753f215ed765f0155145417b2c33ddfe049207843f63d01c5e5bba239",
+    "size_in_bytes": 23737
+   },
+   {
+    "_path": "share/doc/libogg/packets.png",
+    "path_type": "hardlink",
+    "sha256": "47bb12b97020c711cfce816f409a2305ca6b8df3141b8f321262f9885e04d49c",
+    "sha256_in_prefix": "47bb12b97020c711cfce816f409a2305ca6b8df3141b8f321262f9885e04d49c",
+    "size_in_bytes": 19776
+   },
+   {
+    "_path": "share/doc/libogg/pages.png",
+    "path_type": "hardlink",
+    "sha256": "6d39711e662b28c990516b88fa23c0f71791881f421dcd158e15ee9280a4cbfd",
+    "sha256_in_prefix": "6d39711e662b28c990516b88fa23c0f71791881f421dcd158e15ee9280a4cbfd",
+    "size_in_bytes": 43547
+   },
+   {
+    "_path": "share/doc/libogg/rfc3533.txt",
+    "path_type": "hardlink",
+    "sha256": "f170265303dd32d026611f7e080338d15d5456643d1d4c22f2c32046860c5476",
+    "sha256_in_prefix": "f170265303dd32d026611f7e080338d15d5456643d1d4c22f2c32046860c5476",
+    "size_in_bytes": 32045
+   },
+   {
+    "_path": "share/doc/libogg/rfc5334.txt",
+    "path_type": "hardlink",
+    "sha256": "de42494701e2acb01585d3c2668c7057238a573d4d0dbc482f8a3a853079950d",
+    "sha256_in_prefix": "de42494701e2acb01585d3c2668c7057238a573d4d0dbc482f8a3a853079950d",
+    "size_in_bytes": 27018
+   },
+   {
+    "_path": "share/doc/libogg/skeleton.html",
+    "path_type": "hardlink",
+    "sha256": "587c2d528014a7acf2b7e0003e70194872deb562a63918d1edf8df8e9e219a71",
+    "sha256_in_prefix": "587c2d528014a7acf2b7e0003e70194872deb562a63918d1edf8df8e9e219a71",
+    "size_in_bytes": 15166
+   },
+   {
+    "_path": "share/doc/libogg/stream.png",
+    "path_type": "hardlink",
+    "sha256": "7aef2906fe37b86abe53a3aa668be1881d73ef3b8efc7762a9e354e5edf6a63a",
+    "sha256_in_prefix": "7aef2906fe37b86abe53a3aa668be1881d73ef3b8efc7762a9e354e5edf6a63a",
+    "size_in_bytes": 2254
+   },
+   {
+    "_path": "share/doc/libogg/vorbisword2.png",
+    "path_type": "hardlink",
+    "sha256": "f97e4fdc963779b4bbcf1c86ae9cf586d69010f11aa0d142ee0f4b6955d1635e",
+    "sha256_in_prefix": "f97e4fdc963779b4bbcf1c86ae9cf586d69010f11aa0d142ee0f4b6955d1635e",
+    "size_in_bytes": 1394
+   },
+   {
+    "_path": "share/doc/libogg/white-ogg.png",
+    "path_type": "hardlink",
+    "sha256": "a8cd12b9700b2e503261cef7529e3c7f3b27b433b90f3b5f14636aba602ab2a8",
+    "sha256_in_prefix": "a8cd12b9700b2e503261cef7529e3c7f3b27b433b90f3b5f14636aba602ab2a8",
+    "size_in_bytes": 2652
+   },
+   {
+    "_path": "share/doc/libogg/white-xifish.png",
+    "path_type": "hardlink",
+    "sha256": "393224c5730de09be8a1c9a8a0a6d53add3d77caebc8603e8e033eb527b15a35",
+    "sha256_in_prefix": "393224c5730de09be8a1c9a8a0a6d53add3d77caebc8603e8e033eb527b15a35",
+    "size_in_bytes": 965
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "152640cb85a760721ffdf419bbb33d838885a855c7deb89177c9a263bcdfff6a",
+ "size": 204185,
+ "subdir": "linux-64",
+ "timestamp": 1623063983000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/libogg-1.3.5-h27cfd23_1.conda",
+ "version": "1.3.5"
+}

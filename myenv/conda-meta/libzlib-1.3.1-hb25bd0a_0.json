@@ -1,0 +1,51 @@
+{
+ "build": "hb25bd0a_0",
+ "build_number": 0,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [
+  "zlib 1.3.1"
+ ],
+ "depends": [
+  "__glibc >=2.17,<3.0.a0",
+  "libgcc-ng >=11.2.0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "lib/libz.so.1",
+  "lib/libz.so.1.3.1"
+ ],
+ "fn": "libzlib-1.3.1-hb25bd0a_0.conda",
+ "license": "Zlib",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "338ee51e19ee211b7fc994d4ba88c631",
+ "name": "libzlib",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "lib/libz.so.1",
+    "path_type": "softlink",
+    "sha256": "96b55bbfb48f50af95da290c4cce33d0724e6565715bfc2e859de7d9efde3cbc",
+    "size_in_bytes": 108688
+   },
+   {
+    "_path": "lib/libz.so.1.3.1",
+    "path_type": "hardlink",
+    "sha256": "96b55bbfb48f50af95da290c4cce33d0724e6565715bfc2e859de7d9efde3cbc",
+    "sha256_in_prefix": "96b55bbfb48f50af95da290c4cce33d0724e6565715bfc2e859de7d9efde3cbc",
+    "size_in_bytes": 108688
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "2e0a3ea3aba7ffaa9c2ce9b267b34b12859f93bde8e62cedcbbab6144776568f",
+ "size": 60697,
+ "subdir": "linux-64",
+ "timestamp": 1756475934000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/libzlib-1.3.1-hb25bd0a_0.conda",
+ "version": "1.3.1"
+}

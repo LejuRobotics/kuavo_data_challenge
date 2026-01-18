@@ -1,0 +1,63 @@
+{
+ "build": "h4e0627c_1",
+ "build_number": 1,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "__glibc >=2.28,<3.0.a0",
+  "lcms2 >=2.16,<3.0a0",
+  "libgcc-ng >=11.2.0",
+  "libopenjpeg 2.5.4 hee96239_1",
+  "libpng >=1.6.50,<1.7.0a0",
+  "libtiff >=4.7.0,<5.0a0",
+  "zlib >=1.2.13,<2.0a0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "bin/opj_compress",
+  "bin/opj_decompress",
+  "bin/opj_dump"
+ ],
+ "fn": "openjpeg-2.5.4-h4e0627c_1.conda",
+ "license": "BSD-2-Clause",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "8b55a0132c0973ab9d4bdb12459562e5",
+ "name": "openjpeg",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "bin/opj_compress",
+    "path_type": "hardlink",
+    "sha256": "e74cd4020115fa74b3462f4ad4c49216c42fe21da7c136605460a52509eddfc2",
+    "sha256_in_prefix": "e74cd4020115fa74b3462f4ad4c49216c42fe21da7c136605460a52509eddfc2",
+    "size_in_bytes": 123440
+   },
+   {
+    "_path": "bin/opj_decompress",
+    "path_type": "hardlink",
+    "sha256": "c493959050cd391335c962d186ff3cc3fa7327b2dc3986846486ae638d206786",
+    "sha256_in_prefix": "c493959050cd391335c962d186ff3cc3fa7327b2dc3986846486ae638d206786",
+    "size_in_bytes": 115040
+   },
+   {
+    "_path": "bin/opj_dump",
+    "path_type": "hardlink",
+    "sha256": "824a41fcbf109c9aae0f49302e4de74e7fb9592466f7411f4101187fa5b366fa",
+    "sha256_in_prefix": "824a41fcbf109c9aae0f49302e4de74e7fb9592466f7411f4101187fa5b366fa",
+    "size_in_bytes": 27616
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "d05519791a3220a40d3a98332dcb9ea564947646ec7649641376ac9cc5e7036e",
+ "size": 96707,
+ "subdir": "linux-64",
+ "timestamp": 1761732755000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/openjpeg-2.5.4-h4e0627c_1.conda",
+ "version": "2.5.4"
+}

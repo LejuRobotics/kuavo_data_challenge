@@ -1,0 +1,75 @@
+{
+ "build": "h6a678d5_0",
+ "build_number": 0,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "libgcc-ng >=11.2.0",
+  "libstdcxx-ng >=11.2.0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "include/Lerc_c_api.h",
+  "include/Lerc_types.h",
+  "lib/libLerc.so",
+  "lib/libLerc.so.4",
+  "lib/pkgconfig/Lerc.pc"
+ ],
+ "fn": "lerc-4.0.0-h6a678d5_0.conda",
+ "license": "Apache-2.0",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "86429321752f28131f259bd4f4d2b9d4",
+ "name": "lerc",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "include/Lerc_c_api.h",
+    "path_type": "hardlink",
+    "sha256": "51c3d4c683eac91beb16e521a7ae38516ac06b867dc12e5555961cb7d1975e65",
+    "sha256_in_prefix": "51c3d4c683eac91beb16e521a7ae38516ac06b867dc12e5555961cb7d1975e65",
+    "size_in_bytes": 22507
+   },
+   {
+    "_path": "include/Lerc_types.h",
+    "path_type": "hardlink",
+    "sha256": "4887c98b138f7cebaa4f26699e9a8647d612058892b261c37395728b3695b038",
+    "sha256_in_prefix": "4887c98b138f7cebaa4f26699e9a8647d612058892b261c37395728b3695b038",
+    "size_in_bytes": 1285
+   },
+   {
+    "_path": "lib/libLerc.so",
+    "path_type": "softlink",
+    "sha256": "cde7319ac80cff1ffa24d9d7f56e71c3958f0cecbcb7cef4b10621e54e6eb866",
+    "size_in_bytes": 838456
+   },
+   {
+    "_path": "lib/libLerc.so.4",
+    "path_type": "hardlink",
+    "sha256": "cde7319ac80cff1ffa24d9d7f56e71c3958f0cecbcb7cef4b10621e54e6eb866",
+    "sha256_in_prefix": "cde7319ac80cff1ffa24d9d7f56e71c3958f0cecbcb7cef4b10621e54e6eb866",
+    "size_in_bytes": 838456
+   },
+   {
+    "_path": "lib/pkgconfig/Lerc.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/croot/lerc_1734423357377/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_pl",
+    "sha256": "c5de8875843d213f4bf255c5f74bf64c4dc717c2f5c69133ae8d8bdb4466094b",
+    "sha256_in_prefix": "7545b54cb7e2a5a58b9cfa363a3c730aec75e2ae50b6bdf591aaccd88577f1e6",
+    "size_in_bytes": 526
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "9e4f8b56d4f7fca9c0156c1db5ee2ae6e9c31c1b639d429d2b48cc65e743662d",
+ "size": 267739,
+ "subdir": "linux-64",
+ "timestamp": 1734423401000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/lerc-4.0.0-h6a678d5_0.conda",
+ "version": "4.0.0"
+}

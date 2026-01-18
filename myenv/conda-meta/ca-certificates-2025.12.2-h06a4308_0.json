@@ -1,0 +1,46 @@
+{
+ "build": "h06a4308_0",
+ "build_number": 0,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [],
+ "extracted_package_dir": "",
+ "files": [
+  "ssl/cacert.pem",
+  "ssl/cert.pem"
+ ],
+ "fn": "ca-certificates-2025.12.2-h06a4308_0.conda",
+ "license": "MPL-2.0",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "4a93c43656592eb990b914fead171268",
+ "name": "ca-certificates",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "ssl/cacert.pem",
+    "path_type": "hardlink",
+    "sha256": "f1407d974c5ed87d544bd931a278232e13925177e239fca370619aba63c757b4",
+    "sha256_in_prefix": "f1407d974c5ed87d544bd931a278232e13925177e239fca370619aba63c757b4",
+    "size_in_bytes": 225076
+   },
+   {
+    "_path": "ssl/cert.pem",
+    "path_type": "softlink",
+    "sha256": "f1407d974c5ed87d544bd931a278232e13925177e239fca370619aba63c757b4",
+    "size_in_bytes": 225076
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "0c11f114b16e3b392f9e23f62ed6e48df81e1faec9bd036459edf7009bd819ac",
+ "size": 128414,
+ "subdir": "linux-64",
+ "timestamp": 1764713819000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/ca-certificates-2025.12.2-h06a4308_0.conda",
+ "version": "2025.12.2"
+}

@@ -1,0 +1,75 @@
+\doxysection{theoradec.\+h}
+\label{theoradec_8h_source}\index{theoradec.h@{theoradec.h}}
+\textbf{ Go to the documentation of this file.}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/********************************************************************}}
+\DoxyCodeLine{2 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{3 \textcolor{comment}{ * THIS FILE IS PART OF THE OggTheora SOFTWARE CODEC SOURCE CODE.   *}}
+\DoxyCodeLine{4 \textcolor{comment}{ * USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS     *}}
+\DoxyCodeLine{5 \textcolor{comment}{ * GOVERNED BY A BSD-\/STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *}}
+\DoxyCodeLine{6 \textcolor{comment}{ * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *}}
+\DoxyCodeLine{7 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{8 \textcolor{comment}{ * THE Theora SOURCE CODE IS COPYRIGHT (C) 2002-\/2009                *}}
+\DoxyCodeLine{9 \textcolor{comment}{ * by the Xiph.Org Foundation https://www.xiph.org/                 *}}
+\DoxyCodeLine{10 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{11 \textcolor{comment}{ ********************************************************************}}
+\DoxyCodeLine{12 \textcolor{comment}{}}
+\DoxyCodeLine{13 \textcolor{comment}{  function:}}
+\DoxyCodeLine{14 \textcolor{comment}{}}
+\DoxyCodeLine{15 \textcolor{comment}{ ********************************************************************/}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#if !defined(OGG\_THEORA\_THEORADEC\_HEADER)}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\# define OGG\_THEORA\_THEORADEC\_HEADER (1)}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\# include <stddef.h>}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{\# include <ogg/ogg.h>}}
+\DoxyCodeLine{24 \textcolor{preprocessor}{\# include "{}codec.h"{}}}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{preprocessor}{\#if defined(\_\_cplusplus)}}
+\DoxyCodeLine{27 \textcolor{keyword}{extern} \textcolor{stringliteral}{"{}C"{}} \{}
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 }
+\DoxyCodeLine{49 \textcolor{preprocessor}{\#define TH\_DECCTL\_GET\_PPLEVEL\_MAX (1)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_PPLEVEL (3)}}
+\DoxyCodeLine{78 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_GRANPOS (5)}}
+\DoxyCodeLine{92 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_STRIPE\_CB (7)}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{96 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_TELEMETRY\_MBMODE (9)}}
+\DoxyCodeLine{99 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_TELEMETRY\_MV (11)}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_TELEMETRY\_QI (13)}}
+\DoxyCodeLine{105 \textcolor{preprocessor}{\#define TH\_DECCTL\_SET\_TELEMETRY\_BITS (15)}}
+\DoxyCodeLine{141 \textcolor{keyword}{typedef} void (*th\_stripe\_decoded\_func)(\textcolor{keywordtype}{void} *\_ctx,th\_ycbcr\_buffer \_buf,}
+\DoxyCodeLine{142  \textcolor{keywordtype}{int} \_yfrag0,\textcolor{keywordtype}{int} \_yfrag\_end);}
+\DoxyCodeLine{143 }
+\DoxyCodeLine{145 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{148   \textcolor{keywordtype}{void}                   *ctx;}
+\DoxyCodeLine{150   th\_stripe\_decoded\_func  stripe\_decoded;}
+\DoxyCodeLine{151 \}th\_stripe\_callback;}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154 }
+\DoxyCodeLine{162 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }th\_dec\_ctx    th\_dec\_ctx;}
+\DoxyCodeLine{169 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }th\_setup\_info th\_setup\_info;}
+\DoxyCodeLine{234 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} th\_decode\_headerin(th\_info *\_info,th\_comment *\_tc,}
+\DoxyCodeLine{235  th\_setup\_info **\_setup,ogg\_packet *\_op);}
+\DoxyCodeLine{258 \textcolor{keyword}{extern} th\_dec\_ctx *th\_decode\_alloc(\textcolor{keyword}{const} th\_info *\_info,}
+\DoxyCodeLine{259  \textcolor{keyword}{const} th\_setup\_info *\_setup);}
+\DoxyCodeLine{265 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} th\_setup\_free(th\_setup\_info *\_setup);}
+\DoxyCodeLine{277 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} th\_decode\_ctl(th\_dec\_ctx *\_dec,\textcolor{keywordtype}{int} \_req,\textcolor{keywordtype}{void} *\_buf,}
+\DoxyCodeLine{278  \textcolor{keywordtype}{size\_t} \_buf\_sz);}
+\DoxyCodeLine{301 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} th\_decode\_packetin(th\_dec\_ctx *\_dec,\textcolor{keyword}{const} ogg\_packet *\_op,}
+\DoxyCodeLine{302  ogg\_int64\_t *\_granpos);}
+\DoxyCodeLine{318 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} th\_decode\_ycbcr\_out(th\_dec\_ctx *\_dec,}
+\DoxyCodeLine{319  th\_ycbcr\_buffer \_ycbcr);}
+\DoxyCodeLine{322 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} th\_decode\_free(th\_dec\_ctx *\_dec);}
+\DoxyCodeLine{325 }
+\DoxyCodeLine{326 }
+\DoxyCodeLine{327 }
+\DoxyCodeLine{328 \textcolor{preprocessor}{\#if defined(\_\_cplusplus)}}
+\DoxyCodeLine{329 \}}
+\DoxyCodeLine{330 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{331 }
+\DoxyCodeLine{332 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/* OGG\_THEORA\_THEORADEC\_HEADER */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

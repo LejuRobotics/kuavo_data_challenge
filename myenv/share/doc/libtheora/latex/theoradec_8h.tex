@@ -1,0 +1,463 @@
+\doxysection{theoradec.\+h File Reference}
+\label{theoradec_8h}\index{theoradec.h@{theoradec.h}}
+
+
+The {\ttfamily libtheoradec} C decoding API.  
+
+
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include $<$ogg/ogg.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}codec.\+h\char`\"{}}\newline
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \textbf{ th\+\_\+stripe\+\_\+callback}
+\begin{DoxyCompactList}\small\item\em The striped decode callback data to pass to \doxyref{TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+STRIPE\+\_\+\+CB}{p.}{theoradec_8h_ac95cc9e109474b0fa4bb920ab2cfdf1e}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \textbf{ OGG\+\_\+\+THEORA\+\_\+\+THEORADEC\+\_\+\+HEADER}~(1)
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{Indent}\textbf{ Decoder state}\par
+{\em The following data structures are opaque, and their contents are not publicly defined by this API.
+
+Referring to their internals directly is unsupported, and may break without warning. }\begin{DoxyCompactItemize}
+\item 
+typedef struct \textbf{ th\+\_\+dec\+\_\+ctx} \textbf{ th\+\_\+dec\+\_\+ctx}
+\begin{DoxyCompactList}\small\item\em The decoder context. \end{DoxyCompactList}\item 
+typedef struct \textbf{ th\+\_\+setup\+\_\+info} \textbf{ th\+\_\+setup\+\_\+info}
+\begin{DoxyCompactList}\small\item\em Setup information. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{Functions}
+\begin{Indent}\textbf{ Functions for decoding}\par
+{\em You must link to {\ttfamily libtheoradec} if you use any of the functions in this section.
+
+The functions are listed in the order they are used in a typical decode. The basic steps are\+:
+\begin{DoxyItemize}
+\item Parse the header packets by repeatedly calling \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50}.
+\item Allocate a \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle with \doxyref{th\+\_\+decode\+\_\+alloc()}{p.}{theoradec_8h_a81888d90a9654eec3878706bd8605898}.
+\item Call \doxyref{th\+\_\+setup\+\_\+free()}{p.}{theoradec_8h_adef55431b68aaa59d0d7b32b2f118f27} to free any memory used for codec setup information.
+\item Perform any additional decoder configuration with \doxyref{th\+\_\+decode\+\_\+ctl()}{p.}{theoradec_8h_a1a8051958d75b1012573b6e3c8f670e1}.
+\item For each video data packet\+:
+\begin{DoxyItemize}
+\item Submit the packet to the decoder via \doxyref{th\+\_\+decode\+\_\+packetin()}{p.}{theoradec_8h_a31c814bf09b2232aff69c57ae20f04eb}.
+\item Retrieve the uncompressed video data via \doxyref{th\+\_\+decode\+\_\+ycbcr\+\_\+out()}{p.}{theoradec_8h_aa9cc8af63fa8540e0fc95572f259cdcb}.
+\end{DoxyItemize}
+\item Call \doxyref{th\+\_\+decode\+\_\+free()}{p.}{theoradec_8h_afb6684ad8ba507b71112bc9de148e7d0} to release all decoder memory. 
+\end{DoxyItemize}}\begin{DoxyCompactItemize}
+\item 
+int \textbf{ th\+\_\+decode\+\_\+headerin} (\textbf{ th\+\_\+info} $\ast$\+\_\+info, \textbf{ th\+\_\+comment} $\ast$\+\_\+tc, \textbf{ th\+\_\+setup\+\_\+info} $\ast$$\ast$\+\_\+setup, ogg\+\_\+packet $\ast$\+\_\+op)
+\begin{DoxyCompactList}\small\item\em Decodes the header packets of a Theora stream. \end{DoxyCompactList}\item 
+\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$ \textbf{ th\+\_\+decode\+\_\+alloc} (const \textbf{ th\+\_\+info} $\ast$\+\_\+info, const \textbf{ th\+\_\+setup\+\_\+info} $\ast$\+\_\+setup)
+\begin{DoxyCompactList}\small\item\em Allocates a decoder instance. \end{DoxyCompactList}\item 
+void \textbf{ th\+\_\+setup\+\_\+free} (\textbf{ th\+\_\+setup\+\_\+info} $\ast$\+\_\+setup)
+\begin{DoxyCompactList}\small\item\em Releases all storage used for the decoder setup information. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+decode\+\_\+ctl} (\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$\+\_\+dec, int \+\_\+req, void $\ast$\+\_\+buf, size\+\_\+t \+\_\+buf\+\_\+sz)
+\begin{DoxyCompactList}\small\item\em Decoder control function. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+decode\+\_\+packetin} (\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$\+\_\+dec, const ogg\+\_\+packet $\ast$\+\_\+op, ogg\+\_\+int64\+\_\+t $\ast$\+\_\+granpos)
+\begin{DoxyCompactList}\small\item\em Submits a packet containing encoded video data to the decoder. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+decode\+\_\+ycbcr\+\_\+out} (\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$\+\_\+dec, \textbf{ th\+\_\+ycbcr\+\_\+buffer} \+\_\+ycbcr)
+\begin{DoxyCompactList}\small\item\em Outputs the next available frame of decoded Y\textquotesingle{}Cb\+Cr data. \end{DoxyCompactList}\item 
+void \textbf{ th\+\_\+decode\+\_\+free} (\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$\+\_\+dec)
+\begin{DoxyCompactList}\small\item\em Frees an allocated decoder instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{th\+\_\+decode\+\_\+ctl() codes}
+\label{theoradec_8h_decctlcodes}%
+These are the available request codes for \doxyref{th\+\_\+decode\+\_\+ctl()}{p.}{theoradec_8h_a1a8051958d75b1012573b6e3c8f670e1}.
+
+By convention, these are odd, to distinguish them from the \doxyref{encoder control codes}{p.}{theoraenc_8h_encctlcodes}. Keep any experimental or vendor-\/specific values above {\ttfamily 0x8000}. \begin{DoxyCompactItemize}
+\item 
+\#define \textbf{ TH\+\_\+\+DECCTL\+\_\+\+GET\+\_\+\+PPLEVEL\+\_\+\+MAX}~(1)
+\begin{DoxyCompactList}\small\item\em Gets the maximum post-\/processing level. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+PPLEVEL}~(3)
+\begin{DoxyCompactList}\small\item\em Sets the post-\/processing level. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+GRANPOS}~(5)
+\begin{DoxyCompactList}\small\item\em Sets the granule position. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+STRIPE\+\_\+\+CB}~(7)
+\begin{DoxyCompactList}\small\item\em Sets the striped decode callback function. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+TELEMETRY\+\_\+\+MBMODE}~(9)
+\begin{DoxyCompactList}\small\item\em Sets the macroblock display mode. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+TELEMETRY\+\_\+\+MV}~(11)
+\begin{DoxyCompactList}\small\item\em Sets the motion vector display mode. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+TELEMETRY\+\_\+\+QI}~(13)
+\begin{DoxyCompactList}\small\item\em Sets the adaptive quantization display mode. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+TELEMETRY\+\_\+\+BITS}~(15)
+\begin{DoxyCompactList}\small\item\em Sets the bitstream breakdown visualization mode. \end{DoxyCompactList}\item 
+typedef void($\ast$ \textbf{ th\+\_\+stripe\+\_\+decoded\+\_\+func}) (void $\ast$\+\_\+ctx, \textbf{ th\+\_\+ycbcr\+\_\+buffer} \+\_\+buf, int \+\_\+yfrag0, int \+\_\+yfrag\+\_\+end)
+\begin{DoxyCompactList}\small\item\em A callback function for striped decode. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The {\ttfamily libtheoradec} C decoding API. 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\label{theoradec_8h_a01a53a08096cec23bab65f2680595c72}} 
+\index{theoradec.h@{theoradec.h}!OGG\_THEORA\_THEORADEC\_HEADER@{OGG\_THEORA\_THEORADEC\_HEADER}}
+\index{OGG\_THEORA\_THEORADEC\_HEADER@{OGG\_THEORA\_THEORADEC\_HEADER}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{OGG\_THEORA\_THEORADEC\_HEADER}
+{\footnotesize\ttfamily \#define OGG\+\_\+\+THEORA\+\_\+\+THEORADEC\+\_\+\+HEADER~(1)}
+
+\mbox{\label{theoradec_8h_ab31f251c9319f2140d247585d30b3d07}} 
+\index{theoradec.h@{theoradec.h}!TH\_DECCTL\_GET\_PPLEVEL\_MAX@{TH\_DECCTL\_GET\_PPLEVEL\_MAX}}
+\index{TH\_DECCTL\_GET\_PPLEVEL\_MAX@{TH\_DECCTL\_GET\_PPLEVEL\_MAX}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{TH\_DECCTL\_GET\_PPLEVEL\_MAX}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DECCTL\+\_\+\+GET\+\_\+\+PPLEVEL\+\_\+\+MAX~(1)}
+
+
+
+Gets the maximum post-\/processing level. 
+
+The decoder supports a post-\/processing filter that can improve the appearance of the decoded images. This returns the highest level setting for this post-\/processor, corresponding to maximum improvement and computational expense.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em \+\_\+buf} & int\+: The maximum post-\/processing level. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+dec\+\_\+ctx} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoradec_8h_a1e870c654d35394f0d490045df04e0f5}} 
+\index{theoradec.h@{theoradec.h}!TH\_DECCTL\_SET\_GRANPOS@{TH\_DECCTL\_SET\_GRANPOS}}
+\index{TH\_DECCTL\_SET\_GRANPOS@{TH\_DECCTL\_SET\_GRANPOS}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{TH\_DECCTL\_SET\_GRANPOS}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+GRANPOS~(5)}
+
+
+
+Sets the granule position. 
+
+Call this after a seek, before decoding the first frame, to ensure that the proper granule position is returned for all subsequent frames. If you track timestamps yourself and do not use the granule position returned by the decoder, then you need not call this function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & {\ttfamily ogg\+\_\+int64\+\_\+t}\+: The granule position of the next frame. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+dec\+\_\+ctx} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(ogg\+\_\+int64\+\_\+t)}, or the granule position is negative. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoradec_8h_a87774c35e1a755a84e2d705b38ebef0d}} 
+\index{theoradec.h@{theoradec.h}!TH\_DECCTL\_SET\_PPLEVEL@{TH\_DECCTL\_SET\_PPLEVEL}}
+\index{TH\_DECCTL\_SET\_PPLEVEL@{TH\_DECCTL\_SET\_PPLEVEL}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{TH\_DECCTL\_SET\_PPLEVEL}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+PPLEVEL~(3)}
+
+
+
+Sets the post-\/processing level. 
+
+By default, post-\/processing is disabled.
+
+Sets the level of post-\/processing to use when decoding the compressed stream. This must be a value between zero (off) and the maximum returned by TH\+\_\+\+DECCTL\+\_\+\+GET\+\_\+\+PPLEVEL\+\_\+\+MAX.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & int\+: The new post-\/processing level. 0 to disable; larger values use more CPU. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+dec\+\_\+ctx} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(int)}, or the post-\/processing level is out of bounds. The maximum post-\/processing level may be implementation-\/specific, and can be obtained via \doxyref{TH\+\_\+\+DECCTL\+\_\+\+GET\+\_\+\+PPLEVEL\+\_\+\+MAX}{p.}{theoradec_8h_ab31f251c9319f2140d247585d30b3d07}. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & Not supported by this implementation. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoradec_8h_ac95cc9e109474b0fa4bb920ab2cfdf1e}} 
+\index{theoradec.h@{theoradec.h}!TH\_DECCTL\_SET\_STRIPE\_CB@{TH\_DECCTL\_SET\_STRIPE\_CB}}
+\index{TH\_DECCTL\_SET\_STRIPE\_CB@{TH\_DECCTL\_SET\_STRIPE\_CB}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{TH\_DECCTL\_SET\_STRIPE\_CB}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+STRIPE\+\_\+\+CB~(7)}
+
+
+
+Sets the striped decode callback function. 
+
+If set, this function will be called as each piece of a frame is fully decoded in \doxyref{th\+\_\+decode\+\_\+packetin()}{p.}{theoradec_8h_a31c814bf09b2232aff69c57ae20f04eb}. You can pass in a \doxyref{th\+\_\+stripe\+\_\+callback}{p.}{structth__stripe__callback} with \doxyref{th\+\_\+stripe\+\_\+callback\+::stripe\+\_\+decoded}{p.}{structth__stripe__callback_a977c725680a37e3446e459f063b1f4a5} set to {\ttfamily NULL} to disable the callbacks at any point. Enabling striped decode does not prevent you from calling \doxyref{th\+\_\+decode\+\_\+ycbcr\+\_\+out()}{p.}{theoradec_8h_aa9cc8af63fa8540e0fc95572f259cdcb} after the frame is fully decoded.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em \+\_\+buf} & \doxyref{th\+\_\+stripe\+\_\+callback}{p.}{structth__stripe__callback}\+: The callback parameters. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+dec\+\_\+ctx} or {\itshape \+\_\+buf} is {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EINVAL} & {\itshape \+\_\+buf\+\_\+sz} is not {\ttfamily sizeof(th\+\_\+stripe\+\_\+callback)}. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoradec_8h_a7f43fec07486f8a5f00e92aab7d44a25}} 
+\index{theoradec.h@{theoradec.h}!TH\_DECCTL\_SET\_TELEMETRY\_BITS@{TH\_DECCTL\_SET\_TELEMETRY\_BITS}}
+\index{TH\_DECCTL\_SET\_TELEMETRY\_BITS@{TH\_DECCTL\_SET\_TELEMETRY\_BITS}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{TH\_DECCTL\_SET\_TELEMETRY\_BITS}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+TELEMETRY\+\_\+\+BITS~(15)}
+
+
+
+Sets the bitstream breakdown visualization mode. 
+
+Set to 0 to disable displaying bitstream breakdown. \mbox{\label{theoradec_8h_a8d5e0b9b4c8898f93f241acbeb7e7ffb}} 
+\index{theoradec.h@{theoradec.h}!TH\_DECCTL\_SET\_TELEMETRY\_MBMODE@{TH\_DECCTL\_SET\_TELEMETRY\_MBMODE}}
+\index{TH\_DECCTL\_SET\_TELEMETRY\_MBMODE@{TH\_DECCTL\_SET\_TELEMETRY\_MBMODE}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{TH\_DECCTL\_SET\_TELEMETRY\_MBMODE}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+TELEMETRY\+\_\+\+MBMODE~(9)}
+
+
+
+Sets the macroblock display mode. 
+
+Set to 0 to disable displaying macroblocks. \mbox{\label{theoradec_8h_a829285a03d24832c583f33c6357df8aa}} 
+\index{theoradec.h@{theoradec.h}!TH\_DECCTL\_SET\_TELEMETRY\_MV@{TH\_DECCTL\_SET\_TELEMETRY\_MV}}
+\index{TH\_DECCTL\_SET\_TELEMETRY\_MV@{TH\_DECCTL\_SET\_TELEMETRY\_MV}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{TH\_DECCTL\_SET\_TELEMETRY\_MV}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+TELEMETRY\+\_\+\+MV~(11)}
+
+
+
+Sets the motion vector display mode. 
+
+Set to 0 to disable displaying motion vectors. \mbox{\label{theoradec_8h_ae3e2f7674ad92fe67b63915d48c9df5b}} 
+\index{theoradec.h@{theoradec.h}!TH\_DECCTL\_SET\_TELEMETRY\_QI@{TH\_DECCTL\_SET\_TELEMETRY\_QI}}
+\index{TH\_DECCTL\_SET\_TELEMETRY\_QI@{TH\_DECCTL\_SET\_TELEMETRY\_QI}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{TH\_DECCTL\_SET\_TELEMETRY\_QI}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+TELEMETRY\+\_\+\+QI~(13)}
+
+
+
+Sets the adaptive quantization display mode. 
+
+Set to 0 to disable displaying adaptive quantization. 
+
+\doxysubsection{Typedef Documentation}
+\mbox{\label{theoradec_8h_a843d70bb02563885a8d54b9c1a781729}} 
+\index{theoradec.h@{theoradec.h}!th\_dec\_ctx@{th\_dec\_ctx}}
+\index{th\_dec\_ctx@{th\_dec\_ctx}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_dec\_ctx}
+{\footnotesize\ttfamily typedef struct \textbf{ th\+\_\+dec\+\_\+ctx} \textbf{ th\+\_\+dec\+\_\+ctx}}
+
+
+
+The decoder context. 
+
+\mbox{\label{theoradec_8h_ab71cd2657455cc27d6c0127c66a89f28}} 
+\index{theoradec.h@{theoradec.h}!th\_setup\_info@{th\_setup\_info}}
+\index{th\_setup\_info@{th\_setup\_info}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_setup\_info}
+{\footnotesize\ttfamily typedef struct \textbf{ th\+\_\+setup\+\_\+info} \textbf{ th\+\_\+setup\+\_\+info}}
+
+
+
+Setup information. 
+
+This contains auxiliary information (Huffman tables and quantization parameters) decoded from the setup header by \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50} to be passed to \doxyref{th\+\_\+decode\+\_\+alloc()}{p.}{theoradec_8h_a81888d90a9654eec3878706bd8605898}. It can be re-\/used to initialize any number of decoders, and can be freed via \doxyref{th\+\_\+setup\+\_\+free()}{p.}{theoradec_8h_adef55431b68aaa59d0d7b32b2f118f27} at any time. \mbox{\label{theoradec_8h_aac9c30f65672f8266d8370fc1ca55bca}} 
+\index{theoradec.h@{theoradec.h}!th\_stripe\_decoded\_func@{th\_stripe\_decoded\_func}}
+\index{th\_stripe\_decoded\_func@{th\_stripe\_decoded\_func}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_stripe\_decoded\_func}
+{\footnotesize\ttfamily typedef void($\ast$ th\+\_\+stripe\+\_\+decoded\+\_\+func) (void $\ast$\+\_\+ctx, \textbf{ th\+\_\+ycbcr\+\_\+buffer} \+\_\+buf, int \+\_\+yfrag0, int \+\_\+yfrag\+\_\+end)}
+
+
+
+A callback function for striped decode. 
+
+This is a function pointer to an application-\/provided function that will be called each time a section of the image is fully decoded in \doxyref{th\+\_\+decode\+\_\+packetin()}{p.}{theoradec_8h_a31c814bf09b2232aff69c57ae20f04eb}. This allows the application to process the section immediately, while it is still in cache. Note that the frame is decoded bottom to top, so {\itshape \+\_\+yfrag0} will steadily decrease with each call until it reaches 0, at which point the full frame is decoded. The number of fragment rows made available in each call depends on the pixel format and the number of post-\/processing filters enabled, and may not even be constant for the entire frame. If a non-\/{\ttfamily NULL} {\itshape \+\_\+granpos} pointer is passed to \doxyref{th\+\_\+decode\+\_\+packetin()}{p.}{theoradec_8h_a31c814bf09b2232aff69c57ae20f04eb}, the granule position for the frame will be stored in it before the first callback is made. If an entire frame is dropped (a 0-\/byte packet), then no callbacks will be made at all for that frame. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+ctx} & An application-\/provided context pointer. \\
+\hline
+{\em \+\_\+buf} & The image buffer for the decoded frame. \\
+\hline
+{\em \+\_\+yfrag0} & The Y coordinate of the first row of 8x8 fragments decoded. Multiply this by 8 to obtain the pixel row number in the luma plane. If the chroma planes are subsampled in the Y direction, this will always be divisible by two. \\
+\hline
+{\em \+\_\+yfrag\+\_\+end} & The Y coordinate of the first row of 8x8 fragments past the newly decoded section. If the chroma planes are subsampled in the Y direction, this will always be divisible by two. I.\+e., this section contains fragment rows {\ttfamily {\itshape \+\_\+yfrag0} ...{\itshape \+\_\+yfrag\+\_\+end} -\/1}. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\label{theoradec_8h_a81888d90a9654eec3878706bd8605898}} 
+\index{theoradec.h@{theoradec.h}!th\_decode\_alloc@{th\_decode\_alloc}}
+\index{th\_decode\_alloc@{th\_decode\_alloc}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_decode\_alloc()}
+{\footnotesize\ttfamily \textbf{ th\+\_\+dec\+\_\+ctx} $\ast$ th\+\_\+decode\+\_\+alloc (\begin{DoxyParamCaption}\item[{const \textbf{ th\+\_\+info} $\ast$}]{\+\_\+info,  }\item[{const \textbf{ th\+\_\+setup\+\_\+info} $\ast$}]{\+\_\+setup }\end{DoxyParamCaption})}
+
+
+
+Allocates a decoder instance. 
+
+{\bfseries{Security Warning\+:}} The Theora format supports very large frame sizes, potentially even larger than the address space of a 32-\/bit machine, and creating a decoder context allocates the space for several frames of data. If the allocation fails here, your program will crash, possibly at some future point because the OS kernel returned a valid memory range and will only fail when it tries to map the pages in it the first time they are used. Even if it succeeds, you may experience a denial of service if the frame size is large enough to cause excessive paging. If you are integrating libtheora in a larger application where such things are undesirable, it is highly recommended that you check the frame size in {\itshape \+\_\+info} before calling this function and refuse to decode streams where it is larger than some reasonable maximum. libtheora will not check this for you, because there may be machines that can handle such streams and applications that wish to. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+info} & A \doxyref{th\+\_\+info}{p.}{structth__info} struct filled via \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50}. \\
+\hline
+{\em \+\_\+setup} & A \doxyref{th\+\_\+setup\+\_\+info}{p.}{theoradec_8h_ab71cd2657455cc27d6c0127c66a89f28} handle returned via \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The initialized \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle. 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em NULL} & If the decoding parameters were invalid. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoradec_8h_a1a8051958d75b1012573b6e3c8f670e1}} 
+\index{theoradec.h@{theoradec.h}!th\_decode\_ctl@{th\_decode\_ctl}}
+\index{th\_decode\_ctl@{th\_decode\_ctl}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_decode\_ctl()}
+{\footnotesize\ttfamily int th\+\_\+decode\+\_\+ctl (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$}]{\+\_\+dec,  }\item[{int}]{\+\_\+req,  }\item[{void $\ast$}]{\+\_\+buf,  }\item[{size\+\_\+t}]{\+\_\+buf\+\_\+sz }\end{DoxyParamCaption})}
+
+
+
+Decoder control function. 
+
+This is used to provide advanced control of the decoding process. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+dec} & A \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle. \\
+\hline
+{\em \+\_\+req} & The control code to process. See \doxyref{the list of available control codes}{p.}{theoradec_8h_decctlcodes} for details. \\
+\hline
+{\em \+\_\+buf} & The parameters for this control code. \\
+\hline
+{\em \+\_\+buf\+\_\+sz} & The size of the parameter buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Possible return values depend on the control code used. See \doxyref{the list of control codes}{p.}{theoradec_8h_decctlcodes} for specific values. Generally 0 indicates success. 
+\end{DoxyReturn}
+\mbox{\label{theoradec_8h_afb6684ad8ba507b71112bc9de148e7d0}} 
+\index{theoradec.h@{theoradec.h}!th\_decode\_free@{th\_decode\_free}}
+\index{th\_decode\_free@{th\_decode\_free}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_decode\_free()}
+{\footnotesize\ttfamily void th\+\_\+decode\+\_\+free (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$}]{\+\_\+dec }\end{DoxyParamCaption})}
+
+
+
+Frees an allocated decoder instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+dec} & A \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle. \\
+\hline
+\end{DoxyParams}
+\mbox{\label{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50}} 
+\index{theoradec.h@{theoradec.h}!th\_decode\_headerin@{th\_decode\_headerin}}
+\index{th\_decode\_headerin@{th\_decode\_headerin}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_decode\_headerin()}
+{\footnotesize\ttfamily int th\+\_\+decode\+\_\+headerin (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+info} $\ast$}]{\+\_\+info,  }\item[{\textbf{ th\+\_\+comment} $\ast$}]{\+\_\+tc,  }\item[{\textbf{ th\+\_\+setup\+\_\+info} $\ast$$\ast$}]{\+\_\+setup,  }\item[{ogg\+\_\+packet $\ast$}]{\+\_\+op }\end{DoxyParamCaption})}
+
+
+
+Decodes the header packets of a Theora stream. 
+
+This should be called on the initial packets of the stream, in succession, until it returns {\ttfamily 0}, indicating that all headers have been processed, or an error is encountered. At least three header packets are required, and additional optional header packets may follow. This can be used on the first packet of any logical stream to determine if that stream is a Theora stream. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+info} & A \doxyref{th\+\_\+info}{p.}{structth__info} structure to fill in. This must have been previously initialized with \doxyref{th\+\_\+info\+\_\+init()}{p.}{codec_8h_a430d9c605816a6ca0bdce3a0b965b926}. The application may immediately begin using the contents of this structure after the first header is decoded, though it must continue to be passed in on all subsequent calls. \\
+\hline
+{\em \+\_\+tc} & A \doxyref{th\+\_\+comment}{p.}{structth__comment} structure to fill in. The application may immediately begin using the contents of this structure after the second header is decoded, though it must continue to be passed in on all subsequent calls. \\
+\hline
+{\em \+\_\+setup} & Returns a pointer to additional, private setup information needed by the decoder. The contents of this pointer must be initialized to {\ttfamily NULL} on the first call, and the returned value must continue to be passed in on all subsequent calls. \\
+\hline
+{\em \+\_\+op} & An {\ttfamily ogg\+\_\+packet} structure which contains one of the initial packets of an Ogg logical stream. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A positive value indicates that a Theora header was successfully processed. 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & The first video data packet was encountered after all required header packets were parsed. The packet just passed in on this call should be saved and fed to \doxyref{th\+\_\+decode\+\_\+packetin()}{p.}{theoradec_8h_a31c814bf09b2232aff69c57ae20f04eb} to begin decoding video data. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & One of {\itshape \+\_\+info}, {\itshape \+\_\+tc}, or {\itshape \+\_\+setup} was {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EBADHEADER} & {\itshape \+\_\+op} was {\ttfamily NULL}, the packet was not the next header packet in the expected sequence, or the format of the header data was invalid. \\
+\hline
+{\em TH\+\_\+\+EVERSION} & The packet data was a Theora info header, but for a bitstream version not decodable with this version of {\ttfamily libtheoradec}. \\
+\hline
+{\em TH\+\_\+\+ENOTFORMAT} & The packet was not a Theora header. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoradec_8h_a31c814bf09b2232aff69c57ae20f04eb}} 
+\index{theoradec.h@{theoradec.h}!th\_decode\_packetin@{th\_decode\_packetin}}
+\index{th\_decode\_packetin@{th\_decode\_packetin}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_decode\_packetin()}
+{\footnotesize\ttfamily int th\+\_\+decode\+\_\+packetin (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$}]{\+\_\+dec,  }\item[{const ogg\+\_\+packet $\ast$}]{\+\_\+op,  }\item[{ogg\+\_\+int64\+\_\+t $\ast$}]{\+\_\+granpos }\end{DoxyParamCaption})}
+
+
+
+Submits a packet containing encoded video data to the decoder. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+dec} & A \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle. \\
+\hline
+{\em \+\_\+op} & An {\ttfamily ogg\+\_\+packet} containing encoded video data. \\
+\hline
+{\em \+\_\+granpos} & Returns the granule position of the decoded packet. If non-\/{\ttfamily NULL}, the granule position for this specific packet is stored in this location. This is computed incrementally from previously decoded packets. After a seek, the correct granule position must be set via \doxyref{TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+GRANPOS}{p.}{theoradec_8h_a1e870c654d35394f0d490045df04e0f5} for this to work properly. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & Success. A new decoded frame can be retrieved by calling \doxyref{th\+\_\+decode\+\_\+ycbcr\+\_\+out()}{p.}{theoradec_8h_aa9cc8af63fa8540e0fc95572f259cdcb}. \\
+\hline
+{\em TH\+\_\+\+DUPFRAME} & The packet represented a dropped frame (either a 0-\/byte frame or an INTER frame with no coded blocks). The player can skip the call to \doxyref{th\+\_\+decode\+\_\+ycbcr\+\_\+out()}{p.}{theoradec_8h_aa9cc8af63fa8540e0fc95572f259cdcb}, as the contents of the decoded frame buffer have not changed. \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+dec} or {\itshape \+\_\+op} was {\ttfamily NULL}. \\
+\hline
+{\em TH\+\_\+\+EBADPACKET} & {\itshape \+\_\+op} does not contain encoded video data. \\
+\hline
+{\em TH\+\_\+\+EIMPL} & The video data uses bitstream features which this library does not support. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoradec_8h_aa9cc8af63fa8540e0fc95572f259cdcb}} 
+\index{theoradec.h@{theoradec.h}!th\_decode\_ycbcr\_out@{th\_decode\_ycbcr\_out}}
+\index{th\_decode\_ycbcr\_out@{th\_decode\_ycbcr\_out}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_decode\_ycbcr\_out()}
+{\footnotesize\ttfamily int th\+\_\+decode\+\_\+ycbcr\+\_\+out (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+dec\+\_\+ctx} $\ast$}]{\+\_\+dec,  }\item[{\textbf{ th\+\_\+ycbcr\+\_\+buffer}}]{\+\_\+ycbcr }\end{DoxyParamCaption})}
+
+
+
+Outputs the next available frame of decoded Y\textquotesingle{}Cb\+Cr data. 
+
+If a striped decode callback has been set with \doxyref{TH\+\_\+\+DECCTL\+\_\+\+SET\+\_\+\+STRIPE\+\_\+\+CB}{p.}{theoradec_8h_ac95cc9e109474b0fa4bb920ab2cfdf1e}, then the application does not need to call this function. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+dec} & A \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle. \\
+\hline
+{\em \+\_\+ycbcr} & A video buffer structure to fill in. {\ttfamily libtheoradec} will fill in all the members of this structure, including the pointers to the uncompressed video data. The memory for this video data is owned by {\ttfamily libtheoradec}. It may be freed or overwritten without notification when subsequent frames are decoded. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & Success \\
+\hline
+{\em TH\+\_\+\+EFAULT} & {\itshape \+\_\+dec} or {\itshape \+\_\+ycbcr} was {\ttfamily NULL}. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{theoradec_8h_adef55431b68aaa59d0d7b32b2f118f27}} 
+\index{theoradec.h@{theoradec.h}!th\_setup\_free@{th\_setup\_free}}
+\index{th\_setup\_free@{th\_setup\_free}!theoradec.h@{theoradec.h}}
+\doxysubsubsection{th\_setup\_free()}
+{\footnotesize\ttfamily void th\+\_\+setup\+\_\+free (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+setup\+\_\+info} $\ast$}]{\+\_\+setup }\end{DoxyParamCaption})}
+
+
+
+Releases all storage used for the decoder setup information. 
+
+This should be called after you no longer want to create any decoders for a stream whose headers you have parsed with \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50}. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+setup} & The setup information to free. This can safely be {\ttfamily NULL}. \\
+\hline
+\end{DoxyParams}

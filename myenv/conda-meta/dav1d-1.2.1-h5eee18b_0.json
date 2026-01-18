@@ -1,0 +1,121 @@
+{
+ "build": "h5eee18b_0",
+ "build_number": 0,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "libgcc-ng >=11.2.0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "bin/dav1d",
+  "include/dav1d/common.h",
+  "include/dav1d/data.h",
+  "include/dav1d/dav1d.h",
+  "include/dav1d/headers.h",
+  "include/dav1d/picture.h",
+  "include/dav1d/version.h",
+  "lib/libdav1d.so",
+  "lib/libdav1d.so.6",
+  "lib/libdav1d.so.6.9.0",
+  "lib/pkgconfig/dav1d.pc"
+ ],
+ "fn": "dav1d-1.2.1-h5eee18b_0.conda",
+ "license": "BSD-2-Clause",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "616c9f26cd289f10a79f3d166b338804",
+ "name": "dav1d",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "bin/dav1d",
+    "path_type": "hardlink",
+    "sha256": "5e6a84bcdd692d323c11f5ff9b811c4cb7fd9b87a065033663e6b2e920186a13",
+    "sha256_in_prefix": "5e6a84bcdd692d323c11f5ff9b811c4cb7fd9b87a065033663e6b2e920186a13",
+    "size_in_bytes": 49064
+   },
+   {
+    "_path": "include/dav1d/common.h",
+    "path_type": "hardlink",
+    "sha256": "62bcebef397d127de595d24164730a026670a3428303f809aed59f7aa26175a6",
+    "sha256_in_prefix": "62bcebef397d127de595d24164730a026670a3428303f809aed59f7aa26175a6",
+    "size_in_bytes": 3258
+   },
+   {
+    "_path": "include/dav1d/data.h",
+    "path_type": "hardlink",
+    "sha256": "283e79ba35c3f90083d68f729a82a3d3625945c0776de5e87b4c081f0296a529",
+    "sha256_in_prefix": "283e79ba35c3f90083d68f729a82a3d3625945c0776de5e87b4c081f0296a529",
+    "size_in_bytes": 4488
+   },
+   {
+    "_path": "include/dav1d/dav1d.h",
+    "path_type": "hardlink",
+    "sha256": "e74102e8c9bc57a408b6821a7c8b1420998e1a7a8a734f70055046e51a0a7dab",
+    "sha256_in_prefix": "e74102e8c9bc57a408b6821a7c8b1420998e1a7a8a734f70055046e51a0a7dab",
+    "size_in_bytes": 12382
+   },
+   {
+    "_path": "include/dav1d/headers.h",
+    "path_type": "hardlink",
+    "sha256": "04d00dde4b0f4759438bc82ef8a4cf0e81a43d42f05b809614324747f94f1442",
+    "sha256_in_prefix": "04d00dde4b0f4759438bc82ef8a4cf0e81a43d42f05b809614324747f94f1442",
+    "size_in_bytes": 13873
+   },
+   {
+    "_path": "include/dav1d/picture.h",
+    "path_type": "hardlink",
+    "sha256": "60dcdc56cd2f67771b281cbe0149249ffee59a3ec768c825b8fbd5c9faf6ae16",
+    "sha256_in_prefix": "60dcdc56cd2f67771b281cbe0149249ffee59a3ec768c825b8fbd5c9faf6ae16",
+    "size_in_bytes": 6013
+   },
+   {
+    "_path": "include/dav1d/version.h",
+    "path_type": "hardlink",
+    "sha256": "fd3a2d9a74930b4ca1d6522b72f1dbff8b89a05d6244abfc0785014f7d61e7ae",
+    "sha256_in_prefix": "fd3a2d9a74930b4ca1d6522b72f1dbff8b89a05d6244abfc0785014f7d61e7ae",
+    "size_in_bytes": 1652
+   },
+   {
+    "_path": "lib/libdav1d.so",
+    "path_type": "softlink",
+    "sha256": "79fd00926afe0c1c03c17c26d5f15e39c9f57f7cac6cb6c71b4485129ed714eb",
+    "size_in_bytes": 2630448
+   },
+   {
+    "_path": "lib/libdav1d.so.6",
+    "path_type": "softlink",
+    "sha256": "79fd00926afe0c1c03c17c26d5f15e39c9f57f7cac6cb6c71b4485129ed714eb",
+    "size_in_bytes": 2630448
+   },
+   {
+    "_path": "lib/libdav1d.so.6.9.0",
+    "path_type": "hardlink",
+    "sha256": "79fd00926afe0c1c03c17c26d5f15e39c9f57f7cac6cb6c71b4485129ed714eb",
+    "sha256_in_prefix": "79fd00926afe0c1c03c17c26d5f15e39c9f57f7cac6cb6c71b4485129ed714eb",
+    "size_in_bytes": 2630448
+   },
+   {
+    "_path": "lib/pkgconfig/dav1d.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/croot/dav1d_1688745928931/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_p",
+    "sha256": "219ca500045f823dc88ea8c1c566b3e0905bb105aa429a51b51d6e40689890b5",
+    "sha256_in_prefix": "1ff443a185d47c216e8588b907640899f3feee85b57312b24d54c9b83e0442ee",
+    "size_in_bytes": 456
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "da35238abc91a5cb8f75251492283b1539c6af7da0eb5b0b6c623c155f181622",
+ "size": 842693,
+ "subdir": "linux-64",
+ "timestamp": 1688746033000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/dav1d-1.2.1-h5eee18b_0.conda",
+ "version": "1.2.1"
+}

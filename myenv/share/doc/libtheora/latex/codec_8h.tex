@@ -1,0 +1,609 @@
+\doxysection{codec.\+h File Reference}
+\label{codec_8h}\index{codec.h@{codec.h}}
+
+
+The shared {\ttfamily libtheoradec} and {\ttfamily libtheoraenc} C API.  
+
+
+{\ttfamily \#include $<$ogg/ogg.\+h$>$}\newline
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \textbf{ th\+\_\+img\+\_\+plane}
+\begin{DoxyCompactList}\small\item\em A buffer for a single color plane in an uncompressed image. \end{DoxyCompactList}\item 
+struct \textbf{ th\+\_\+info}
+\begin{DoxyCompactList}\small\item\em Theora bitstream information. \end{DoxyCompactList}\item 
+struct \textbf{ th\+\_\+comment}
+\begin{DoxyCompactList}\small\item\em The comment information. \end{DoxyCompactList}\item 
+struct \textbf{ th\+\_\+quant\+\_\+ranges}
+\begin{DoxyCompactList}\small\item\em A set of {\itshape qi} ranges. \end{DoxyCompactList}\item 
+struct \textbf{ th\+\_\+quant\+\_\+info}
+\begin{DoxyCompactList}\small\item\em A complete set of quantization parameters. \end{DoxyCompactList}\item 
+struct \textbf{ th\+\_\+huff\+\_\+code}
+\begin{DoxyCompactList}\small\item\em A Huffman code for a Theora DCT token. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \textbf{ OGG\+\_\+\+THEORA\+\_\+\+CODEC\+\_\+\+HEADER}~(1)
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{Indent}\textbf{ Basic shared functions}\par
+{\em These functions return information about the library itself, or provide high-\/level information about codec state and packet type.
+
+You must link to {\ttfamily libtheoradec} if you use any of the functions in this section. }\begin{DoxyCompactItemize}
+\item 
+const char $\ast$ \textbf{ th\+\_\+version\+\_\+string} (void)
+\begin{DoxyCompactList}\small\item\em Retrieves a human-\/readable string to identify the library vendor and version. \end{DoxyCompactList}\item 
+ogg\+\_\+uint32\+\_\+t \textbf{ th\+\_\+version\+\_\+number} (void)
+\begin{DoxyCompactList}\small\item\em Retrieves the library version number. \end{DoxyCompactList}\item 
+ogg\+\_\+int64\+\_\+t \textbf{ th\+\_\+granule\+\_\+frame} (void $\ast$\+\_\+encdec, ogg\+\_\+int64\+\_\+t \+\_\+granpos)
+\begin{DoxyCompactList}\small\item\em Converts a granule position to an absolute frame index, starting at {\ttfamily 0}. \end{DoxyCompactList}\item 
+double \textbf{ th\+\_\+granule\+\_\+time} (void $\ast$\+\_\+encdec, ogg\+\_\+int64\+\_\+t \+\_\+granpos)
+\begin{DoxyCompactList}\small\item\em Converts a granule position to an absolute time in seconds. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+packet\+\_\+isheader} (ogg\+\_\+packet $\ast$\+\_\+op)
+\begin{DoxyCompactList}\small\item\em Determines whether a Theora packet is a header or not. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+packet\+\_\+iskeyframe} (ogg\+\_\+packet $\ast$\+\_\+op)
+\begin{DoxyCompactList}\small\item\em Determines whether a theora packet is a key frame or not. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Functions for manipulating header data}\par
+{\em These functions manipulate the \doxyref{th\+\_\+info}{p.}{structth__info} and \doxyref{th\+\_\+comment}{p.}{structth__comment} structures which describe video parameters and key-\/value metadata, respectively.
+
+You must link to {\ttfamily libtheoradec} if you use any of the functions in this section. }\begin{DoxyCompactItemize}
+\item 
+void \textbf{ th\+\_\+info\+\_\+init} (\textbf{ th\+\_\+info} $\ast$\+\_\+info)
+\begin{DoxyCompactList}\small\item\em Initializes a \doxyref{th\+\_\+info}{p.}{structth__info} structure. \end{DoxyCompactList}\item 
+void \textbf{ th\+\_\+info\+\_\+clear} (\textbf{ th\+\_\+info} $\ast$\+\_\+info)
+\begin{DoxyCompactList}\small\item\em Clears a \doxyref{th\+\_\+info}{p.}{structth__info} structure. \end{DoxyCompactList}\item 
+void \textbf{ th\+\_\+comment\+\_\+init} (\textbf{ th\+\_\+comment} $\ast$\+\_\+tc)
+\begin{DoxyCompactList}\small\item\em Initialize a \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. \end{DoxyCompactList}\item 
+void \textbf{ th\+\_\+comment\+\_\+add} (\textbf{ th\+\_\+comment} $\ast$\+\_\+tc, const char $\ast$\+\_\+comment)
+\begin{DoxyCompactList}\small\item\em Add a comment to an initialized \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. \end{DoxyCompactList}\item 
+void \textbf{ th\+\_\+comment\+\_\+add\+\_\+tag} (\textbf{ th\+\_\+comment} $\ast$\+\_\+tc, const char $\ast$\+\_\+tag, const char $\ast$\+\_\+val)
+\begin{DoxyCompactList}\small\item\em Add a comment to an initialized \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. \end{DoxyCompactList}\item 
+char $\ast$ \textbf{ th\+\_\+comment\+\_\+query} (\textbf{ th\+\_\+comment} $\ast$\+\_\+tc, const char $\ast$\+\_\+tag, int \+\_\+count)
+\begin{DoxyCompactList}\small\item\em Look up a comment value by its tag. \end{DoxyCompactList}\item 
+int \textbf{ th\+\_\+comment\+\_\+query\+\_\+count} (\textbf{ th\+\_\+comment} $\ast$\+\_\+tc, const char $\ast$\+\_\+tag)
+\begin{DoxyCompactList}\small\item\em Look up the number of instances of a tag. \end{DoxyCompactList}\item 
+void \textbf{ th\+\_\+comment\+\_\+clear} (\textbf{ th\+\_\+comment} $\ast$\+\_\+tc)
+\begin{DoxyCompactList}\small\item\em Clears a \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{Return codes}
+\begin{DoxyCompactItemize}
+\item 
+\#define \textbf{ TH\+\_\+\+EFAULT}~(-\/1)
+\begin{DoxyCompactList}\small\item\em An invalid pointer was provided. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+EINVAL}~(-\/10)
+\begin{DoxyCompactList}\small\item\em An invalid argument was provided. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+EBADHEADER}~(-\/20)
+\begin{DoxyCompactList}\small\item\em The contents of the header were incomplete, invalid, or unexpected. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+ENOTFORMAT}~(-\/21)
+\begin{DoxyCompactList}\small\item\em The header does not belong to a Theora stream. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+EVERSION}~(-\/22)
+\begin{DoxyCompactList}\small\item\em The bitstream version is too high. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+EIMPL}~(-\/23)
+\begin{DoxyCompactList}\small\item\em The specified function is not implemented. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+EBADPACKET}~(-\/24)
+\begin{DoxyCompactList}\small\item\em There were errors in the video data packet. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+DUPFRAME}~(1)
+\begin{DoxyCompactList}\small\item\em The decoded packet represented a dropped frame. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+NHUFFMAN\+\_\+\+TABLES}~(80)
+\begin{DoxyCompactList}\small\item\em The number of Huffman tables used by Theora. \end{DoxyCompactList}\item 
+\#define \textbf{ TH\+\_\+\+NDCT\+\_\+\+TOKENS}~(32)
+\begin{DoxyCompactList}\small\item\em The number of DCT token values in each table. \end{DoxyCompactList}\item 
+enum \textbf{ th\+\_\+colorspace} \{ \textbf{ TH\+\_\+\+CS\+\_\+\+UNSPECIFIED}
+, \textbf{ TH\+\_\+\+CS\+\_\+\+ITU\+\_\+\+REC\+\_\+470M}
+, \textbf{ TH\+\_\+\+CS\+\_\+\+ITU\+\_\+\+REC\+\_\+470\+BG}
+, \textbf{ TH\+\_\+\+CS\+\_\+\+NSPACES}
+ \}
+\begin{DoxyCompactList}\small\item\em The currently defined color space tags. \end{DoxyCompactList}\item 
+enum \textbf{ th\+\_\+pixel\+\_\+fmt} \{ \newline
+\textbf{ TH\+\_\+\+PF\+\_\+420}
+, \textbf{ TH\+\_\+\+PF\+\_\+\+RSVD}
+, \textbf{ TH\+\_\+\+PF\+\_\+422}
+, \textbf{ TH\+\_\+\+PF\+\_\+444}
+, \newline
+\textbf{ TH\+\_\+\+PF\+\_\+\+NFORMATS}
+ \}
+\begin{DoxyCompactList}\small\item\em The currently defined pixel format tags. \end{DoxyCompactList}\item 
+typedef \textbf{ th\+\_\+img\+\_\+plane} \textbf{ th\+\_\+ycbcr\+\_\+buffer}[3]
+\begin{DoxyCompactList}\small\item\em A complete image buffer for an uncompressed frame. \end{DoxyCompactList}\item 
+typedef struct \textbf{ th\+\_\+comment} \textbf{ th\+\_\+comment}
+\begin{DoxyCompactList}\small\item\em The comment information. \end{DoxyCompactList}\item 
+typedef unsigned char \textbf{ th\+\_\+quant\+\_\+base}[64]
+\begin{DoxyCompactList}\small\item\em A single base matrix. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The shared {\ttfamily libtheoradec} and {\ttfamily libtheoraenc} C API. 
+
+You don\textquotesingle{}t need to include this directly. 
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\label{codec_8h_aaff54665be7ea0fb741419663c775fe3}} 
+\index{codec.h@{codec.h}!OGG\_THEORA\_CODEC\_HEADER@{OGG\_THEORA\_CODEC\_HEADER}}
+\index{OGG\_THEORA\_CODEC\_HEADER@{OGG\_THEORA\_CODEC\_HEADER}!codec.h@{codec.h}}
+\doxysubsubsection{OGG\_THEORA\_CODEC\_HEADER}
+{\footnotesize\ttfamily \#define OGG\+\_\+\+THEORA\+\_\+\+CODEC\+\_\+\+HEADER~(1)}
+
+\mbox{\label{codec_8h_ab10e7b64f17a02707fc9348ea9832d09}} 
+\index{codec.h@{codec.h}!TH\_DUPFRAME@{TH\_DUPFRAME}}
+\index{TH\_DUPFRAME@{TH\_DUPFRAME}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_DUPFRAME}
+{\footnotesize\ttfamily \#define TH\+\_\+\+DUPFRAME~(1)}
+
+
+
+The decoded packet represented a dropped frame. 
+
+The player can continue to display the current frame, as the contents of the decoded frame buffer have not changed. \mbox{\label{codec_8h_af00f7ecc5242d12a717202537324a510}} 
+\index{codec.h@{codec.h}!TH\_EBADHEADER@{TH\_EBADHEADER}}
+\index{TH\_EBADHEADER@{TH\_EBADHEADER}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_EBADHEADER}
+{\footnotesize\ttfamily \#define TH\+\_\+\+EBADHEADER~(-\/20)}
+
+
+
+The contents of the header were incomplete, invalid, or unexpected. 
+
+\mbox{\label{codec_8h_a6efb84e9c2213a8840003eee2847b27f}} 
+\index{codec.h@{codec.h}!TH\_EBADPACKET@{TH\_EBADPACKET}}
+\index{TH\_EBADPACKET@{TH\_EBADPACKET}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_EBADPACKET}
+{\footnotesize\ttfamily \#define TH\+\_\+\+EBADPACKET~(-\/24)}
+
+
+
+There were errors in the video data packet. 
+
+\mbox{\label{codec_8h_a4d8d8e34fc5ec39ffa05d61a310a0407}} 
+\index{codec.h@{codec.h}!TH\_EFAULT@{TH\_EFAULT}}
+\index{TH\_EFAULT@{TH\_EFAULT}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_EFAULT}
+{\footnotesize\ttfamily \#define TH\+\_\+\+EFAULT~(-\/1)}
+
+
+
+An invalid pointer was provided. 
+
+\mbox{\label{codec_8h_a921c47accc17841f220af5a6afb79efe}} 
+\index{codec.h@{codec.h}!TH\_EIMPL@{TH\_EIMPL}}
+\index{TH\_EIMPL@{TH\_EIMPL}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_EIMPL}
+{\footnotesize\ttfamily \#define TH\+\_\+\+EIMPL~(-\/23)}
+
+
+
+The specified function is not implemented. 
+
+\mbox{\label{codec_8h_afbbd9f19fbf292aeb62a37792cecb870}} 
+\index{codec.h@{codec.h}!TH\_EINVAL@{TH\_EINVAL}}
+\index{TH\_EINVAL@{TH\_EINVAL}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_EINVAL}
+{\footnotesize\ttfamily \#define TH\+\_\+\+EINVAL~(-\/10)}
+
+
+
+An invalid argument was provided. 
+
+\mbox{\label{codec_8h_a3dc08a00a9aba231be398f3e31726d9c}} 
+\index{codec.h@{codec.h}!TH\_ENOTFORMAT@{TH\_ENOTFORMAT}}
+\index{TH\_ENOTFORMAT@{TH\_ENOTFORMAT}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_ENOTFORMAT}
+{\footnotesize\ttfamily \#define TH\+\_\+\+ENOTFORMAT~(-\/21)}
+
+
+
+The header does not belong to a Theora stream. 
+
+\mbox{\label{codec_8h_ac3a45ef2b24f75259258edc481e3a122}} 
+\index{codec.h@{codec.h}!TH\_EVERSION@{TH\_EVERSION}}
+\index{TH\_EVERSION@{TH\_EVERSION}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_EVERSION}
+{\footnotesize\ttfamily \#define TH\+\_\+\+EVERSION~(-\/22)}
+
+
+
+The bitstream version is too high. 
+
+\mbox{\label{codec_8h_a2a44f48084e76a58cae48fb5d47cd422}} 
+\index{codec.h@{codec.h}!TH\_NDCT\_TOKENS@{TH\_NDCT\_TOKENS}}
+\index{TH\_NDCT\_TOKENS@{TH\_NDCT\_TOKENS}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_NDCT\_TOKENS}
+{\footnotesize\ttfamily \#define TH\+\_\+\+NDCT\+\_\+\+TOKENS~(32)}
+
+
+
+The number of DCT token values in each table. 
+
+\mbox{\label{codec_8h_a49bf449eae33c5320f0c308f32c6ae42}} 
+\index{codec.h@{codec.h}!TH\_NHUFFMAN\_TABLES@{TH\_NHUFFMAN\_TABLES}}
+\index{TH\_NHUFFMAN\_TABLES@{TH\_NHUFFMAN\_TABLES}!codec.h@{codec.h}}
+\doxysubsubsection{TH\_NHUFFMAN\_TABLES}
+{\footnotesize\ttfamily \#define TH\+\_\+\+NHUFFMAN\+\_\+\+TABLES~(80)}
+
+
+
+The number of Huffman tables used by Theora. 
+
+
+
+\doxysubsection{Typedef Documentation}
+\mbox{\label{codec_8h_a96239eba5d663e3d9ccb40031b2dcfe4}} 
+\index{codec.h@{codec.h}!th\_comment@{th\_comment}}
+\index{th\_comment@{th\_comment}!codec.h@{codec.h}}
+\doxysubsubsection{th\_comment}
+{\footnotesize\ttfamily typedef struct \textbf{ th\+\_\+comment} \textbf{ th\+\_\+comment}}
+
+
+
+The comment information. 
+
+This structure holds the in-\/stream metadata corresponding to the \textquotesingle{}comment\textquotesingle{} header packet. The comment header is meant to be used much like someone jotting a quick note on the label of a video. It should be a short, to the point text note that can be more than a couple words, but not more than a short paragraph.
+
+The metadata is stored as a series of (tag, value) pairs, in length-\/encoded string vectors. The first occurrence of the \textquotesingle{}=\textquotesingle{} character delimits the tag and value. A particular tag may occur more than once, and order is significant. The character set encoding for the strings is always UTF-\/8, but the tag names are limited to ASCII, and treated as case-\/insensitive. See {\texttt{ the Theora specification}}, Section 6.\+3.\+3 for details.
+
+In filling in this structure, \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50} will null-\/terminate the user\+\_\+comment strings for safety. However, the bitstream format itself treats them as 8-\/bit clean vectors, possibly containing null characters, so the length array should be treated as their authoritative length. \mbox{\label{codec_8h_a6a1426d16beef8a311d7f0e9d2e96326}} 
+\index{codec.h@{codec.h}!th\_quant\_base@{th\_quant\_base}}
+\index{th\_quant\_base@{th\_quant\_base}!codec.h@{codec.h}}
+\doxysubsubsection{th\_quant\_base}
+{\footnotesize\ttfamily typedef unsigned char th\+\_\+quant\+\_\+base[64]}
+
+
+
+A single base matrix. 
+
+\mbox{\label{codec_8h_a343f7cfabad179cc4fe527cf06873f45}} 
+\index{codec.h@{codec.h}!th\_ycbcr\_buffer@{th\_ycbcr\_buffer}}
+\index{th\_ycbcr\_buffer@{th\_ycbcr\_buffer}!codec.h@{codec.h}}
+\doxysubsubsection{th\_ycbcr\_buffer}
+{\footnotesize\ttfamily typedef \textbf{ th\+\_\+img\+\_\+plane} th\+\_\+ycbcr\+\_\+buffer[3]}
+
+
+
+A complete image buffer for an uncompressed frame. 
+
+The chroma planes may be decimated by a factor of two in either direction, as indicated by \doxyref{th\+\_\+info\+::pixel\+\_\+fmt}{p.}{structth__info_a2301388ef3755c41ab12fd144c1fc54e}. The width and height of the Y\textquotesingle{} plane must be multiples of 16. They may need to be cropped for display, using the rectangle specified by \doxyref{th\+\_\+info\+::pic\+\_\+x}{p.}{structth__info_a5b3f834bcf141564e7bb14f49101870f}, \doxyref{th\+\_\+info\+::pic\+\_\+y}{p.}{structth__info_a8aacc575cab2dfe3735001c2ad32aa14}, \doxyref{th\+\_\+info\+::pic\+\_\+width}{p.}{structth__info_a5048edf77b141dd3e9a92ca85e317345}, and \doxyref{th\+\_\+info\+::pic\+\_\+height}{p.}{structth__info_a775178474283c5990ba73f9ba7f6b88b}. All samples are 8 bits. \begin{DoxyNote}{Note}
+The term YUV often used to describe a colorspace is ambiguous. The exact parameters of the RGB to YUV conversion process aside, in many contexts the U and V channels actually have opposite meanings. To avoid this confusion, we are explicit\+: the name of the color channels are Y\textquotesingle{}Cb\+Cr, and they appear in that order, always. The prime symbol denotes that the Y channel is non-\/linear. Cb and Cr stand for \char`\"{}\+Chroma blue\char`\"{} and \char`\"{}\+Chroma red\char`\"{}, respectively. 
+\end{DoxyNote}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\label{codec_8h_a4ce7a695ce353b1582d29b6c1ddf31a0}} 
+\index{codec.h@{codec.h}!th\_colorspace@{th\_colorspace}}
+\index{th\_colorspace@{th\_colorspace}!codec.h@{codec.h}}
+\doxysubsubsection{th\_colorspace}
+{\footnotesize\ttfamily enum \textbf{ th\+\_\+colorspace}}
+
+
+
+The currently defined color space tags. 
+
+See {\texttt{ the Theora specification}}, Chapter 4, for exact details on the meaning of each of these color spaces. \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_CS\_UNSPECIFIED@{TH\_CS\_UNSPECIFIED}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_CS\_UNSPECIFIED@{TH\_CS\_UNSPECIFIED}}}\mbox{\label{codec_8h_a4ce7a695ce353b1582d29b6c1ddf31a0adb9a17a3283c8d490652e507db2427cf}} 
+TH\+\_\+\+CS\+\_\+\+UNSPECIFIED&The color space was not specified at the encoder. It may be conveyed by an external means. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_CS\_ITU\_REC\_470M@{TH\_CS\_ITU\_REC\_470M}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_CS\_ITU\_REC\_470M@{TH\_CS\_ITU\_REC\_470M}}}\mbox{\label{codec_8h_a4ce7a695ce353b1582d29b6c1ddf31a0a1a19346bbfb8192baa4c185df73d3397}} 
+TH\+\_\+\+CS\+\_\+\+ITU\+\_\+\+REC\+\_\+470M&A color space designed for NTSC content. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_CS\_ITU\_REC\_470BG@{TH\_CS\_ITU\_REC\_470BG}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_CS\_ITU\_REC\_470BG@{TH\_CS\_ITU\_REC\_470BG}}}\mbox{\label{codec_8h_a4ce7a695ce353b1582d29b6c1ddf31a0a009021d50836ddb0ec6004a2803775fe}} 
+TH\+\_\+\+CS\+\_\+\+ITU\+\_\+\+REC\+\_\+470\+BG&A color space designed for PAL/\+SECAM content. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_CS\_NSPACES@{TH\_CS\_NSPACES}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_CS\_NSPACES@{TH\_CS\_NSPACES}}}\mbox{\label{codec_8h_a4ce7a695ce353b1582d29b6c1ddf31a0a0fa8ea07f583ee57943520ddb2f6e62e}} 
+TH\+\_\+\+CS\+\_\+\+NSPACES&The total number of currently defined color spaces. \\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\label{codec_8h_a5c9e7f2f0c7ed209c9ca3ed0abd328bc}} 
+\index{codec.h@{codec.h}!th\_pixel\_fmt@{th\_pixel\_fmt}}
+\index{th\_pixel\_fmt@{th\_pixel\_fmt}!codec.h@{codec.h}}
+\doxysubsubsection{th\_pixel\_fmt}
+{\footnotesize\ttfamily enum \textbf{ th\+\_\+pixel\+\_\+fmt}}
+
+
+
+The currently defined pixel format tags. 
+
+See {\texttt{ the Theora specification}}, Section 4.\+4, for details on the precise sample locations. \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_PF\_420@{TH\_PF\_420}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_PF\_420@{TH\_PF\_420}}}\mbox{\label{codec_8h_a5c9e7f2f0c7ed209c9ca3ed0abd328bcafed7ad7ee4345930255827bff6055162}} 
+TH\+\_\+\+PF\+\_\+420&Chroma decimation by 2 in both the X and Y directions (4\+:2\+:0). The Cb and Cr chroma planes are half the width and half the height of the luma plane. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_PF\_RSVD@{TH\_PF\_RSVD}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_PF\_RSVD@{TH\_PF\_RSVD}}}\mbox{\label{codec_8h_a5c9e7f2f0c7ed209c9ca3ed0abd328bca9e60af0159d42b20806d7eb4a8b833e6}} 
+TH\+\_\+\+PF\+\_\+\+RSVD&Currently reserved. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_PF\_422@{TH\_PF\_422}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_PF\_422@{TH\_PF\_422}}}\mbox{\label{codec_8h_a5c9e7f2f0c7ed209c9ca3ed0abd328bca0271d01babf2f51512479f4a6245b9fa}} 
+TH\+\_\+\+PF\+\_\+422&Chroma decimation by 2 in the X direction (4\+:2\+:2). The Cb and Cr chroma planes are half the width of the luma plane, but full height. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_PF\_444@{TH\_PF\_444}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_PF\_444@{TH\_PF\_444}}}\mbox{\label{codec_8h_a5c9e7f2f0c7ed209c9ca3ed0abd328bca2ac50ac048ea75501a5e0f99a63c8c86}} 
+TH\+\_\+\+PF\+\_\+444&No chroma decimation (4\+:4\+:4). The Cb and Cr chroma planes are full width and full height. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TH\_PF\_NFORMATS@{TH\_PF\_NFORMATS}!codec.h@{codec.h}}\index{codec.h@{codec.h}!TH\_PF\_NFORMATS@{TH\_PF\_NFORMATS}}}\mbox{\label{codec_8h_a5c9e7f2f0c7ed209c9ca3ed0abd328bca2d6d78b9df1df086bb60f32f963a31eb}} 
+TH\+\_\+\+PF\+\_\+\+NFORMATS&The total number of currently defined pixel formats. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\label{codec_8h_a6be106c7e209680199a98d6d537d7e23}} 
+\index{codec.h@{codec.h}!th\_comment\_add@{th\_comment\_add}}
+\index{th\_comment\_add@{th\_comment\_add}!codec.h@{codec.h}}
+\doxysubsubsection{th\_comment\_add()}
+{\footnotesize\ttfamily void th\+\_\+comment\+\_\+add (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+comment} $\ast$}]{\+\_\+tc,  }\item[{const char $\ast$}]{\+\_\+comment }\end{DoxyParamCaption})}
+
+
+
+Add a comment to an initialized \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. 
+
+\begin{DoxyNote}{Note}
+Neither \doxyref{th\+\_\+comment\+\_\+add()}{p.}{codec_8h_a6be106c7e209680199a98d6d537d7e23} nor \doxyref{th\+\_\+comment\+\_\+add\+\_\+tag()}{p.}{codec_8h_acdfd88bde77364dd8342c55daa9ff151} support comments containing null values, although the bitstream format does support them. To add such comments you will need to manipulate the \doxyref{th\+\_\+comment}{p.}{structth__comment} structure directly. 
+\end{DoxyNote}
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+tc} & The \doxyref{th\+\_\+comment}{p.}{structth__comment} struct to add the comment to. \\
+\hline
+{\em \+\_\+comment} & Must be a null-\/terminated UTF-\/8 string containing the comment in \char`\"{}\+TAG=the value\char`\"{} form. \\
+\hline
+\end{DoxyParams}
+\mbox{\label{codec_8h_acdfd88bde77364dd8342c55daa9ff151}} 
+\index{codec.h@{codec.h}!th\_comment\_add\_tag@{th\_comment\_add\_tag}}
+\index{th\_comment\_add\_tag@{th\_comment\_add\_tag}!codec.h@{codec.h}}
+\doxysubsubsection{th\_comment\_add\_tag()}
+{\footnotesize\ttfamily void th\+\_\+comment\+\_\+add\+\_\+tag (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+comment} $\ast$}]{\+\_\+tc,  }\item[{const char $\ast$}]{\+\_\+tag,  }\item[{const char $\ast$}]{\+\_\+val }\end{DoxyParamCaption})}
+
+
+
+Add a comment to an initialized \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. 
+
+\begin{DoxyNote}{Note}
+Neither \doxyref{th\+\_\+comment\+\_\+add()}{p.}{codec_8h_a6be106c7e209680199a98d6d537d7e23} nor \doxyref{th\+\_\+comment\+\_\+add\+\_\+tag()}{p.}{codec_8h_acdfd88bde77364dd8342c55daa9ff151} support comments containing null values, although the bitstream format does support them. To add such comments you will need to manipulate the \doxyref{th\+\_\+comment}{p.}{structth__comment} structure directly. 
+\end{DoxyNote}
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+tc} & The \doxyref{th\+\_\+comment}{p.}{structth__comment} struct to add the comment to. \\
+\hline
+{\em \+\_\+tag} & A null-\/terminated string containing the tag associated with the comment. \\
+\hline
+{\em \+\_\+val} & The corresponding value as a null-\/terminated string. \\
+\hline
+\end{DoxyParams}
+\mbox{\label{codec_8h_ae736c1afa514947a3feb223143af95e3}} 
+\index{codec.h@{codec.h}!th\_comment\_clear@{th\_comment\_clear}}
+\index{th\_comment\_clear@{th\_comment\_clear}!codec.h@{codec.h}}
+\doxysubsubsection{th\_comment\_clear()}
+{\footnotesize\ttfamily void th\+\_\+comment\+\_\+clear (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+comment} $\ast$}]{\+\_\+tc }\end{DoxyParamCaption})}
+
+
+
+Clears a \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. 
+
+This should be called on a \doxyref{th\+\_\+comment}{p.}{structth__comment} structure after it is no longer needed. It will free all memory used by the structure members. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+tc} & The \doxyref{th\+\_\+comment}{p.}{structth__comment} struct to clear. \\
+\hline
+\end{DoxyParams}
+\mbox{\label{codec_8h_a6c8ab25988e7ea9d7b1e31a54cf58f09}} 
+\index{codec.h@{codec.h}!th\_comment\_init@{th\_comment\_init}}
+\index{th\_comment\_init@{th\_comment\_init}!codec.h@{codec.h}}
+\doxysubsubsection{th\_comment\_init()}
+{\footnotesize\ttfamily void th\+\_\+comment\+\_\+init (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+comment} $\ast$}]{\+\_\+tc }\end{DoxyParamCaption})}
+
+
+
+Initialize a \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. 
+
+This should be called on a freshly allocated \doxyref{th\+\_\+comment}{p.}{structth__comment} structure before attempting to use it. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+tc} & The \doxyref{th\+\_\+comment}{p.}{structth__comment} struct to initialize. \\
+\hline
+\end{DoxyParams}
+\mbox{\label{codec_8h_aa68e50bc76d5f94dd83260b15ca7d211}} 
+\index{codec.h@{codec.h}!th\_comment\_query@{th\_comment\_query}}
+\index{th\_comment\_query@{th\_comment\_query}!codec.h@{codec.h}}
+\doxysubsubsection{th\_comment\_query()}
+{\footnotesize\ttfamily char $\ast$ th\+\_\+comment\+\_\+query (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+comment} $\ast$}]{\+\_\+tc,  }\item[{const char $\ast$}]{\+\_\+tag,  }\item[{int}]{\+\_\+count }\end{DoxyParamCaption})}
+
+
+
+Look up a comment value by its tag. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+tc} & An initialized \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. \\
+\hline
+{\em \+\_\+tag} & The tag to look up. \\
+\hline
+{\em \+\_\+count} & The instance of the tag. The same tag can appear multiple times, each with a distinct value, so an index is required to retrieve them all. The order in which these values appear is significant and should be preserved. Use \doxyref{th\+\_\+comment\+\_\+query\+\_\+count()}{p.}{codec_8h_ab1b5b1a478c1e404b22b823dc95a1f51} to get the legal range for the {\itshape \+\_\+count} parameter. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A pointer to the queried tag\textquotesingle{}s value. This points directly to data in the \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. It should not be modified or freed by the application, and modifications to the structure may invalidate the pointer. 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em NULL} & If no matching tag is found. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{codec_8h_ab1b5b1a478c1e404b22b823dc95a1f51}} 
+\index{codec.h@{codec.h}!th\_comment\_query\_count@{th\_comment\_query\_count}}
+\index{th\_comment\_query\_count@{th\_comment\_query\_count}!codec.h@{codec.h}}
+\doxysubsubsection{th\_comment\_query\_count()}
+{\footnotesize\ttfamily int th\+\_\+comment\+\_\+query\+\_\+count (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+comment} $\ast$}]{\+\_\+tc,  }\item[{const char $\ast$}]{\+\_\+tag }\end{DoxyParamCaption})}
+
+
+
+Look up the number of instances of a tag. 
+
+Call this first when querying for a specific tag and then iterate over the number of instances with separate calls to \doxyref{th\+\_\+comment\+\_\+query()}{p.}{codec_8h_aa68e50bc76d5f94dd83260b15ca7d211} to retrieve all the values for that tag in order. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+tc} & An initialized \doxyref{th\+\_\+comment}{p.}{structth__comment} structure. \\
+\hline
+{\em \+\_\+tag} & The tag to look up. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The number of instances of this particular tag. 
+\end{DoxyReturn}
+\mbox{\label{codec_8h_a95b10e76fc4c05d0240ea2dfd9fd62bd}} 
+\index{codec.h@{codec.h}!th\_granule\_frame@{th\_granule\_frame}}
+\index{th\_granule\_frame@{th\_granule\_frame}!codec.h@{codec.h}}
+\doxysubsubsection{th\_granule\_frame()}
+{\footnotesize\ttfamily ogg\+\_\+int64\+\_\+t th\+\_\+granule\+\_\+frame (\begin{DoxyParamCaption}\item[{void $\ast$}]{\+\_\+encdec,  }\item[{ogg\+\_\+int64\+\_\+t}]{\+\_\+granpos }\end{DoxyParamCaption})}
+
+
+
+Converts a granule position to an absolute frame index, starting at {\ttfamily 0}. 
+
+The granule position is interpreted in the context of a given \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} or \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle (either will suffice). 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+encdec} & A previously allocated \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} or \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle. \\
+\hline
+{\em \+\_\+granpos} & The granule position to convert. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The absolute frame index corresponding to {\itshape \+\_\+granpos}. 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em -\/1} & The given granule position was invalid (i.\+e. negative). \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{codec_8h_a707e1e281de788af0df39ef00f3fb432}} 
+\index{codec.h@{codec.h}!th\_granule\_time@{th\_granule\_time}}
+\index{th\_granule\_time@{th\_granule\_time}!codec.h@{codec.h}}
+\doxysubsubsection{th\_granule\_time()}
+{\footnotesize\ttfamily double th\+\_\+granule\+\_\+time (\begin{DoxyParamCaption}\item[{void $\ast$}]{\+\_\+encdec,  }\item[{ogg\+\_\+int64\+\_\+t}]{\+\_\+granpos }\end{DoxyParamCaption})}
+
+
+
+Converts a granule position to an absolute time in seconds. 
+
+The granule position is interpreted in the context of a given \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} or \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle (either will suffice). 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+encdec} & A previously allocated \doxyref{th\+\_\+enc\+\_\+ctx}{p.}{theoraenc_8h_af5cc40472b925456d42526a035d66edd} or \doxyref{th\+\_\+dec\+\_\+ctx}{p.}{theoradec_8h_a843d70bb02563885a8d54b9c1a781729} handle. \\
+\hline
+{\em \+\_\+granpos} & The granule position to convert. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The absolute time in seconds corresponding to {\itshape \+\_\+granpos}. This is the \char`\"{}end time\char`\"{} for the frame, or the latest time it should be displayed. It is not the presentation time. 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em -\/1} & The given granule position was invalid (i.\+e. negative). \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{codec_8h_ab3d6441ab4a4969859ef5fd78a9e3c1c}} 
+\index{codec.h@{codec.h}!th\_info\_clear@{th\_info\_clear}}
+\index{th\_info\_clear@{th\_info\_clear}!codec.h@{codec.h}}
+\doxysubsubsection{th\_info\_clear()}
+{\footnotesize\ttfamily void th\+\_\+info\+\_\+clear (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+info} $\ast$}]{\+\_\+info }\end{DoxyParamCaption})}
+
+
+
+Clears a \doxyref{th\+\_\+info}{p.}{structth__info} structure. 
+
+This should be called on a \doxyref{th\+\_\+info}{p.}{structth__info} structure after it is no longer needed. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+info} & The \doxyref{th\+\_\+info}{p.}{structth__info} struct to clear. \\
+\hline
+\end{DoxyParams}
+\mbox{\label{codec_8h_a430d9c605816a6ca0bdce3a0b965b926}} 
+\index{codec.h@{codec.h}!th\_info\_init@{th\_info\_init}}
+\index{th\_info\_init@{th\_info\_init}!codec.h@{codec.h}}
+\doxysubsubsection{th\_info\_init()}
+{\footnotesize\ttfamily void th\+\_\+info\+\_\+init (\begin{DoxyParamCaption}\item[{\textbf{ th\+\_\+info} $\ast$}]{\+\_\+info }\end{DoxyParamCaption})}
+
+
+
+Initializes a \doxyref{th\+\_\+info}{p.}{structth__info} structure. 
+
+This should be called on a freshly allocated \doxyref{th\+\_\+info}{p.}{structth__info} structure before attempting to use it. 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+info} & The \doxyref{th\+\_\+info}{p.}{structth__info} struct to initialize. \\
+\hline
+\end{DoxyParams}
+\mbox{\label{codec_8h_a02f3f38261a9b39452d8a5e6f8737cc1}} 
+\index{codec.h@{codec.h}!th\_packet\_isheader@{th\_packet\_isheader}}
+\index{th\_packet\_isheader@{th\_packet\_isheader}!codec.h@{codec.h}}
+\doxysubsubsection{th\_packet\_isheader()}
+{\footnotesize\ttfamily int th\+\_\+packet\+\_\+isheader (\begin{DoxyParamCaption}\item[{ogg\+\_\+packet $\ast$}]{\+\_\+op }\end{DoxyParamCaption})}
+
+
+
+Determines whether a Theora packet is a header or not. 
+
+This function does no verification beyond checking the packet type bit, so it should not be used for bitstream identification; use \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50} for that. As per the Theora specification, an empty (0-\/byte) packet is treated as a data packet (a delta frame with no coded blocks). 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+op} & An {\ttfamily ogg\+\_\+packet} containing encoded Theora data. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 1} & The packet is a header packet \\
+\hline
+{\em 0} & The packet is a video data packet. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{codec_8h_afe95cfd06f0fef413266c9168a66248a}} 
+\index{codec.h@{codec.h}!th\_packet\_iskeyframe@{th\_packet\_iskeyframe}}
+\index{th\_packet\_iskeyframe@{th\_packet\_iskeyframe}!codec.h@{codec.h}}
+\doxysubsubsection{th\_packet\_iskeyframe()}
+{\footnotesize\ttfamily int th\+\_\+packet\+\_\+iskeyframe (\begin{DoxyParamCaption}\item[{ogg\+\_\+packet $\ast$}]{\+\_\+op }\end{DoxyParamCaption})}
+
+
+
+Determines whether a theora packet is a key frame or not. 
+
+This function does no verification beyond checking the packet type and key frame bits, so it should not be used for bitstream identification; use \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50} for that. As per the Theora specification, an empty (0-\/byte) packet is treated as a delta frame (with no coded blocks). 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+op} & An {\ttfamily ogg\+\_\+packet} containing encoded Theora data. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 1} & The packet contains a key frame. \\
+\hline
+{\em 0} & The packet contains a delta frame. \\
+\hline
+{\em -\/1} & The packet is not a video data packet. \\
+\hline
+\end{DoxyRetVals}
+\mbox{\label{codec_8h_ab723a75c0f95b3eb817f7f769846016b}} 
+\index{codec.h@{codec.h}!th\_version\_number@{th\_version\_number}}
+\index{th\_version\_number@{th\_version\_number}!codec.h@{codec.h}}
+\doxysubsubsection{th\_version\_number()}
+{\footnotesize\ttfamily ogg\+\_\+uint32\+\_\+t th\+\_\+version\+\_\+number (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Retrieves the library version number. 
+
+This is the highest bitstream version that the encoder library will produce, or that the decoder library can decode. This number is composed of a 16-\/bit major version, 8-\/bit minor version and 8 bit sub-\/version, composed as follows\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(VERSION\_MAJOR<<16)+(VERSION\_MINOR<<8)+(VERSION\_SUBMINOR)}
+
+\end{DoxyCode}
+ \begin{DoxyReturn}{Returns}
+the version number. 
+\end{DoxyReturn}
+\mbox{\label{codec_8h_a57a0637587e6f78a718d03c927f2c9fd}} 
+\index{codec.h@{codec.h}!th\_version\_string@{th\_version\_string}}
+\index{th\_version\_string@{th\_version\_string}!codec.h@{codec.h}}
+\doxysubsubsection{th\_version\_string()}
+{\footnotesize\ttfamily const char $\ast$ th\+\_\+version\+\_\+string (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Retrieves a human-\/readable string to identify the library vendor and version. 
+
+\begin{DoxyReturn}{Returns}
+the version string. 
+\end{DoxyReturn}

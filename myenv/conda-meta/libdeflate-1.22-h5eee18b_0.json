@@ -1,0 +1,116 @@
+{
+ "build": "h5eee18b_0",
+ "build_number": 0,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "libgcc-ng >=11.2.0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "bin/libdeflate-gunzip",
+  "bin/libdeflate-gzip",
+  "include/libdeflate.h",
+  "lib/cmake/libdeflate/libdeflate-config-version.cmake",
+  "lib/cmake/libdeflate/libdeflate-config.cmake",
+  "lib/cmake/libdeflate/libdeflate-targets-release.cmake",
+  "lib/cmake/libdeflate/libdeflate-targets.cmake",
+  "lib/libdeflate.so",
+  "lib/libdeflate.so.0",
+  "lib/pkgconfig/libdeflate.pc"
+ ],
+ "fn": "libdeflate-1.22-h5eee18b_0.conda",
+ "license": "MIT",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "51297c5e50c5a5ecc8d5eb0883ff04bc",
+ "name": "libdeflate",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "bin/libdeflate-gunzip",
+    "path_type": "hardlink",
+    "sha256": "c6bf09401907f3fb74c5956692b08a9bf607ca3949bc1d63ac3eca1977d4e12f",
+    "sha256_in_prefix": "c6bf09401907f3fb74c5956692b08a9bf607ca3949bc1d63ac3eca1977d4e12f",
+    "size_in_bytes": 30904
+   },
+   {
+    "_path": "bin/libdeflate-gzip",
+    "path_type": "hardlink",
+    "sha256": "c6bf09401907f3fb74c5956692b08a9bf607ca3949bc1d63ac3eca1977d4e12f",
+    "sha256_in_prefix": "c6bf09401907f3fb74c5956692b08a9bf607ca3949bc1d63ac3eca1977d4e12f",
+    "size_in_bytes": 30904
+   },
+   {
+    "_path": "include/libdeflate.h",
+    "path_type": "hardlink",
+    "sha256": "6cd45ac7ac79fa96959aca3b2d4e5f1bd0034f3d28b779d2205b4c225e6e4b4a",
+    "sha256_in_prefix": "6cd45ac7ac79fa96959aca3b2d4e5f1bd0034f3d28b779d2205b4c225e6e4b4a",
+    "size_in_bytes": 17098
+   },
+   {
+    "_path": "lib/cmake/libdeflate/libdeflate-config-version.cmake",
+    "path_type": "hardlink",
+    "sha256": "a282b861d88b285370dc4600053bf53c7dcef7c1d469b561df7d1a3eea1f1e5d",
+    "sha256_in_prefix": "a282b861d88b285370dc4600053bf53c7dcef7c1d469b561df7d1a3eea1f1e5d",
+    "size_in_bytes": 1860
+   },
+   {
+    "_path": "lib/cmake/libdeflate/libdeflate-config.cmake",
+    "path_type": "hardlink",
+    "sha256": "89d776266a833dc238b2b5455f2d4774dff1cf792e3d479bd4c2b2122ff8797f",
+    "sha256_in_prefix": "89d776266a833dc238b2b5455f2d4774dff1cf792e3d479bd4c2b2122ff8797f",
+    "size_in_bytes": 947
+   },
+   {
+    "_path": "lib/cmake/libdeflate/libdeflate-targets-release.cmake",
+    "path_type": "hardlink",
+    "sha256": "ff1236ec47137965c796c6094b155964a45258fc1ab9fa3431ed1fff7056cac6",
+    "sha256_in_prefix": "ff1236ec47137965c796c6094b155964a45258fc1ab9fa3431ed1fff7056cac6",
+    "size_in_bytes": 920
+   },
+   {
+    "_path": "lib/cmake/libdeflate/libdeflate-targets.cmake",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/croot/libdeflate_1734423289200/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeh",
+    "sha256": "2dee9c08bccc888992ef2f996b11e4d855acd3f533808ecad196bed62a6fe2db",
+    "sha256_in_prefix": "1795ec461b06b14fc253c3e3c5d015a3c65fd475e2e23b86283950e118efc057",
+    "size_in_bytes": 4250
+   },
+   {
+    "_path": "lib/libdeflate.so",
+    "path_type": "softlink",
+    "sha256": "b86ebee743507d1ff8c4bec967952cc63dfd44432d0ddf0679c1e49646364b6e",
+    "size_in_bytes": 93728
+   },
+   {
+    "_path": "lib/libdeflate.so.0",
+    "path_type": "hardlink",
+    "sha256": "b86ebee743507d1ff8c4bec967952cc63dfd44432d0ddf0679c1e49646364b6e",
+    "sha256_in_prefix": "b86ebee743507d1ff8c4bec967952cc63dfd44432d0ddf0679c1e49646364b6e",
+    "size_in_bytes": 93728
+   },
+   {
+    "_path": "lib/pkgconfig/libdeflate.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/croot/libdeflate_1734423289200/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeh",
+    "sha256": "9693b68a896fd31f6384ce33a14c0fca576f0df02bd612d805f95e5198f82250",
+    "sha256_in_prefix": "dab8d9b3779c11541bad0bf94968c13e9a84c6dfe60a87c5020db3538b897df7",
+    "size_in_bytes": 1011
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "887659602662b765acf0ed4b973f43e0a86e67d20b0f0f29f8a50455da739eeb",
+ "size": 69500,
+ "subdir": "linux-64",
+ "timestamp": 1734423317000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/libdeflate-1.22-h5eee18b_0.conda",
+ "version": "1.22"
+}

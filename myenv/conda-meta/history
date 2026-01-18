@@ -1,0 +1,80 @@
+==> 2025-12-04 19:50:05 <==
+# cmd: /data/home/libo/miniconda3/bin/conda create -n kdc python=3.10
+# conda version: 25.7.0
++defaults/linux-64::_libgcc_mutex-0.1-main
++defaults/linux-64::_openmp_mutex-5.1-1_gnu
++defaults/linux-64::bzip2-1.0.8-h5eee18b_6
++defaults/linux-64::ca-certificates-2025.12.2-h06a4308_0
++defaults/linux-64::expat-2.7.3-h3385a95_0
++defaults/linux-64::ld_impl_linux-64-2.44-h153f514_2
++defaults/linux-64::libffi-3.4.4-h6a678d5_1
++defaults/linux-64::libgcc-15.2.0-h69a1729_7
++defaults/linux-64::libgcc-ng-15.2.0-h166f726_7
++defaults/linux-64::libgomp-15.2.0-h4751f2c_7
++defaults/linux-64::libnsl-2.0.0-h5eee18b_0
++defaults/linux-64::libstdcxx-15.2.0-h39759b7_7
++defaults/linux-64::libstdcxx-ng-15.2.0-hc03a8fd_7
++defaults/linux-64::libuuid-1.41.5-h5eee18b_0
++defaults/linux-64::libxcb-1.17.0-h9b100fa_0
++defaults/linux-64::libzlib-1.3.1-hb25bd0a_0
++defaults/linux-64::ncurses-6.5-h7934f7d_0
++defaults/linux-64::openssl-3.0.18-hd6dcaed_0
++defaults/linux-64::pthread-stubs-0.3-h0ce48e5_1
++defaults/linux-64::python-3.10.19-h6fa692b_0
++defaults/linux-64::readline-8.3-hc2a1206_0
++defaults/linux-64::setuptools-80.9.0-py310h06a4308_0
++defaults/linux-64::sqlite-3.51.0-h2a70700_0
++defaults/linux-64::tk-8.6.15-h54e0aa7_0
++defaults/linux-64::wheel-0.45.1-py310h06a4308_0
++defaults/linux-64::xorg-libx11-1.8.12-h9b100fa_1
++defaults/linux-64::xorg-libxau-1.0.12-h9b100fa_0
++defaults/linux-64::xorg-libxdmcp-1.1.5-h9b100fa_0
++defaults/linux-64::xorg-xorgproto-2024.1-h5eee18b_1
++defaults/linux-64::xz-5.6.4-h5eee18b_1
++defaults/linux-64::zlib-1.3.1-hb25bd0a_0
++defaults/noarch::pip-25.3-pyhc872135_0
++defaults/noarch::tzdata-2025b-h04d1e81_0
+# update specs: ['python=3.10']
+==> 2025-12-04 20:10:30 <==
+# cmd: /data/home/libo/miniconda3/bin/conda install ffmpeg==6.1.1
+# conda version: 25.7.0
++defaults/linux-64::aom-3.12.1-h7934f7d_0
++defaults/linux-64::cairo-1.18.4-h44eff21_0
++defaults/linux-64::dav1d-1.2.1-h5eee18b_0
++defaults/linux-64::ffmpeg-6.1.1-hecf7045_5
++defaults/linux-64::fontconfig-2.15.0-h2c49b7f_0
++defaults/linux-64::freetype-2.13.3-h4a9f257_0
++defaults/linux-64::giflib-5.2.2-h5eee18b_0
++defaults/linux-64::graphite2-1.3.14-h295c915_1
++defaults/linux-64::harfbuzz-10.2.0-hdfddeaa_1
++defaults/linux-64::icu-73.1-h6a678d5_0
++defaults/linux-64::jpeg-9f-h5ce9db8_0
++defaults/linux-64::lame-3.100-h7b6447c_0
++defaults/linux-64::lcms2-2.17-heab6991_0
++defaults/linux-64::leptonica-1.82.0-hfdeec58_3
++defaults/linux-64::lerc-4.0.0-h6a678d5_0
++defaults/linux-64::libarchive-3.8.2-h3ec8f01_0
++defaults/linux-64::libdeflate-1.22-h5eee18b_0
++defaults/linux-64::libglib-2.84.4-h77a78f3_0
++defaults/linux-64::libiconv-1.16-h5eee18b_3
++defaults/linux-64::libogg-1.3.5-h27cfd23_1
++defaults/linux-64::libopenjpeg-2.5.4-hee96239_1
++defaults/linux-64::libopus-1.3.1-h5eee18b_1
++defaults/linux-64::libpng-1.6.50-h2ed474d_0
++defaults/linux-64::libtheora-1.2.0-h32ad74f_1
++defaults/linux-64::libtiff-4.7.1-h029b1ac_0
++defaults/linux-64::libvorbis-1.3.7-h7b6447c_0
++defaults/linux-64::libvpx-1.15.2-h4cb591d_0
++defaults/linux-64::libwebp-1.6.0-h089d785_0
++defaults/linux-64::libwebp-base-1.6.0-hb7bb969_0
++defaults/linux-64::libxml2-2.13.9-h2c43086_0
++defaults/linux-64::lz4-c-1.9.4-h6a678d5_1
++defaults/linux-64::openh264-2.6.0-he621ea3_0
++defaults/linux-64::openjpeg-2.5.4-h4e0627c_1
++defaults/linux-64::pcre2-10.46-hf426167_0
++defaults/linux-64::pixman-0.46.4-h7934f7d_0
++defaults/linux-64::tesseract-5.2.0-hb0d2e87_3
++defaults/linux-64::xorg-libxext-1.3.6-h9b100fa_0
++defaults/linux-64::xorg-libxrender-0.9.12-h9b100fa_0
++defaults/linux-64::zstd-1.5.7-h11fc155_0
+# update specs: ['ffmpeg==6.1.1']

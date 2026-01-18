@@ -1,0 +1,79 @@
+\doxysection{th\+\_\+comment Struct Reference}
+\label{structth__comment}\index{th\_comment@{th\_comment}}
+
+
+The comment information.  
+
+
+
+
+{\ttfamily \#include $<$codec.\+h$>$}
+
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$$\ast$ \textbf{ user\+\_\+comments}
+\begin{DoxyCompactList}\small\item\em The array of comment string vectors. \end{DoxyCompactList}\item 
+int $\ast$ \textbf{ comment\+\_\+lengths}
+\begin{DoxyCompactList}\small\item\em An array of the corresponding length of each vector, in bytes. \end{DoxyCompactList}\item 
+int \textbf{ comments}
+\begin{DoxyCompactList}\small\item\em The total number of comment strings. \end{DoxyCompactList}\item 
+char $\ast$ \textbf{ vendor}
+\begin{DoxyCompactList}\small\item\em The null-\/terminated vendor string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The comment information. 
+
+This structure holds the in-\/stream metadata corresponding to the \textquotesingle{}comment\textquotesingle{} header packet. The comment header is meant to be used much like someone jotting a quick note on the label of a video. It should be a short, to the point text note that can be more than a couple words, but not more than a short paragraph.
+
+The metadata is stored as a series of (tag, value) pairs, in length-\/encoded string vectors. The first occurrence of the \textquotesingle{}=\textquotesingle{} character delimits the tag and value. A particular tag may occur more than once, and order is significant. The character set encoding for the strings is always UTF-\/8, but the tag names are limited to ASCII, and treated as case-\/insensitive. See {\texttt{ the Theora specification}}, Section 6.\+3.\+3 for details.
+
+In filling in this structure, \doxyref{th\+\_\+decode\+\_\+headerin()}{p.}{theoradec_8h_a006d01d36fbe64768c571e6a12b7fc50} will null-\/terminate the user\+\_\+comment strings for safety. However, the bitstream format itself treats them as 8-\/bit clean vectors, possibly containing null characters, so the length array should be treated as their authoritative length. 
+
+\doxysubsection{Field Documentation}
+\mbox{\label{structth__comment_a723dc6fdf75757e70e28eea864b10898}} 
+\index{th\_comment@{th\_comment}!comment\_lengths@{comment\_lengths}}
+\index{comment\_lengths@{comment\_lengths}!th\_comment@{th\_comment}}
+\doxysubsubsection{comment\_lengths}
+{\footnotesize\ttfamily int$\ast$ th\+\_\+comment\+::comment\+\_\+lengths}
+
+
+
+An array of the corresponding length of each vector, in bytes. 
+
+\mbox{\label{structth__comment_a5990c34932376f070ad0fc314daaeb78}} 
+\index{th\_comment@{th\_comment}!comments@{comments}}
+\index{comments@{comments}!th\_comment@{th\_comment}}
+\doxysubsubsection{comments}
+{\footnotesize\ttfamily int th\+\_\+comment\+::comments}
+
+
+
+The total number of comment strings. 
+
+\mbox{\label{structth__comment_ad72830e183e707bb0df423eb73b00de4}} 
+\index{th\_comment@{th\_comment}!user\_comments@{user\_comments}}
+\index{user\_comments@{user\_comments}!th\_comment@{th\_comment}}
+\doxysubsubsection{user\_comments}
+{\footnotesize\ttfamily char$\ast$$\ast$ th\+\_\+comment\+::user\+\_\+comments}
+
+
+
+The array of comment string vectors. 
+
+\mbox{\label{structth__comment_a93fbe894d23603f56843be15b0cbdba0}} 
+\index{th\_comment@{th\_comment}!vendor@{vendor}}
+\index{vendor@{vendor}!th\_comment@{th\_comment}}
+\doxysubsubsection{vendor}
+{\footnotesize\ttfamily char$\ast$ th\+\_\+comment\+::vendor}
+
+
+
+The null-\/terminated vendor string. 
+
+This identifies the software used to encode the stream. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\textbf{ codec.\+h}\end{DoxyCompactItemize}

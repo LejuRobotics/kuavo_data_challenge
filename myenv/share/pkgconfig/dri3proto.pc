@@ -1,0 +1,7 @@
+prefix=/root/kuavo_data_challenge/myenv
+includedir=${prefix}/include
+ 
+Name: DRI3Proto
+Description: DRI3 extension headers
+Version: 1.4
+Cflags: -I${includedir}

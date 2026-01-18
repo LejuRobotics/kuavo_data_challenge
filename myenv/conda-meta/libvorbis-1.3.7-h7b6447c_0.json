@@ -1,0 +1,1274 @@
+{
+ "build": "h7b6447c_0",
+ "build_number": 0,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "libgcc-ng >=7.3.0",
+  "libogg >=1.3.2,<2.0a0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "include/vorbis/codec.h",
+  "include/vorbis/vorbisenc.h",
+  "include/vorbis/vorbisfile.h",
+  "lib/libvorbis.a",
+  "lib/libvorbis.so",
+  "lib/libvorbis.so.0",
+  "lib/libvorbis.so.0.4.9",
+  "lib/libvorbisenc.a",
+  "lib/libvorbisenc.so",
+  "lib/libvorbisenc.so.2",
+  "lib/libvorbisenc.so.2.0.12",
+  "lib/libvorbisfile.a",
+  "lib/libvorbisfile.so",
+  "lib/libvorbisfile.so.3",
+  "lib/libvorbisfile.so.3.3.8",
+  "lib/pkgconfig/vorbis.pc",
+  "lib/pkgconfig/vorbisenc.pc",
+  "lib/pkgconfig/vorbisfile.pc",
+  "share/aclocal/vorbis.m4",
+  "share/doc/libvorbis-1.3.7/doxygen-build.stamp",
+  "share/doc/libvorbis-1.3.7/eightphase.png",
+  "share/doc/libvorbis-1.3.7/fish_xiph_org.png",
+  "share/doc/libvorbis-1.3.7/floor1_inverse_dB_table.html",
+  "share/doc/libvorbis-1.3.7/floorval.png",
+  "share/doc/libvorbis-1.3.7/fourphase.png",
+  "share/doc/libvorbis-1.3.7/framing.html",
+  "share/doc/libvorbis-1.3.7/helper.html",
+  "share/doc/libvorbis-1.3.7/index.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/index.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/overview.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/reference.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/return.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/style.css",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_blockout.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_buffer.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_headerout.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_init.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_wrote.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_bitrate_addblock.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_bitrate_flushpacket.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_block.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_block_clear.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_block_init.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_add.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_add_tag.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_clear.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_init.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_query.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_query_count.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_commentheader_out.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_dsp_clear.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_dsp_state.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_granule_time.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_info.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_info_blocksize.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_info_clear.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_info_init.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_packet_blocksize.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_blockin.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_halfrate.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_halfrate_p.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_headerin.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_idheader.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_init.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_lapout.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_pcmout.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_read.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_restart.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_trackonly.html",
+  "share/doc/libvorbis-1.3.7/libvorbis/vorbis_version_string.html",
+  "share/doc/libvorbis-1.3.7/oggstream.html",
+  "share/doc/libvorbis-1.3.7/programming.html",
+  "share/doc/libvorbis-1.3.7/rfc5215.txt",
+  "share/doc/libvorbis-1.3.7/rfc5215.xml",
+  "share/doc/libvorbis-1.3.7/squarepolar.png",
+  "share/doc/libvorbis-1.3.7/stereo.html",
+  "share/doc/libvorbis-1.3.7/stream.png",
+  "share/doc/libvorbis-1.3.7/v-comment.html",
+  "share/doc/libvorbis-1.3.7/vorbis-clip.txt",
+  "share/doc/libvorbis-1.3.7/vorbis-errors.txt",
+  "share/doc/libvorbis-1.3.7/vorbis-fidelity.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/changes.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/examples.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/index.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/ovectl_ratemanage2_arg.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/ovectl_ratemanage_arg.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/overview.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/reference.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/style.css",
+  "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_ctl.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_init.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_init_vbr.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_setup_init.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_setup_managed.html",
+  "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_setup_vbr.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/OggVorbis_File.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/callbacks.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/chaining_example_c.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/chainingexample.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/crosslap.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/datastructures.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/decoding.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/example.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/exampleindex.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/fileinfo.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/index.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/initialization.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_bitrate.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_bitrate_instant.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_callbacks.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_clear.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_comment.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_crosslap.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_fopen.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_info.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_open.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_open_callbacks.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_seek.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_seek_lap.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_seek_page.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_seek_page_lap.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_tell.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_total.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_raw_seek.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_raw_seek_lap.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_raw_tell.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_raw_total.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_read.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_read_filter.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_read_float.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_seekable.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_serialnumber.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_streams.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_test.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_test_callbacks.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_test_open.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_seek.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_seek_lap.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_seek_page.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_seek_page_lap.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_tell.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_total.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/overview.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/reference.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/seekexample.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/seeking.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/seeking_example_c.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/seeking_test_c.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/seekingexample.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/style.css",
+  "share/doc/libvorbis-1.3.7/vorbisfile/threads.html",
+  "share/doc/libvorbis-1.3.7/vorbisfile/vorbisfile_example_c.html"
+ ],
+ "fn": "libvorbis-1.3.7-h7b6447c_0.conda",
+ "license": "BSD-3-Clause",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "66711b855c73a5ac42127ad8789b6cf3",
+ "name": "libvorbis",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "include/vorbis/codec.h",
+    "path_type": "hardlink",
+    "sha256": "1d031e3cbae7defe966426e33802450a56388a1323eec1ec629e6d4095c676c5",
+    "sha256_in_prefix": "1d031e3cbae7defe966426e33802450a56388a1323eec1ec629e6d4095c676c5",
+    "size_in_bytes": 8387
+   },
+   {
+    "_path": "include/vorbis/vorbisenc.h",
+    "path_type": "hardlink",
+    "sha256": "d2aba0527252dc265ffc40bc9b1955d5ac0dc8d5e16d9376fa366c05fa27dc7f",
+    "sha256_in_prefix": "d2aba0527252dc265ffc40bc9b1955d5ac0dc8d5e16d9376fa366c05fa27dc7f",
+    "size_in_bytes": 16990
+   },
+   {
+    "_path": "include/vorbis/vorbisfile.h",
+    "path_type": "hardlink",
+    "sha256": "7d98264e57b0190ef0a2701a0bea5f982e82fc1bedd93cd9408a2fff7790f803",
+    "sha256_in_prefix": "7d98264e57b0190ef0a2701a0bea5f982e82fc1bedd93cd9408a2fff7790f803",
+    "size_in_bytes": 7990
+   },
+   {
+    "_path": "lib/libvorbis.a",
+    "path_type": "hardlink",
+    "sha256": "e90ad7c79de5afb8e05db18b3259b76eb25646ec51d3b8e3f4000ba15a68287e",
+    "sha256_in_prefix": "e90ad7c79de5afb8e05db18b3259b76eb25646ec51d3b8e3f4000ba15a68287e",
+    "size_in_bytes": 294374
+   },
+   {
+    "_path": "lib/libvorbis.so",
+    "path_type": "softlink",
+    "sha256": "0a58fe3c7524d60c386a7a80d4922b50ee17cd5038d1073fdac7b0a426f998aa",
+    "size_in_bytes": 221864
+   },
+   {
+    "_path": "lib/libvorbis.so.0",
+    "path_type": "softlink",
+    "sha256": "0a58fe3c7524d60c386a7a80d4922b50ee17cd5038d1073fdac7b0a426f998aa",
+    "size_in_bytes": 221864
+   },
+   {
+    "_path": "lib/libvorbis.so.0.4.9",
+    "path_type": "hardlink",
+    "sha256": "0a58fe3c7524d60c386a7a80d4922b50ee17cd5038d1073fdac7b0a426f998aa",
+    "sha256_in_prefix": "0a58fe3c7524d60c386a7a80d4922b50ee17cd5038d1073fdac7b0a426f998aa",
+    "size_in_bytes": 221864
+   },
+   {
+    "_path": "lib/libvorbisenc.a",
+    "path_type": "hardlink",
+    "sha256": "cb4e76875ede8da3924fc2031d09f748c61b05872f2095379f51e896836f2185",
+    "sha256_in_prefix": "cb4e76875ede8da3924fc2031d09f748c61b05872f2095379f51e896836f2185",
+    "size_in_bytes": 802958
+   },
+   {
+    "_path": "lib/libvorbisenc.so",
+    "path_type": "softlink",
+    "sha256": "ce0297712c7aa3fe75d5e63a060dcd6d1b8daf0d8dacb0591141260b776e8b56",
+    "size_in_bytes": 803664
+   },
+   {
+    "_path": "lib/libvorbisenc.so.2",
+    "path_type": "softlink",
+    "sha256": "ce0297712c7aa3fe75d5e63a060dcd6d1b8daf0d8dacb0591141260b776e8b56",
+    "size_in_bytes": 803664
+   },
+   {
+    "_path": "lib/libvorbisenc.so.2.0.12",
+    "path_type": "hardlink",
+    "sha256": "ce0297712c7aa3fe75d5e63a060dcd6d1b8daf0d8dacb0591141260b776e8b56",
+    "sha256_in_prefix": "ce0297712c7aa3fe75d5e63a060dcd6d1b8daf0d8dacb0591141260b776e8b56",
+    "size_in_bytes": 803664
+   },
+   {
+    "_path": "lib/libvorbisfile.a",
+    "path_type": "hardlink",
+    "sha256": "6acda0e30c65744bd013fea102a45f5837bc7d638a7115b642a8dccee05b540b",
+    "sha256_in_prefix": "6acda0e30c65744bd013fea102a45f5837bc7d638a7115b642a8dccee05b540b",
+    "size_in_bytes": 45956
+   },
+   {
+    "_path": "lib/libvorbisfile.so",
+    "path_type": "softlink",
+    "sha256": "c83b8e77d76184dccab545d7b147fb630a735e6555bf29c3124865b461e56c85",
+    "size_in_bytes": 48952
+   },
+   {
+    "_path": "lib/libvorbisfile.so.3",
+    "path_type": "softlink",
+    "sha256": "c83b8e77d76184dccab545d7b147fb630a735e6555bf29c3124865b461e56c85",
+    "size_in_bytes": 48952
+   },
+   {
+    "_path": "lib/libvorbisfile.so.3.3.8",
+    "path_type": "hardlink",
+    "sha256": "c83b8e77d76184dccab545d7b147fb630a735e6555bf29c3124865b461e56c85",
+    "sha256_in_prefix": "c83b8e77d76184dccab545d7b147fb630a735e6555bf29c3124865b461e56c85",
+    "size_in_bytes": 48952
+   },
+   {
+    "_path": "lib/pkgconfig/vorbis.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/tmp/build/80754af9/libvorbis_1600376007067/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_plac",
+    "sha256": "f12159ec0809f0e87f8603ba16c15d9cd764b04b8cc416898d5e699348b7d752",
+    "sha256_in_prefix": "90a7028c79c9a5ecb9c0a4e846233d4388a870c53eb48f43b7f518d721af8423",
+    "size_in_bytes": 562
+   },
+   {
+    "_path": "lib/pkgconfig/vorbisenc.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/tmp/build/80754af9/libvorbis_1600376007067/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_plac",
+    "sha256": "ba35aae2c7207242ac78a7f079c052bee16751cbb04045789543ec89a271cc8f",
+    "sha256_in_prefix": "5c9c9d697be2cce0197ee5e35d68800c080a3918432cffefb1594be4bdc13610",
+    "size_in_bytes": 623
+   },
+   {
+    "_path": "lib/pkgconfig/vorbisfile.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/tmp/build/80754af9/libvorbis_1600376007067/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_plac",
+    "sha256": "0ea06bb304a38efc06172e0e71a6b355a1125826d4c5e97f576a27bcb47cee3b",
+    "sha256_in_prefix": "5fbb6b3debdb1910296c447e6453d0e64e5de2f8f511223fc87713414ab03361",
+    "size_in_bytes": 649
+   },
+   {
+    "_path": "share/aclocal/vorbis.m4",
+    "path_type": "hardlink",
+    "sha256": "cf48b40f1ef8a389d66159ed927ee2f9e17ec91ad3ee936da4645899988b31f5",
+    "sha256_in_prefix": "cf48b40f1ef8a389d66159ed927ee2f9e17ec91ad3ee936da4645899988b31f5",
+    "size_in_bytes": 4861
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/doxygen-build.stamp",
+    "path_type": "hardlink",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size_in_bytes": 0
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/eightphase.png",
+    "path_type": "hardlink",
+    "sha256": "d928eafbe5f5500e16dc4d9a9b6743844332d5ad7496e1cd1ac3b8ee29667c93",
+    "sha256_in_prefix": "d928eafbe5f5500e16dc4d9a9b6743844332d5ad7496e1cd1ac3b8ee29667c93",
+    "size_in_bytes": 11130
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/fish_xiph_org.png",
+    "path_type": "hardlink",
+    "sha256": "5ad6acc08e81978952f0817231f9166983fec952540eab966cba493ff73e7ac8",
+    "sha256_in_prefix": "5ad6acc08e81978952f0817231f9166983fec952540eab966cba493ff73e7ac8",
+    "size_in_bytes": 2503
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/floor1_inverse_dB_table.html",
+    "path_type": "hardlink",
+    "sha256": "db0919a986075b89d7dec83cfb2434a9893adbdd45ecf72ad727a25a79cc5548",
+    "sha256_in_prefix": "db0919a986075b89d7dec83cfb2434a9893adbdd45ecf72ad727a25a79cc5548",
+    "size_in_bytes": 5418
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/floorval.png",
+    "path_type": "hardlink",
+    "sha256": "4d61c1e956f0acfc909189e101117dc8781c92721172b5f1bdff5a433d981f04",
+    "sha256_in_prefix": "4d61c1e956f0acfc909189e101117dc8781c92721172b5f1bdff5a433d981f04",
+    "size_in_bytes": 2545
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/fourphase.png",
+    "path_type": "hardlink",
+    "sha256": "1cac06a3999801ac928ccc6d612167dc99b70b5468fae2bfffc8a93593d810de",
+    "sha256_in_prefix": "1cac06a3999801ac928ccc6d612167dc99b70b5468fae2bfffc8a93593d810de",
+    "size_in_bytes": 9992
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/framing.html",
+    "path_type": "hardlink",
+    "sha256": "0680a2688fec652d75f2a62e2f723865a1501564e21e3796f6d0a298de3c6269",
+    "sha256_in_prefix": "0680a2688fec652d75f2a62e2f723865a1501564e21e3796f6d0a298de3c6269",
+    "size_in_bytes": 14623
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/helper.html",
+    "path_type": "hardlink",
+    "sha256": "a1e0f4b8d4f8df7542d1fb4816ab38a2634f8b946c8d83f33451f1ef47e6e3dc",
+    "sha256_in_prefix": "a1e0f4b8d4f8df7542d1fb4816ab38a2634f8b946c8d83f33451f1ef47e6e3dc",
+    "size_in_bytes": 5730
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/index.html",
+    "path_type": "hardlink",
+    "sha256": "d711de877f301101ce45a61ca3602a008b5cabd1db5a37849f81c1723df498e6",
+    "sha256_in_prefix": "d711de877f301101ce45a61ca3602a008b5cabd1db5a37849f81c1723df498e6",
+    "size_in_bytes": 2249
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/index.html",
+    "path_type": "hardlink",
+    "sha256": "ff6572329034dd86975a3c934b34e5cc2b038572639c660624451060cafeb9a9",
+    "sha256_in_prefix": "ff6572329034dd86975a3c934b34e5cc2b038572639c660624451060cafeb9a9",
+    "size_in_bytes": 1259
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/overview.html",
+    "path_type": "hardlink",
+    "sha256": "377eb20da3237a5f5bcb99bbeb705baadbaded932ba2db8fad9739bdd3643a04",
+    "sha256_in_prefix": "377eb20da3237a5f5bcb99bbeb705baadbaded932ba2db8fad9739bdd3643a04",
+    "size_in_bytes": 5954
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/reference.html",
+    "path_type": "hardlink",
+    "sha256": "37fa8dd4dd4fdf696a876a0300294e9e0a71a5d8c1f6db66382efe519dad1252",
+    "sha256_in_prefix": "37fa8dd4dd4fdf696a876a0300294e9e0a71a5d8c1f6db66382efe519dad1252",
+    "size_in_bytes": 3730
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/return.html",
+    "path_type": "hardlink",
+    "sha256": "afa929c59de62a452177ff8ef532c5b9c6764f9f162b15f6834beb12ea05dbc9",
+    "sha256_in_prefix": "afa929c59de62a452177ff8ef532c5b9c6764f9f162b15f6834beb12ea05dbc9",
+    "size_in_bytes": 2262
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/style.css",
+    "path_type": "hardlink",
+    "sha256": "dce5d3639396566c572515801a5e5599a894bdfe875796c26d44000187840e7d",
+    "sha256_in_prefix": "dce5d3639396566c572515801a5e5599a894bdfe875796c26d44000187840e7d",
+    "size_in_bytes": 279
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis.html",
+    "path_type": "hardlink",
+    "sha256": "d98aeb13f2fd008e84eb0ca5bc8b1b4f1aa1919eb23509d33f579de940c00e41",
+    "sha256_in_prefix": "d98aeb13f2fd008e84eb0ca5bc8b1b4f1aa1919eb23509d33f579de940c00e41",
+    "size_in_bytes": 2629
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_blockout.html",
+    "path_type": "hardlink",
+    "sha256": "af7fe20427f821dcddb2d2677cc5a048424b0ffbb23f5a0ec235f28ce5b61dde",
+    "sha256_in_prefix": "af7fe20427f821dcddb2d2677cc5a048424b0ffbb23f5a0ec235f28ce5b61dde",
+    "size_in_bytes": 2096
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_buffer.html",
+    "path_type": "hardlink",
+    "sha256": "26418b906861cfb7122a6eb48c34f5b27c1c7cb55e908406277bb2e261fa6e55",
+    "sha256_in_prefix": "26418b906861cfb7122a6eb48c34f5b27c1c7cb55e908406277bb2e261fa6e55",
+    "size_in_bytes": 2115
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_headerout.html",
+    "path_type": "hardlink",
+    "sha256": "241d5a52e337764d490add6774ab687b6cd36ab9cf2f3bb836be6435540ff27c",
+    "sha256_in_prefix": "241d5a52e337764d490add6774ab687b6cd36ab9cf2f3bb836be6435540ff27c",
+    "size_in_bytes": 2596
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_init.html",
+    "path_type": "hardlink",
+    "sha256": "f9c732074c4e9cf36f1a0beed1abb12a0faa6be0abade414f2916b989b80b64e",
+    "sha256_in_prefix": "f9c732074c4e9cf36f1a0beed1abb12a0faa6be0abade414f2916b989b80b64e",
+    "size_in_bytes": 1565
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_analysis_wrote.html",
+    "path_type": "hardlink",
+    "sha256": "055966cf8b303e341b6e2dbce10a487bde80befc047f9ad75904c8b2d356d711",
+    "sha256_in_prefix": "055966cf8b303e341b6e2dbce10a487bde80befc047f9ad75904c8b2d356d711",
+    "size_in_bytes": 2035
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_bitrate_addblock.html",
+    "path_type": "hardlink",
+    "sha256": "b6a0bf08b5328dcb2744ddb565df4749d350f7fca43e583c8443b03b03d2cf43",
+    "sha256_in_prefix": "b6a0bf08b5328dcb2744ddb565df4749d350f7fca43e583c8443b03b03d2cf43",
+    "size_in_bytes": 1876
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_bitrate_flushpacket.html",
+    "path_type": "hardlink",
+    "sha256": "520dc420a620c7dcb26adfc104d0da763c2bd1967941aa918e1c5714d02d0bb0",
+    "sha256_in_prefix": "520dc420a620c7dcb26adfc104d0da763c2bd1967941aa918e1c5714d02d0bb0",
+    "size_in_bytes": 2109
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_block.html",
+    "path_type": "hardlink",
+    "sha256": "7b53bb066cdb1114f7c78e1425d5c36d8c2120d6f31c96626a32e16f1e00e7f7",
+    "sha256_in_prefix": "7b53bb066cdb1114f7c78e1425d5c36d8c2120d6f31c96626a32e16f1e00e7f7",
+    "size_in_bytes": 1571
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_block_clear.html",
+    "path_type": "hardlink",
+    "sha256": "f2352917abf1afb622923f67a737024f829067a80c50a054250bbe36932cea13",
+    "sha256_in_prefix": "f2352917abf1afb622923f67a737024f829067a80c50a054250bbe36932cea13",
+    "size_in_bytes": 1293
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_block_init.html",
+    "path_type": "hardlink",
+    "sha256": "9e5634acef1d6d95cb1b0fc6059ec16efaa01a2c6a3b4fdd6b6c6f63d6abd9d6",
+    "sha256_in_prefix": "9e5634acef1d6d95cb1b0fc6059ec16efaa01a2c6a3b4fdd6b6c6f63d6abd9d6",
+    "size_in_bytes": 1553
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment.html",
+    "path_type": "hardlink",
+    "sha256": "29ff0fbf5b6fe5712b949b9d91613297485549bb6f70529af46c049016f6895b",
+    "sha256_in_prefix": "29ff0fbf5b6fe5712b949b9d91613297485549bb6f70529af46c049016f6895b",
+    "size_in_bytes": 2952
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_add.html",
+    "path_type": "hardlink",
+    "sha256": "d51f71542ebe930a9a8e5e7c89ed5f1c3d350c79adaeaf195d241725efc3f7bb",
+    "sha256_in_prefix": "d51f71542ebe930a9a8e5e7c89ed5f1c3d350c79adaeaf195d241725efc3f7bb",
+    "size_in_bytes": 1786
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_add_tag.html",
+    "path_type": "hardlink",
+    "sha256": "6ca087c1edcaf3d81dc22d6790234ac081deedc4ca58952390ced7c50f006beb",
+    "sha256_in_prefix": "6ca087c1edcaf3d81dc22d6790234ac081deedc4ca58952390ced7c50f006beb",
+    "size_in_bytes": 2036
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_clear.html",
+    "path_type": "hardlink",
+    "sha256": "5c82d21c19c128c3aa27a5ffefaad57c7f7a063d37ec7018070e42c45210c007",
+    "sha256_in_prefix": "5c82d21c19c128c3aa27a5ffefaad57c7f7a063d37ec7018070e42c45210c007",
+    "size_in_bytes": 1833
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_init.html",
+    "path_type": "hardlink",
+    "sha256": "fcd51df9ffd42a052cad022197d3684c3a832481bdadeadbc29a823a10cc41e4",
+    "sha256_in_prefix": "fcd51df9ffd42a052cad022197d3684c3a832481bdadeadbc29a823a10cc41e4",
+    "size_in_bytes": 1954
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_query.html",
+    "path_type": "hardlink",
+    "sha256": "77e07a5dca450c954b7dd91e6437041b0f424498618b101472c4b95fec772556",
+    "sha256_in_prefix": "77e07a5dca450c954b7dd91e6437041b0f424498618b101472c4b95fec772556",
+    "size_in_bytes": 1975
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_comment_query_count.html",
+    "path_type": "hardlink",
+    "sha256": "829d584a9d4a25cf9068c034dbd1d9dc7354fd5dae29a4ea41e54685117f176d",
+    "sha256_in_prefix": "829d584a9d4a25cf9068c034dbd1d9dc7354fd5dae29a4ea41e54685117f176d",
+    "size_in_bytes": 1620
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_commentheader_out.html",
+    "path_type": "hardlink",
+    "sha256": "4480624db5ff3c117e692e1a7bfdde61399cf45f45257fd10f0b9e60191eaf5e",
+    "sha256_in_prefix": "4480624db5ff3c117e692e1a7bfdde61399cf45f45257fd10f0b9e60191eaf5e",
+    "size_in_bytes": 1481
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_dsp_clear.html",
+    "path_type": "hardlink",
+    "sha256": "fc0dab76b24cb0bd78d7d1dcc9221f5bf4b4b77cef658dd2bbe0c660cd56ef3a",
+    "sha256_in_prefix": "fc0dab76b24cb0bd78d7d1dcc9221f5bf4b4b77cef658dd2bbe0c660cd56ef3a",
+    "size_in_bytes": 1403
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_dsp_state.html",
+    "path_type": "hardlink",
+    "sha256": "f61ce69f6327b00562c55d8b06c8178fd5798b6137e18c728a062dcf0972d50b",
+    "sha256_in_prefix": "f61ce69f6327b00562c55d8b06c8178fd5798b6137e18c728a062dcf0972d50b",
+    "size_in_bytes": 1361
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_granule_time.html",
+    "path_type": "hardlink",
+    "sha256": "fda8ae19853640694df971100ffb5b4c83da4b493375f0b00f7d432f815f3b02",
+    "sha256_in_prefix": "fda8ae19853640694df971100ffb5b4c83da4b493375f0b00f7d432f815f3b02",
+    "size_in_bytes": 1513
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_info.html",
+    "path_type": "hardlink",
+    "sha256": "06a7301b4f752638b925bf7cee3ca78cd7b502fe91a425ae6984e268afea7a53",
+    "sha256_in_prefix": "06a7301b4f752638b925bf7cee3ca78cd7b502fe91a425ae6984e268afea7a53",
+    "size_in_bytes": 2393
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_info_blocksize.html",
+    "path_type": "hardlink",
+    "sha256": "a5c4578b12e03202df8c3ceaf068433ba06cfe5c19e16dacc6830870a3309d3c",
+    "sha256_in_prefix": "a5c4578b12e03202df8c3ceaf068433ba06cfe5c19e16dacc6830870a3309d3c",
+    "size_in_bytes": 1575
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_info_clear.html",
+    "path_type": "hardlink",
+    "sha256": "5de75ab98da919c08a3eeeadc7c15daf0bfa688284730702d4fb8afe95745834",
+    "sha256_in_prefix": "5de75ab98da919c08a3eeeadc7c15daf0bfa688284730702d4fb8afe95745834",
+    "size_in_bytes": 1279
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_info_init.html",
+    "path_type": "hardlink",
+    "sha256": "6afddff08083a6d07fcb3e4306d26f391b97e28b65c1c594f1c3235f15a64c9d",
+    "sha256_in_prefix": "6afddff08083a6d07fcb3e4306d26f391b97e28b65c1c594f1c3235f15a64c9d",
+    "size_in_bytes": 1327
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_packet_blocksize.html",
+    "path_type": "hardlink",
+    "sha256": "708b766fe8e8d6fc7805f0a074b911762598a6d3ef72ec64c3b8c6164a484661",
+    "sha256_in_prefix": "708b766fe8e8d6fc7805f0a074b911762598a6d3ef72ec64c3b8c6164a484661",
+    "size_in_bytes": 1622
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis.html",
+    "path_type": "hardlink",
+    "sha256": "7b896aeef4d43885b643f5f1d50e9f16d4bac07a2a6b85f56dbc27ae6d6b37cb",
+    "sha256_in_prefix": "7b896aeef4d43885b643f5f1d50e9f16d4bac07a2a6b85f56dbc27ae6d6b37cb",
+    "size_in_bytes": 1772
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_blockin.html",
+    "path_type": "hardlink",
+    "sha256": "ffc17185a4ac74890a17204796d32bbecf8ed86754b9c15a8c6a824f1fac5957",
+    "sha256_in_prefix": "ffc17185a4ac74890a17204796d32bbecf8ed86754b9c15a8c6a824f1fac5957",
+    "size_in_bytes": 1819
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_halfrate.html",
+    "path_type": "hardlink",
+    "sha256": "1f757ccaf53f75f6534b925c1361e5cbacb2049c6832f9a7588dddd4ea4f53ae",
+    "sha256_in_prefix": "1f757ccaf53f75f6534b925c1361e5cbacb2049c6832f9a7588dddd4ea4f53ae",
+    "size_in_bytes": 1676
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_halfrate_p.html",
+    "path_type": "hardlink",
+    "sha256": "39708f01cd4096d13fe83a1b603579b495eb45358acd14627d0d97ef140bdb76",
+    "sha256_in_prefix": "39708f01cd4096d13fe83a1b603579b495eb45358acd14627d0d97ef140bdb76",
+    "size_in_bytes": 1504
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_headerin.html",
+    "path_type": "hardlink",
+    "sha256": "bbb67133f794a88d10beae439853ae0247dda7c9f796a134c77d0187e6e8f5f0",
+    "sha256_in_prefix": "bbb67133f794a88d10beae439853ae0247dda7c9f796a134c77d0187e6e8f5f0",
+    "size_in_bytes": 2311
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_idheader.html",
+    "path_type": "hardlink",
+    "sha256": "be0678e43eb3e5ae2042292f7fb2e293b711c0864dca78a6becede43bb1e6e4b",
+    "sha256_in_prefix": "be0678e43eb3e5ae2042292f7fb2e293b711c0864dca78a6becede43bb1e6e4b",
+    "size_in_bytes": 1503
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_init.html",
+    "path_type": "hardlink",
+    "sha256": "29418a7781cc4df7651ccbac43b923f89a2e3fd07b68797c503850d7b3185cd6",
+    "sha256_in_prefix": "29418a7781cc4df7651ccbac43b923f89a2e3fd07b68797c503850d7b3185cd6",
+    "size_in_bytes": 1712
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_lapout.html",
+    "path_type": "hardlink",
+    "sha256": "d792083fa69387a2b2aa866a10c4020e9ad0e037f78a342ee8cbbcc65b943d95",
+    "sha256_in_prefix": "d792083fa69387a2b2aa866a10c4020e9ad0e037f78a342ee8cbbcc65b943d95",
+    "size_in_bytes": 2235
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_pcmout.html",
+    "path_type": "hardlink",
+    "sha256": "6d8f68c28f394d90e15deadbf0300b22b1781e4b31e3511d947e757d5c60043c",
+    "sha256_in_prefix": "6d8f68c28f394d90e15deadbf0300b22b1781e4b31e3511d947e757d5c60043c",
+    "size_in_bytes": 2263
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_read.html",
+    "path_type": "hardlink",
+    "sha256": "cd9e326a8b60f6bd11ff2e316eebcfd2196712d4ab4484b7c1aef47b8a14f237",
+    "sha256_in_prefix": "cd9e326a8b60f6bd11ff2e316eebcfd2196712d4ab4484b7c1aef47b8a14f237",
+    "size_in_bytes": 1641
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_restart.html",
+    "path_type": "hardlink",
+    "sha256": "043755c1812494bf45b07d3be4b65f8c6eab2bff79f2a67c2252dde8a10ff6e6",
+    "sha256_in_prefix": "043755c1812494bf45b07d3be4b65f8c6eab2bff79f2a67c2252dde8a10ff6e6",
+    "size_in_bytes": 1501
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_synthesis_trackonly.html",
+    "path_type": "hardlink",
+    "sha256": "8e21dcba272d1c30fd8deced872b886ff93ff16468e29421c532a797d69bc04d",
+    "sha256_in_prefix": "8e21dcba272d1c30fd8deced872b886ff93ff16468e29421c532a797d69bc04d",
+    "size_in_bytes": 1845
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/libvorbis/vorbis_version_string.html",
+    "path_type": "hardlink",
+    "sha256": "bac4384b4582955d09edd0bb7a0614711e303ea9be57e6bc6783b873a441ffc2",
+    "sha256_in_prefix": "bac4384b4582955d09edd0bb7a0614711e303ea9be57e6bc6783b873a441ffc2",
+    "size_in_bytes": 1363
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/oggstream.html",
+    "path_type": "hardlink",
+    "sha256": "4f56d111cd549b41ff4e3ccc7a418037e35c2c88240c437931b69497a793d544",
+    "sha256_in_prefix": "4f56d111cd549b41ff4e3ccc7a418037e35c2c88240c437931b69497a793d544",
+    "size_in_bytes": 8623
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/programming.html",
+    "path_type": "hardlink",
+    "sha256": "f7c88999edc2f1616e149be69533f56f5b767dec9a2b8273a98583304d50ffda",
+    "sha256_in_prefix": "f7c88999edc2f1616e149be69533f56f5b767dec9a2b8273a98583304d50ffda",
+    "size_in_bytes": 18839
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/rfc5215.txt",
+    "path_type": "hardlink",
+    "sha256": "960c9717754928303eca6c2c4eb448c29cadaee23c538d6978b0ed602c2c8a40",
+    "sha256_in_prefix": "960c9717754928303eca6c2c4eb448c29cadaee23c538d6978b0ed602c2c8a40",
+    "size_in_bytes": 54327
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/rfc5215.xml",
+    "path_type": "hardlink",
+    "sha256": "fae93ab5ed0921626c1a4d29f8aa8f4f82aa3e870f6b30c1f7d6b2efeccb03d1",
+    "sha256_in_prefix": "fae93ab5ed0921626c1a4d29f8aa8f4f82aa3e870f6b30c1f7d6b2efeccb03d1",
+    "size_in_bytes": 48010
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/squarepolar.png",
+    "path_type": "hardlink",
+    "sha256": "419c59a5ad7bbc9bf1196ef26d2f3f861d054e2aeb57b7162ba0ae123ad46f44",
+    "sha256_in_prefix": "419c59a5ad7bbc9bf1196ef26d2f3f861d054e2aeb57b7162ba0ae123ad46f44",
+    "size_in_bytes": 8406
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/stereo.html",
+    "path_type": "hardlink",
+    "sha256": "6bac20d1168d408d38c451dfab48aafc437628f0677f1d689bcf0eac2d389b71",
+    "sha256_in_prefix": "6bac20d1168d408d38c451dfab48aafc437628f0677f1d689bcf0eac2d389b71",
+    "size_in_bytes": 16574
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/stream.png",
+    "path_type": "hardlink",
+    "sha256": "f9a97cafda7a5fcbd50b565632766ed665f3d67f2f84708652579f2018b6051c",
+    "sha256_in_prefix": "f9a97cafda7a5fcbd50b565632766ed665f3d67f2f84708652579f2018b6051c",
+    "size_in_bytes": 2171
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/v-comment.html",
+    "path_type": "hardlink",
+    "sha256": "0a18c29c2f944ad293552f7bdda6a6b1f8f8fc2c557690bffd63c1d2d36394d2",
+    "sha256_in_prefix": "0a18c29c2f944ad293552f7bdda6a6b1f8f8fc2c557690bffd63c1d2d36394d2",
+    "size_in_bytes": 9048
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbis-clip.txt",
+    "path_type": "hardlink",
+    "sha256": "ae8ec3dafa7993f601729edb1d64c0fa8631e747da687754424c3f0dc230b0ea",
+    "sha256_in_prefix": "ae8ec3dafa7993f601729edb1d64c0fa8631e747da687754424c3f0dc230b0ea",
+    "size_in_bytes": 7021
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbis-errors.txt",
+    "path_type": "hardlink",
+    "sha256": "c3bbc4e290bd446ab1dd6385cf938a7f6ae860348b68d067bc676890db7c4a82",
+    "sha256_in_prefix": "c3bbc4e290bd446ab1dd6385cf938a7f6ae860348b68d067bc676890db7c4a82",
+    "size_in_bytes": 2730
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbis-fidelity.html",
+    "path_type": "hardlink",
+    "sha256": "1e8312152e456a89ff3d4324e91cdabf858daf63ec0a3d047f527447f93d31de",
+    "sha256_in_prefix": "1e8312152e456a89ff3d4324e91cdabf858daf63ec0a3d047f527447f93d31de",
+    "size_in_bytes": 6663
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/changes.html",
+    "path_type": "hardlink",
+    "sha256": "285470a077024982dbf0e837ad1603bf48ea38da329e25533fad0b8cd43564b5",
+    "sha256_in_prefix": "285470a077024982dbf0e837ad1603bf48ea38da329e25533fad0b8cd43564b5",
+    "size_in_bytes": 3648
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/examples.html",
+    "path_type": "hardlink",
+    "sha256": "e240b53d30e1d1f39fb1e583bf891a64a5c1fa114f0220d028bf66a0923d5a8f",
+    "sha256_in_prefix": "e240b53d30e1d1f39fb1e583bf891a64a5c1fa114f0220d028bf66a0923d5a8f",
+    "size_in_bytes": 4981
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/index.html",
+    "path_type": "hardlink",
+    "sha256": "a6d181d80d7c3f17cc70e0a783e3ab13360fda285bb700e377a0c880ec59c763",
+    "sha256_in_prefix": "a6d181d80d7c3f17cc70e0a783e3ab13360fda285bb700e377a0c880ec59c763",
+    "size_in_bytes": 1247
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/ovectl_ratemanage2_arg.html",
+    "path_type": "hardlink",
+    "sha256": "4d5083dca9af6c558d4b5afd2445dd37c465f73da3688569849fc882beb9b958",
+    "sha256_in_prefix": "4d5083dca9af6c558d4b5afd2445dd37c465f73da3688569849fc882beb9b958",
+    "size_in_bytes": 2597
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/ovectl_ratemanage_arg.html",
+    "path_type": "hardlink",
+    "sha256": "6d1dd4081b28932d786ee6cb58f615edddb344d8aef024bc1ccda3dbf40dc619",
+    "sha256_in_prefix": "6d1dd4081b28932d786ee6cb58f615edddb344d8aef024bc1ccda3dbf40dc619",
+    "size_in_bytes": 3280
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/overview.html",
+    "path_type": "hardlink",
+    "sha256": "0c7a831982d6124324087e6f1e9fb665515e2a93b020c1ad213702c6bc1a523c",
+    "sha256_in_prefix": "0c7a831982d6124324087e6f1e9fb665515e2a93b020c1ad213702c6bc1a523c",
+    "size_in_bytes": 15784
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/reference.html",
+    "path_type": "hardlink",
+    "sha256": "3dd428e4137f196b8f2c898e8dcd5061d715f78412b748676af5d60eac7444c1",
+    "sha256_in_prefix": "3dd428e4137f196b8f2c898e8dcd5061d715f78412b748676af5d60eac7444c1",
+    "size_in_bytes": 1646
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/style.css",
+    "path_type": "hardlink",
+    "sha256": "dce5d3639396566c572515801a5e5599a894bdfe875796c26d44000187840e7d",
+    "sha256_in_prefix": "dce5d3639396566c572515801a5e5599a894bdfe875796c26d44000187840e7d",
+    "size_in_bytes": 279
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_ctl.html",
+    "path_type": "hardlink",
+    "sha256": "0455cc83ec3ea14e925814add5a7e896a706e258a423a5cf6c458eb10f5289b7",
+    "sha256_in_prefix": "0455cc83ec3ea14e925814add5a7e896a706e258a423a5cf6c458eb10f5289b7",
+    "size_in_bytes": 6145
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_init.html",
+    "path_type": "hardlink",
+    "sha256": "956516f02c27b3c9eb7c30c35f1d6d85e0c66c43ea311120ed5800b9be5811de",
+    "sha256_in_prefix": "956516f02c27b3c9eb7c30c35f1d6d85e0c66c43ea311120ed5800b9be5811de",
+    "size_in_bytes": 2690
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_init_vbr.html",
+    "path_type": "hardlink",
+    "sha256": "6ea13714ba8afd490f23cd378d8e37998fdff74ff302e087eae912ef23ff2f32",
+    "sha256_in_prefix": "6ea13714ba8afd490f23cd378d8e37998fdff74ff302e087eae912ef23ff2f32",
+    "size_in_bytes": 2298
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_setup_init.html",
+    "path_type": "hardlink",
+    "sha256": "7b41c426e37757dbf462a271cfaa7695d9162d00714e01b1c0cec448bc71ac86",
+    "sha256_in_prefix": "7b41c426e37757dbf462a271cfaa7695d9162d00714e01b1c0cec448bc71ac86",
+    "size_in_bytes": 2654
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_setup_managed.html",
+    "path_type": "hardlink",
+    "sha256": "0a407f0e22a767b32fb1609c188b010ff27780cd994eb9d6b8710cfae54c9e51",
+    "sha256_in_prefix": "0a407f0e22a767b32fb1609c188b010ff27780cd994eb9d6b8710cfae54c9e51",
+    "size_in_bytes": 3069
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisenc/vorbis_encode_setup_vbr.html",
+    "path_type": "hardlink",
+    "sha256": "f23d1e927bbf7bbc8ef82ed662cb489c721096e05770a749e65647faa249ea10",
+    "sha256_in_prefix": "f23d1e927bbf7bbc8ef82ed662cb489c721096e05770a749e65647faa249ea10",
+    "size_in_bytes": 2666
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/OggVorbis_File.html",
+    "path_type": "hardlink",
+    "sha256": "64c6e9c22f7a52ff19d39d17a57726a9cc3c6491cee8aa4304127a4101f74a8e",
+    "sha256_in_prefix": "64c6e9c22f7a52ff19d39d17a57726a9cc3c6491cee8aa4304127a4101f74a8e",
+    "size_in_bytes": 4960
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/callbacks.html",
+    "path_type": "hardlink",
+    "sha256": "c7aa2ec5f344ae11531f561feab93917695df9d415068d7afc639b1bac2caca5",
+    "sha256_in_prefix": "c7aa2ec5f344ae11531f561feab93917695df9d415068d7afc639b1bac2caca5",
+    "size_in_bytes": 4839
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/chaining_example_c.html",
+    "path_type": "hardlink",
+    "sha256": "12a0fd49fb9dcc7f2d1a672f7f68b4a2d766d02b87e6425e4ed6d77cebd26e74",
+    "sha256_in_prefix": "12a0fd49fb9dcc7f2d1a672f7f68b4a2d766d02b87e6425e4ed6d77cebd26e74",
+    "size_in_bytes": 3026
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/chainingexample.html",
+    "path_type": "hardlink",
+    "sha256": "672097e72b2878963aad522de9f550446364fe51bddfa5d8f8916f4cda7c1a23",
+    "sha256_in_prefix": "672097e72b2878963aad522de9f550446364fe51bddfa5d8f8916f4cda7c1a23",
+    "size_in_bytes": 5535
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/crosslap.html",
+    "path_type": "hardlink",
+    "sha256": "bb4d7915dba6d8ca4d3c3951e610badddedeea6209ee95429634888fd34c87db",
+    "sha256_in_prefix": "bb4d7915dba6d8ca4d3c3951e610badddedeea6209ee95429634888fd34c87db",
+    "size_in_bytes": 5361
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/datastructures.html",
+    "path_type": "hardlink",
+    "sha256": "bb6eb3d07a3ee8dc6803746987d04702be3e941a4dc14ca5109448bb403c80e1",
+    "sha256_in_prefix": "bb6eb3d07a3ee8dc6803746987d04702be3e941a4dc14ca5109448bb403c80e1",
+    "size_in_bytes": 2435
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/decoding.html",
+    "path_type": "hardlink",
+    "sha256": "7111429f56a18b0cd7b35453de66adb514d7c8e509df9b85fbf3fc3b49445716",
+    "sha256_in_prefix": "7111429f56a18b0cd7b35453de66adb514d7c8e509df9b85fbf3fc3b49445716",
+    "size_in_bytes": 3360
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/example.html",
+    "path_type": "hardlink",
+    "sha256": "f34f199910d0dc91428fe44ada0e692dd31d5e69ad307f99fa080c8e69dd6756",
+    "sha256_in_prefix": "f34f199910d0dc91428fe44ada0e692dd31d5e69ad307f99fa080c8e69dd6756",
+    "size_in_bytes": 5482
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/exampleindex.html",
+    "path_type": "hardlink",
+    "sha256": "17d89f0d36c4a52ca52efaf88b532b361a0e8bbc45164a140a504eb9db957a3a",
+    "sha256_in_prefix": "17d89f0d36c4a52ca52efaf88b532b361a0e8bbc45164a140a504eb9db957a3a",
+    "size_in_bytes": 1050
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/fileinfo.html",
+    "path_type": "hardlink",
+    "sha256": "50f6aa89371b3b01fb24ec6a906869415bcf38138d004f5e8e5b2efa4545876f",
+    "sha256_in_prefix": "50f6aa89371b3b01fb24ec6a906869415bcf38138d004f5e8e5b2efa4545876f",
+    "size_in_bytes": 3644
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/index.html",
+    "path_type": "hardlink",
+    "sha256": "84fd16fb027cbaae4e52f476331882673198b03aea72ccf433af12ed4fcb0d6c",
+    "sha256_in_prefix": "84fd16fb027cbaae4e52f476331882673198b03aea72ccf433af12ed4fcb0d6c",
+    "size_in_bytes": 1414
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/initialization.html",
+    "path_type": "hardlink",
+    "sha256": "be6b5591bd2d7b94b729b294c19b83a65fa6748c1ff38769d1154ec398254b5d",
+    "sha256_in_prefix": "be6b5591bd2d7b94b729b294c19b83a65fa6748c1ff38769d1154ec398254b5d",
+    "size_in_bytes": 5118
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_bitrate.html",
+    "path_type": "hardlink",
+    "sha256": "9c69276dc694fb3237e34f264b93acb628a94ec2d1ca4b6189233f49182c27b8",
+    "sha256_in_prefix": "9c69276dc694fb3237e34f264b93acb628a94ec2d1ca4b6189233f49182c27b8",
+    "size_in_bytes": 2512
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_bitrate_instant.html",
+    "path_type": "hardlink",
+    "sha256": "22383f5f09f4732ad44f9537d16fdc6eb01a971c44e441d1b71ab278322240aa",
+    "sha256_in_prefix": "22383f5f09f4732ad44f9537d16fdc6eb01a971c44e441d1b71ab278322240aa",
+    "size_in_bytes": 1763
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_callbacks.html",
+    "path_type": "hardlink",
+    "sha256": "38f6d9ac88481957011c212c6b705a9a2a5d6074799d07afb63bd6980ea47f65",
+    "sha256_in_prefix": "38f6d9ac88481957011c212c6b705a9a2a5d6074799d07afb63bd6980ea47f65",
+    "size_in_bytes": 4401
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_clear.html",
+    "path_type": "hardlink",
+    "sha256": "815a8bc8372681d01ca65597cc0d9288a150770f5b8879d2a3699973cdc170c5",
+    "sha256_in_prefix": "815a8bc8372681d01ca65597cc0d9288a150770f5b8879d2a3699973cdc170c5",
+    "size_in_bytes": 2190
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_comment.html",
+    "path_type": "hardlink",
+    "sha256": "828bf6e6ae82a1da087006783e407e0e4602e9cdd90897da91e496f4662487f1",
+    "sha256_in_prefix": "828bf6e6ae82a1da087006783e407e0e4602e9cdd90897da91e496f4662487f1",
+    "size_in_bytes": 1906
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_crosslap.html",
+    "path_type": "hardlink",
+    "sha256": "14b1f4f86fb24c8338158e4df91a35e9e7f6c469258b0441ffbcb555d4910539",
+    "sha256_in_prefix": "14b1f4f86fb24c8338158e4df91a35e9e7f6c469258b0441ffbcb555d4910539",
+    "size_in_bytes": 3397
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_fopen.html",
+    "path_type": "hardlink",
+    "sha256": "27096242011114242484cee5aa5b6ab4df8cd3f95aa9b68d1ac89dab71eb2230",
+    "sha256_in_prefix": "27096242011114242484cee5aa5b6ab4df8cd3f95aa9b68d1ac89dab71eb2230",
+    "size_in_bytes": 4380
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_info.html",
+    "path_type": "hardlink",
+    "sha256": "29087464d0551d53420ca6c914bc8d6f091b5ef5f1d9ee61fd2ed4786e08adb2",
+    "sha256_in_prefix": "29087464d0551d53420ca6c914bc8d6f091b5ef5f1d9ee61fd2ed4786e08adb2",
+    "size_in_bytes": 1974
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_open.html",
+    "path_type": "hardlink",
+    "sha256": "d9e990843dc92b7352d961abd3f045cee49ce289732fd83da9389ca119063a30",
+    "sha256_in_prefix": "d9e990843dc92b7352d961abd3f045cee49ce289732fd83da9389ca119063a30",
+    "size_in_bytes": 7501
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_open_callbacks.html",
+    "path_type": "hardlink",
+    "sha256": "3627e225606bfa205032bddc8498b92829ea62274496630231ee50dd167bf294",
+    "sha256_in_prefix": "3627e225606bfa205032bddc8498b92829ea62274496630231ee50dd167bf294",
+    "size_in_bytes": 6110
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_seek.html",
+    "path_type": "hardlink",
+    "sha256": "8e4ec7c010d7fdc60f088bf1d96b6e429bdb707e7eb4c6a5049395203f459f5b",
+    "sha256_in_prefix": "8e4ec7c010d7fdc60f088bf1d96b6e429bdb707e7eb4c6a5049395203f459f5b",
+    "size_in_bytes": 2204
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_seek_lap.html",
+    "path_type": "hardlink",
+    "sha256": "1152ec1754e556ed00e1d6bea35af33e7fd6a272b45edfe03c2a2fef94d65ce3",
+    "sha256_in_prefix": "1152ec1754e556ed00e1d6bea35af33e7fd6a272b45edfe03c2a2fef94d65ce3",
+    "size_in_bytes": 3311
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_seek_page.html",
+    "path_type": "hardlink",
+    "sha256": "38b3986f47960133c29cb240489aa4ca429d073704ce80ebce77004377837673",
+    "sha256_in_prefix": "38b3986f47960133c29cb240489aa4ca429d073704ce80ebce77004377837673",
+    "size_in_bytes": 2494
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_seek_page_lap.html",
+    "path_type": "hardlink",
+    "sha256": "c6b5d985fa867b852a8d42da2449e378c03d68f4a4748996a82e6ad7c1a0961c",
+    "sha256_in_prefix": "c6b5d985fa867b852a8d42da2449e378c03d68f4a4748996a82e6ad7c1a0961c",
+    "size_in_bytes": 3644
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_tell.html",
+    "path_type": "hardlink",
+    "sha256": "6577b8e11288e0cd6d3a0eca36f77bd1834743df56db0b60db6cccf1c899fb9d",
+    "sha256_in_prefix": "6577b8e11288e0cd6d3a0eca36f77bd1834743df56db0b60db6cccf1c899fb9d",
+    "size_in_bytes": 1467
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_pcm_total.html",
+    "path_type": "hardlink",
+    "sha256": "4646ecb49665aafca2c39f78b4320e9b24b978381fde081832b7302a4a75b508",
+    "sha256_in_prefix": "4646ecb49665aafca2c39f78b4320e9b24b978381fde081832b7302a4a75b508",
+    "size_in_bytes": 1794
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_raw_seek.html",
+    "path_type": "hardlink",
+    "sha256": "1cdabca30aeeea06a172d30ca44e86042a407ed9f13057ab6511e0e18e6fa448",
+    "sha256_in_prefix": "1cdabca30aeeea06a172d30ca44e86042a407ed9f13057ab6511e0e18e6fa448",
+    "size_in_bytes": 2282
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_raw_seek_lap.html",
+    "path_type": "hardlink",
+    "sha256": "2e814e309c00aafa8aa06693b7d2f6a4d4a40f6f0ffc9c775b331d97072048c7",
+    "sha256_in_prefix": "2e814e309c00aafa8aa06693b7d2f6a4d4a40f6f0ffc9c775b331d97072048c7",
+    "size_in_bytes": 3432
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_raw_tell.html",
+    "path_type": "hardlink",
+    "sha256": "987886c7938b80c3bd41ddc6ced3954caf8c99c3e7203196b121faf15c109777",
+    "sha256_in_prefix": "987886c7938b80c3bd41ddc6ced3954caf8c99c3e7203196b121faf15c109777",
+    "size_in_bytes": 1812
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_raw_total.html",
+    "path_type": "hardlink",
+    "sha256": "245e358b807a4755b6851bc66305d50e5d8611e47e82b15a4dbd0590311d0256",
+    "sha256_in_prefix": "245e358b807a4755b6851bc66305d50e5d8611e47e82b15a4dbd0590311d0256",
+    "size_in_bytes": 1827
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_read.html",
+    "path_type": "hardlink",
+    "sha256": "616b9fa26e605a5bb0bd4589cb979075a6a3e7b77664e64983fa5839d9565cae",
+    "sha256_in_prefix": "616b9fa26e605a5bb0bd4589cb979075a6a3e7b77664e64983fa5839d9565cae",
+    "size_in_bytes": 5411
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_read_filter.html",
+    "path_type": "hardlink",
+    "sha256": "c654420ee2f339e0ec5358446b8e8c44d72afd3fc61aa2eb254d7efa6b4ec3f8",
+    "sha256_in_prefix": "c654420ee2f339e0ec5358446b8e8c44d72afd3fc61aa2eb254d7efa6b4ec3f8",
+    "size_in_bytes": 3803
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_read_float.html",
+    "path_type": "hardlink",
+    "sha256": "e2f63b236c6bebd0e7f7d27314b240177f1ec1ad7534e7848d77af9d8c33b9f6",
+    "sha256_in_prefix": "e2f63b236c6bebd0e7f7d27314b240177f1ec1ad7534e7848d77af9d8c33b9f6",
+    "size_in_bytes": 2952
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_seekable.html",
+    "path_type": "hardlink",
+    "sha256": "7e1ba29bc9f55ff6c20498bd093a334cb55ebe312f2cd4c92070fe39bd67a60b",
+    "sha256_in_prefix": "7e1ba29bc9f55ff6c20498bd093a334cb55ebe312f2cd4c92070fe39bd67a60b",
+    "size_in_bytes": 1415
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_serialnumber.html",
+    "path_type": "hardlink",
+    "sha256": "c4127c48a67db1e326c25d76c930fbe06c28379ac9ff99e20fe24333beeed088",
+    "sha256_in_prefix": "c4127c48a67db1e326c25d76c930fbe06c28379ac9ff99e20fe24333beeed088",
+    "size_in_bytes": 1807
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_streams.html",
+    "path_type": "hardlink",
+    "sha256": "9372583f36fd18baeea6978350c9594aad84afd9d7122923b8f97ba2dc44cc17",
+    "sha256_in_prefix": "9372583f36fd18baeea6978350c9594aad84afd9d7122923b8f97ba2dc44cc17",
+    "size_in_bytes": 1456
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_test.html",
+    "path_type": "hardlink",
+    "sha256": "761d681d51b23ff0f85e9a45267cbecb9f632a5b36ac5a6e35d3fa75a9b15a84",
+    "sha256_in_prefix": "761d681d51b23ff0f85e9a45267cbecb9f632a5b36ac5a6e35d3fa75a9b15a84",
+    "size_in_bytes": 3599
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_test_callbacks.html",
+    "path_type": "hardlink",
+    "sha256": "6542e00b1c19c4843d8e0e322bfadfbe61d6239f2b5abb53a66f78e1f5549c0b",
+    "sha256_in_prefix": "6542e00b1c19c4843d8e0e322bfadfbe61d6239f2b5abb53a66f78e1f5549c0b",
+    "size_in_bytes": 4100
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_test_open.html",
+    "path_type": "hardlink",
+    "sha256": "2dc6da80e25ef0936566f415b81e1e63bac358886d29994b369a524c99ea1d7f",
+    "sha256_in_prefix": "2dc6da80e25ef0936566f415b81e1e63bac358886d29994b369a524c99ea1d7f",
+    "size_in_bytes": 1929
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_seek.html",
+    "path_type": "hardlink",
+    "sha256": "3a0ec524b2df9e0442fe52f773a048e2cdd2b5484051f07f4c463bcff3e3ae99",
+    "sha256_in_prefix": "3a0ec524b2df9e0442fe52f773a048e2cdd2b5484051f07f4c463bcff3e3ae99",
+    "size_in_bytes": 2255
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_seek_lap.html",
+    "path_type": "hardlink",
+    "sha256": "0aea329ab0e51db4c12a4056b426842c6f726feec3912255ba86e7210934f382",
+    "sha256_in_prefix": "0aea329ab0e51db4c12a4056b426842c6f726feec3912255ba86e7210934f382",
+    "size_in_bytes": 3308
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_seek_page.html",
+    "path_type": "hardlink",
+    "sha256": "5464d335cb10930b6d7d01212fe832ccc41c3f18b19abad03ec0d667b5df248e",
+    "sha256_in_prefix": "5464d335cb10930b6d7d01212fe832ccc41c3f18b19abad03ec0d667b5df248e",
+    "size_in_bytes": 2460
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_seek_page_lap.html",
+    "path_type": "hardlink",
+    "sha256": "25b1a1f7f000cda89f2ef04cc6b9d2c2f68a2643c8b1128464b96fde61a32e3c",
+    "sha256_in_prefix": "25b1a1f7f000cda89f2ef04cc6b9d2c2f68a2643c8b1128464b96fde61a32e3c",
+    "size_in_bytes": 3676
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_tell.html",
+    "path_type": "hardlink",
+    "sha256": "5b54a2f67fff5abe83ccffa4db421ef353c6a5104a5418b4329be3fcc6d85d48",
+    "sha256_in_prefix": "5b54a2f67fff5abe83ccffa4db421ef353c6a5104a5418b4329be3fcc6d85d48",
+    "size_in_bytes": 1488
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/ov_time_total.html",
+    "path_type": "hardlink",
+    "sha256": "a006b2125d284ab84d7a505a5f64dbd3a6b43c1c84013c5237a0cad5c41409f0",
+    "sha256_in_prefix": "a006b2125d284ab84d7a505a5f64dbd3a6b43c1c84013c5237a0cad5c41409f0",
+    "size_in_bytes": 1808
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/overview.html",
+    "path_type": "hardlink",
+    "sha256": "d21d4f9b27e225eda3ac753b5e7a069d0ed9be7bf0a67f3dfe1f8b4cb6571d9e",
+    "sha256_in_prefix": "d21d4f9b27e225eda3ac753b5e7a069d0ed9be7bf0a67f3dfe1f8b4cb6571d9e",
+    "size_in_bytes": 1757
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/reference.html",
+    "path_type": "hardlink",
+    "sha256": "1160da41581cb1cdc02757407fa3475512272bf2271fefaf53bec8b5f5a606c2",
+    "sha256_in_prefix": "1160da41581cb1cdc02757407fa3475512272bf2271fefaf53bec8b5f5a606c2",
+    "size_in_bytes": 3150
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/seekexample.html",
+    "path_type": "hardlink",
+    "sha256": "26ed153ac6ea2f86025ecd5bfd3183742798e88f1721560ef6276c69674df2a4",
+    "sha256_in_prefix": "26ed153ac6ea2f86025ecd5bfd3183742798e88f1721560ef6276c69674df2a4",
+    "size_in_bytes": 4208
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/seeking.html",
+    "path_type": "hardlink",
+    "sha256": "107db8620a16f37eaf94bd0750f3b462e5cd9877f37decba24545710beb74e42",
+    "sha256_in_prefix": "107db8620a16f37eaf94bd0750f3b462e5cd9877f37decba24545710beb74e42",
+    "size_in_bytes": 4743
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/seeking_example_c.html",
+    "path_type": "hardlink",
+    "sha256": "cc13db889c629469288262c1a11cc209fd1c8f00eb359816a3ae9e1356299317",
+    "sha256_in_prefix": "cc13db889c629469288262c1a11cc209fd1c8f00eb359816a3ae9e1356299317",
+    "size_in_bytes": 1996
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/seeking_test_c.html",
+    "path_type": "hardlink",
+    "sha256": "cc13db889c629469288262c1a11cc209fd1c8f00eb359816a3ae9e1356299317",
+    "sha256_in_prefix": "cc13db889c629469288262c1a11cc209fd1c8f00eb359816a3ae9e1356299317",
+    "size_in_bytes": 1996
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/seekingexample.html",
+    "path_type": "hardlink",
+    "sha256": "843069cab598d3f8741c743da42e3d1f7e6c0796c006dbed9d71ffcc614fcda0",
+    "sha256_in_prefix": "843069cab598d3f8741c743da42e3d1f7e6c0796c006dbed9d71ffcc614fcda0",
+    "size_in_bytes": 5204
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/style.css",
+    "path_type": "hardlink",
+    "sha256": "dce5d3639396566c572515801a5e5599a894bdfe875796c26d44000187840e7d",
+    "sha256_in_prefix": "dce5d3639396566c572515801a5e5599a894bdfe875796c26d44000187840e7d",
+    "size_in_bytes": 279
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/threads.html",
+    "path_type": "hardlink",
+    "sha256": "4f1706f95d35d42035f64396f9606895b4a18f5e1ec0fe33da61f475890feda9",
+    "sha256_in_prefix": "4f1706f95d35d42035f64396f9606895b4a18f5e1ec0fe33da61f475890feda9",
+    "size_in_bytes": 1552
+   },
+   {
+    "_path": "share/doc/libvorbis-1.3.7/vorbisfile/vorbisfile_example_c.html",
+    "path_type": "hardlink",
+    "sha256": "e69cc58c7785c4a7f3c9c1557726540b7448f7d6caf50165d21e2de631d101ba",
+    "sha256_in_prefix": "e69cc58c7785c4a7f3c9c1557726540b7448f7d6caf50165d21e2de631d101ba",
+    "size_in_bytes": 2433
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "990a36e750a1eeb85dc18f0958a6a144bbf8a9feb586d4fd16f942e4dcd73962",
+ "size": 407850,
+ "subdir": "linux-64",
+ "timestamp": 1600376062000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/libvorbis-1.3.7-h7b6447c_0.conda",
+ "version": "1.3.7"
+}

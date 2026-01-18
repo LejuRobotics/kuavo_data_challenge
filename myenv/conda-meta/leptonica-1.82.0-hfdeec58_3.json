@@ -1,0 +1,458 @@
+{
+ "build": "hfdeec58_3",
+ "build_number": 3,
+ "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+ "constrains": [],
+ "depends": [
+  "giflib >=5.2.2,<5.3.0a0",
+  "jpeg >=9e,<10a",
+  "libgcc-ng >=11.2.0",
+  "libpng >=1.6.39,<1.7.0a0",
+  "libstdcxx-ng >=11.2.0",
+  "libtiff >=4.7.0,<5.0a0",
+  "libwebp",
+  "libwebp-base >=1.3.2,<2.0a0",
+  "openjpeg >=2.5.2,<3.0a0",
+  "zlib >=1.2.13,<2.0.0a0"
+ ],
+ "extracted_package_dir": "",
+ "files": [
+  "bin/convertfilestopdf",
+  "bin/convertfilestops",
+  "bin/convertformat",
+  "bin/convertsegfilestopdf",
+  "bin/convertsegfilestops",
+  "bin/converttopdf",
+  "bin/converttops",
+  "bin/fileinfo",
+  "bin/imagetops",
+  "bin/xtractprotos",
+  "include/leptonica/allheaders.h",
+  "include/leptonica/alltypes.h",
+  "include/leptonica/array.h",
+  "include/leptonica/arrayaccess.h",
+  "include/leptonica/bbuffer.h",
+  "include/leptonica/bilateral.h",
+  "include/leptonica/bmf.h",
+  "include/leptonica/bmfdata.h",
+  "include/leptonica/bmp.h",
+  "include/leptonica/ccbord.h",
+  "include/leptonica/colorfill.h",
+  "include/leptonica/dewarp.h",
+  "include/leptonica/endianness.h",
+  "include/leptonica/environ.h",
+  "include/leptonica/gplot.h",
+  "include/leptonica/hashmap.h",
+  "include/leptonica/heap.h",
+  "include/leptonica/imageio.h",
+  "include/leptonica/jbclass.h",
+  "include/leptonica/leptwin.h",
+  "include/leptonica/list.h",
+  "include/leptonica/morph.h",
+  "include/leptonica/pix.h",
+  "include/leptonica/ptra.h",
+  "include/leptonica/queue.h",
+  "include/leptonica/rbtree.h",
+  "include/leptonica/readbarcode.h",
+  "include/leptonica/recog.h",
+  "include/leptonica/regutils.h",
+  "include/leptonica/stack.h",
+  "include/leptonica/stringcode.h",
+  "include/leptonica/sudoku.h",
+  "include/leptonica/watershed.h",
+  "lib/cmake/LeptonicaConfig-version.cmake",
+  "lib/cmake/LeptonicaConfig.cmake",
+  "lib/liblept.a",
+  "lib/liblept.so",
+  "lib/liblept.so.5",
+  "lib/liblept.so.5.0.4",
+  "lib/libleptonica.a",
+  "lib/libleptonica.so",
+  "lib/pkgconfig/lept.pc"
+ ],
+ "fn": "leptonica-1.82.0-hfdeec58_3.conda",
+ "license": "BSD-2-Clause",
+ "link": {
+  "source": "",
+  "type": 1
+ },
+ "md5": "557d0af38ac8ae757706d9195b9392d2",
+ "name": "leptonica",
+ "package_tarball_full_path": "",
+ "paths_data": {
+  "paths": [
+   {
+    "_path": "bin/convertfilestopdf",
+    "path_type": "hardlink",
+    "sha256": "96205a4d2feabb400b629721a050538e9d4df18ca1b8ac720770a9bbcff89efb",
+    "sha256_in_prefix": "96205a4d2feabb400b629721a050538e9d4df18ca1b8ac720770a9bbcff89efb",
+    "size_in_bytes": 16008
+   },
+   {
+    "_path": "bin/convertfilestops",
+    "path_type": "hardlink",
+    "sha256": "dd0e6c7bd4f949719a9715801b6e3003fb7cd6310f737e04534e3228d9eab66d",
+    "sha256_in_prefix": "dd0e6c7bd4f949719a9715801b6e3003fb7cd6310f737e04534e3228d9eab66d",
+    "size_in_bytes": 15840
+   },
+   {
+    "_path": "bin/convertformat",
+    "path_type": "hardlink",
+    "sha256": "f5bbacb5903434e3546be225d2c783ccbaa34db14f4b65ce895ee91fbd6499bf",
+    "sha256_in_prefix": "f5bbacb5903434e3546be225d2c783ccbaa34db14f4b65ce895ee91fbd6499bf",
+    "size_in_bytes": 16168
+   },
+   {
+    "_path": "bin/convertsegfilestopdf",
+    "path_type": "hardlink",
+    "sha256": "a542464658832a62066a96770aa0d9b44376c6be698eb90f0bf265861ecaf275",
+    "sha256_in_prefix": "a542464658832a62066a96770aa0d9b44376c6be698eb90f0bf265861ecaf275",
+    "size_in_bytes": 16264
+   },
+   {
+    "_path": "bin/convertsegfilestops",
+    "path_type": "hardlink",
+    "sha256": "133ce5e31c5d4c019ee0110f10f75cb415596f5943c23023b6d2f22a4f0c8eb6",
+    "sha256_in_prefix": "133ce5e31c5d4c019ee0110f10f75cb415596f5943c23023b6d2f22a4f0c8eb6",
+    "size_in_bytes": 15848
+   },
+   {
+    "_path": "bin/converttopdf",
+    "path_type": "hardlink",
+    "sha256": "a1e3474e20b10f49633d792e65999b9b8a27bb64f97f3e0286c683c77802ff3d",
+    "sha256_in_prefix": "a1e3474e20b10f49633d792e65999b9b8a27bb64f97f3e0286c683c77802ff3d",
+    "size_in_bytes": 15712
+   },
+   {
+    "_path": "bin/converttops",
+    "path_type": "hardlink",
+    "sha256": "d189a286a8716e41c8ea0fb71b7017dae76c86eb9d552e6ab2cdb1699d00549d",
+    "sha256_in_prefix": "d189a286a8716e41c8ea0fb71b7017dae76c86eb9d552e6ab2cdb1699d00549d",
+    "size_in_bytes": 15952
+   },
+   {
+    "_path": "bin/fileinfo",
+    "path_type": "hardlink",
+    "sha256": "cc486014c472337c9e2382ca753fdf58f58b174d5478415e82d7be316a45804e",
+    "sha256_in_prefix": "cc486014c472337c9e2382ca753fdf58f58b174d5478415e82d7be316a45804e",
+    "size_in_bytes": 15904
+   },
+   {
+    "_path": "bin/imagetops",
+    "path_type": "hardlink",
+    "sha256": "2f42bef32137f93ed68c122b0c8dcac5e61c3f5fba337c59344f4d39c3a8b41b",
+    "sha256_in_prefix": "2f42bef32137f93ed68c122b0c8dcac5e61c3f5fba337c59344f4d39c3a8b41b",
+    "size_in_bytes": 16208
+   },
+   {
+    "_path": "bin/xtractprotos",
+    "path_type": "hardlink",
+    "sha256": "0523b8bde9400244dbf7d305fc88bc1e75a1396dbe33cc54daecabbb54709a77",
+    "sha256_in_prefix": "0523b8bde9400244dbf7d305fc88bc1e75a1396dbe33cc54daecabbb54709a77",
+    "size_in_bytes": 16800
+   },
+   {
+    "_path": "include/leptonica/allheaders.h",
+    "path_type": "hardlink",
+    "sha256": "d283bc9cf4729973c49cd87e8dc88bccdad80d962a06ff7344f7bd8c07077860",
+    "sha256_in_prefix": "d283bc9cf4729973c49cd87e8dc88bccdad80d962a06ff7344f7bd8c07077860",
+    "size_in_bytes": 260772
+   },
+   {
+    "_path": "include/leptonica/alltypes.h",
+    "path_type": "hardlink",
+    "sha256": "fdbf66ffef386c429c04b6118865d8509ff63d5c0e52949918fe95e64db4ee55",
+    "sha256_in_prefix": "fdbf66ffef386c429c04b6118865d8509ff63d5c0e52949918fe95e64db4ee55",
+    "size_in_bytes": 2333
+   },
+   {
+    "_path": "include/leptonica/array.h",
+    "path_type": "hardlink",
+    "sha256": "dbc78c6702c2827225ca9c848bb9fb1cea37843db69d2d1037d665aa46b83270",
+    "sha256_in_prefix": "dbc78c6702c2827225ca9c848bb9fb1cea37843db69d2d1037d665aa46b83270",
+    "size_in_bytes": 6616
+   },
+   {
+    "_path": "include/leptonica/arrayaccess.h",
+    "path_type": "hardlink",
+    "sha256": "3d0c332e2e98ed2d8472a8f45a221a6bf9e75ed0c25f471d8afaf15a5a94017f",
+    "sha256_in_prefix": "3d0c332e2e98ed2d8472a8f45a221a6bf9e75ed0c25f471d8afaf15a5a94017f",
+    "size_in_bytes": 11014
+   },
+   {
+    "_path": "include/leptonica/bbuffer.h",
+    "path_type": "hardlink",
+    "sha256": "3d3143760c038f84c4dd2f486148fd0d0e7b47159ad048451bc59ebb76bb0e98",
+    "sha256_in_prefix": "3d3143760c038f84c4dd2f486148fd0d0e7b47159ad048451bc59ebb76bb0e98",
+    "size_in_bytes": 2731
+   },
+   {
+    "_path": "include/leptonica/bilateral.h",
+    "path_type": "hardlink",
+    "sha256": "a99361ea678f429414f7f6dde4f81079a358f4377f0afa8f58f17aca0253ca30",
+    "sha256_in_prefix": "a99361ea678f429414f7f6dde4f81079a358f4377f0afa8f58f17aca0253ca30",
+    "size_in_bytes": 6649
+   },
+   {
+    "_path": "include/leptonica/bmf.h",
+    "path_type": "hardlink",
+    "sha256": "283001e600b4455f9da85f7e6ff0b27c817322891ac3b80f6fcfb02ca832bbce",
+    "sha256_in_prefix": "283001e600b4455f9da85f7e6ff0b27c817322891ac3b80f6fcfb02ca832bbce",
+    "size_in_bytes": 3182
+   },
+   {
+    "_path": "include/leptonica/bmfdata.h",
+    "path_type": "hardlink",
+    "sha256": "5bc51786e285943ed8220a90cf56dc9e44344054cf18a7e95dcf3d9fc9ea8042",
+    "sha256_in_prefix": "5bc51786e285943ed8220a90cf56dc9e44344054cf18a7e95dcf3d9fc9ea8042",
+    "size_in_bytes": 46921
+   },
+   {
+    "_path": "include/leptonica/bmp.h",
+    "path_type": "hardlink",
+    "sha256": "d674268b6418c56ce58266d60293131284e0a0b943fb589173c6a8ecd24f1162",
+    "sha256_in_prefix": "d674268b6418c56ce58266d60293131284e0a0b943fb589173c6a8ecd24f1162",
+    "size_in_bytes": 5770
+   },
+   {
+    "_path": "include/leptonica/ccbord.h",
+    "path_type": "hardlink",
+    "sha256": "fa8105a981dcedb9c6676aa646c15eeaedffe281474e5511ab30fad5de4645fa",
+    "sha256_in_prefix": "fa8105a981dcedb9c6676aa646c15eeaedffe281474e5511ab30fad5de4645fa",
+    "size_in_bytes": 5477
+   },
+   {
+    "_path": "include/leptonica/colorfill.h",
+    "path_type": "hardlink",
+    "sha256": "119b952a9a8c5304aec73214378641b5953147d1c1689e3e4d1453a6fb8acd01",
+    "sha256_in_prefix": "119b952a9a8c5304aec73214378641b5953147d1c1689e3e4d1453a6fb8acd01",
+    "size_in_bytes": 3297
+   },
+   {
+    "_path": "include/leptonica/dewarp.h",
+    "path_type": "hardlink",
+    "sha256": "44fb09a07a1347d635625277eec6969bdc530e51686f5f5fff9b4ef1cc2d9804",
+    "sha256_in_prefix": "44fb09a07a1347d635625277eec6969bdc530e51686f5f5fff9b4ef1cc2d9804",
+    "size_in_bytes": 11415
+   },
+   {
+    "_path": "include/leptonica/endianness.h",
+    "path_type": "hardlink",
+    "sha256": "cbd73be01dcf316ed72d664d0f5307ca0d07daf2f6f21ef3eab72a56fb89c5e3",
+    "sha256_in_prefix": "cbd73be01dcf316ed72d664d0f5307ca0d07daf2f6f21ef3eab72a56fb89c5e3",
+    "size_in_bytes": 205
+   },
+   {
+    "_path": "include/leptonica/environ.h",
+    "path_type": "hardlink",
+    "sha256": "a278d53704ad0909f9a55609a49cf33601e7bc0d50d8e25864915a7899eaed93",
+    "sha256_in_prefix": "a278d53704ad0909f9a55609a49cf33601e7bc0d50d8e25864915a7899eaed93",
+    "size_in_bytes": 25439
+   },
+   {
+    "_path": "include/leptonica/gplot.h",
+    "path_type": "hardlink",
+    "sha256": "b39294d84d6a199d5d2d551f51008ef4be3b1b7afd5275666f2e0ee04b7297d5",
+    "sha256_in_prefix": "b39294d84d6a199d5d2d551f51008ef4be3b1b7afd5275666f2e0ee04b7297d5",
+    "size_in_bytes": 3814
+   },
+   {
+    "_path": "include/leptonica/hashmap.h",
+    "path_type": "hardlink",
+    "sha256": "709f971fba7781f4008168c9c637a331d91343b599780986c0d3fe647531d342",
+    "sha256_in_prefix": "709f971fba7781f4008168c9c637a331d91343b599780986c0d3fe647531d342",
+    "size_in_bytes": 7135
+   },
+   {
+    "_path": "include/leptonica/heap.h",
+    "path_type": "hardlink",
+    "sha256": "1cbe49878267244a073eb78ac0d9fb6245ec8f106355ce652eb1bfba19de99e0",
+    "sha256_in_prefix": "1cbe49878267244a073eb78ac0d9fb6245ec8f106355ce652eb1bfba19de99e0",
+    "size_in_bytes": 4287
+   },
+   {
+    "_path": "include/leptonica/imageio.h",
+    "path_type": "hardlink",
+    "sha256": "ef4eb553c800eddc04a767a38b5366427b4573553e37762da0b0e37283545215",
+    "sha256_in_prefix": "ef4eb553c800eddc04a767a38b5366427b4573553e37762da0b0e37283545215",
+    "size_in_bytes": 11518
+   },
+   {
+    "_path": "include/leptonica/jbclass.h",
+    "path_type": "hardlink",
+    "sha256": "afb8e526bc414980bd7f7cccfdcb349190d1ec1a5543282faaf8319889d24d7d",
+    "sha256_in_prefix": "afb8e526bc414980bd7f7cccfdcb349190d1ec1a5543282faaf8319889d24d7d",
+    "size_in_bytes": 7183
+   },
+   {
+    "_path": "include/leptonica/leptwin.h",
+    "path_type": "hardlink",
+    "sha256": "f2b5c3c5ea4d1df590f62476b3cbf421b8a619cd7d2e3d4dd45ee28e1b35dd3b",
+    "sha256_in_prefix": "f2b5c3c5ea4d1df590f62476b3cbf421b8a619cd7d2e3d4dd45ee28e1b35dd3b",
+    "size_in_bytes": 1855
+   },
+   {
+    "_path": "include/leptonica/list.h",
+    "path_type": "hardlink",
+    "sha256": "87ba4e86977664f429477d71b139a14ff7b6d343f101f8d16e8c0772d2b07173",
+    "sha256_in_prefix": "87ba4e86977664f429477d71b139a14ff7b6d343f101f8d16e8c0772d2b07173",
+    "size_in_bytes": 3544
+   },
+   {
+    "_path": "include/leptonica/morph.h",
+    "path_type": "hardlink",
+    "sha256": "64058f10dde70c89ce6065c9f6845b5732760e20790034bd95af79d2d913c38b",
+    "sha256_in_prefix": "64058f10dde70c89ce6065c9f6845b5732760e20790034bd95af79d2d913c38b",
+    "size_in_bytes": 9141
+   },
+   {
+    "_path": "include/leptonica/pix.h",
+    "path_type": "hardlink",
+    "sha256": "1da8e9bb0c78825279c8a1f4b23dbdc3aa7fdfa326e72f8e52074bef5b615238",
+    "sha256_in_prefix": "1da8e9bb0c78825279c8a1f4b23dbdc3aa7fdfa326e72f8e52074bef5b615238",
+    "size_in_bytes": 63736
+   },
+   {
+    "_path": "include/leptonica/ptra.h",
+    "path_type": "hardlink",
+    "sha256": "375e63b855fde88eb3b89be56cfa6bdeab0f110b2d9f13858ba3a40cc7e8a714",
+    "sha256_in_prefix": "375e63b855fde88eb3b89be56cfa6bdeab0f110b2d9f13858ba3a40cc7e8a714",
+    "size_in_bytes": 3705
+   },
+   {
+    "_path": "include/leptonica/queue.h",
+    "path_type": "hardlink",
+    "sha256": "7a0aafe30e528e148f335c8b319e6f38982c521a0ff3a7c365e3fb93b3886914",
+    "sha256_in_prefix": "7a0aafe30e528e148f335c8b319e6f38982c521a0ff3a7c365e3fb93b3886914",
+    "size_in_bytes": 3435
+   },
+   {
+    "_path": "include/leptonica/rbtree.h",
+    "path_type": "hardlink",
+    "sha256": "b1fa73a1ff5a769c3ac1ba254e282b8c2ac0b0bf31e623ab91dce38fd256fa8c",
+    "sha256_in_prefix": "b1fa73a1ff5a769c3ac1ba254e282b8c2ac0b0bf31e623ab91dce38fd256fa8c",
+    "size_in_bytes": 3696
+   },
+   {
+    "_path": "include/leptonica/readbarcode.h",
+    "path_type": "hardlink",
+    "sha256": "6934b5c2e7d11639909e8a68eb1bd876613762c11ebf506cf9b765f194ef00cc",
+    "sha256_in_prefix": "6934b5c2e7d11639909e8a68eb1bd876613762c11ebf506cf9b765f194ef00cc",
+    "size_in_bytes": 11698
+   },
+   {
+    "_path": "include/leptonica/recog.h",
+    "path_type": "hardlink",
+    "sha256": "18568150c46d0a4b471bca3b26f7744bdd895ac456c85b1b5cb0fc243437af2f",
+    "sha256_in_prefix": "18568150c46d0a4b471bca3b26f7744bdd895ac456c85b1b5cb0fc243437af2f",
+    "size_in_bytes": 15486
+   },
+   {
+    "_path": "include/leptonica/regutils.h",
+    "path_type": "hardlink",
+    "sha256": "a62f3c204a3591680518170a26ed32d914fd448c66e23b0d45140c3b8850cf00",
+    "sha256_in_prefix": "a62f3c204a3591680518170a26ed32d914fd448c66e23b0d45140c3b8850cf00",
+    "size_in_bytes": 6259
+   },
+   {
+    "_path": "include/leptonica/stack.h",
+    "path_type": "hardlink",
+    "sha256": "e58360890164679417191a50cce97de53d8402d9b804bea136a173fa420ccd52",
+    "sha256_in_prefix": "e58360890164679417191a50cce97de53d8402d9b804bea136a173fa420ccd52",
+    "size_in_bytes": 3147
+   },
+   {
+    "_path": "include/leptonica/stringcode.h",
+    "path_type": "hardlink",
+    "sha256": "a125a55b46bb2b3c4b1fafdb7c1074ce71a25cd54f7487a5380f0f8ae48c0005",
+    "sha256_in_prefix": "a125a55b46bb2b3c4b1fafdb7c1074ce71a25cd54f7487a5380f0f8ae48c0005",
+    "size_in_bytes": 2864
+   },
+   {
+    "_path": "include/leptonica/sudoku.h",
+    "path_type": "hardlink",
+    "sha256": "7e79053c5298f19ffafe40995f8838872e639a0a6677c6af0c6825d364efabc2",
+    "sha256_in_prefix": "7e79053c5298f19ffafe40995f8838872e639a0a6677c6af0c6825d364efabc2",
+    "size_in_bytes": 3357
+   },
+   {
+    "_path": "include/leptonica/watershed.h",
+    "path_type": "hardlink",
+    "sha256": "3428bcacbd361395195203944e16ec5dcd419d38b5438f4a80354101c875229c",
+    "sha256_in_prefix": "3428bcacbd361395195203944e16ec5dcd419d38b5438f4a80354101c875229c",
+    "size_in_bytes": 3530
+   },
+   {
+    "_path": "lib/cmake/LeptonicaConfig-version.cmake",
+    "path_type": "hardlink",
+    "sha256": "0fee89805ec3d2dbb7b3c2f3701f7ae8edc04facdb4d9b6c3291cf79bd5f7fb5",
+    "sha256_in_prefix": "0fee89805ec3d2dbb7b3c2f3701f7ae8edc04facdb4d9b6c3291cf79bd5f7fb5",
+    "size_in_bytes": 383
+   },
+   {
+    "_path": "lib/cmake/LeptonicaConfig.cmake",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/croot/leptonica_1744612016673/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "6c177a23d2000a17c077577dea22e2342262a5561a16dfd25ccab67e9d102374",
+    "sha256_in_prefix": "5cf58801e0518613f5f0331149ee1d3ec9f2b1d0180f83e474c5a96eb30f8efe",
+    "size_in_bytes": 2183
+   },
+   {
+    "_path": "lib/liblept.a",
+    "path_type": "hardlink",
+    "sha256": "55fed67edc1d330bb0b421afc87dd85108138752e799038ae3dceef28c6b7089",
+    "sha256_in_prefix": "55fed67edc1d330bb0b421afc87dd85108138752e799038ae3dceef28c6b7089",
+    "size_in_bytes": 6296676
+   },
+   {
+    "_path": "lib/liblept.so",
+    "path_type": "softlink",
+    "sha256": "2342335a4183ace80d6995ff2732939f5495f55eb204cec025cffbbebfdd94fd",
+    "size_in_bytes": 3350224
+   },
+   {
+    "_path": "lib/liblept.so.5",
+    "path_type": "softlink",
+    "sha256": "2342335a4183ace80d6995ff2732939f5495f55eb204cec025cffbbebfdd94fd",
+    "size_in_bytes": 3350224
+   },
+   {
+    "_path": "lib/liblept.so.5.0.4",
+    "path_type": "hardlink",
+    "sha256": "2342335a4183ace80d6995ff2732939f5495f55eb204cec025cffbbebfdd94fd",
+    "sha256_in_prefix": "2342335a4183ace80d6995ff2732939f5495f55eb204cec025cffbbebfdd94fd",
+    "size_in_bytes": 3350224
+   },
+   {
+    "_path": "lib/libleptonica.a",
+    "path_type": "softlink",
+    "sha256": "55fed67edc1d330bb0b421afc87dd85108138752e799038ae3dceef28c6b7089",
+    "size_in_bytes": 6296676
+   },
+   {
+    "_path": "lib/libleptonica.so",
+    "path_type": "softlink",
+    "sha256": "2342335a4183ace80d6995ff2732939f5495f55eb204cec025cffbbebfdd94fd",
+    "size_in_bytes": 3350224
+   },
+   {
+    "_path": "lib/pkgconfig/lept.pc",
+    "file_mode": "text",
+    "path_type": "hardlink",
+    "prefix_placeholder": "/croot/leptonica_1744612016673/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeho",
+    "sha256": "c41d8dc23061666c177ff77ca34536a67a1a20e6ec0dcec3ce6f47b6f7944093",
+    "sha256_in_prefix": "199fbe39fb039a733e5ba67afbce2f2c967ed7e43211a4367d9cc638b59a4178",
+    "size_in_bytes": 2439
+   }
+  ],
+  "paths_version": 1
+ },
+ "requested_spec": "None",
+ "sha256": "551cd5d3a01f0b684e8f9f03fb9783bf1327123dbfaffca75517ce40f2cff011",
+ "size": 2589466,
+ "subdir": "linux-64",
+ "timestamp": 1744612105000,
+ "url": "https://repo.anaconda.com/pkgs/main/linux-64/leptonica-1.82.0-hfdeec58_3.conda",
+ "version": "1.82.0"
+}

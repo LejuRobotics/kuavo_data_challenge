@@ -1,0 +1,161 @@
+\doxysection{codec.\+h}
+\label{codec_8h_source}\index{codec.h@{codec.h}}
+\textbf{ Go to the documentation of this file.}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/********************************************************************}}
+\DoxyCodeLine{2 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{3 \textcolor{comment}{ * THIS FILE IS PART OF THE OggTheora SOFTWARE CODEC SOURCE CODE.   *}}
+\DoxyCodeLine{4 \textcolor{comment}{ * USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS     *}}
+\DoxyCodeLine{5 \textcolor{comment}{ * GOVERNED BY A BSD-\/STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *}}
+\DoxyCodeLine{6 \textcolor{comment}{ * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *}}
+\DoxyCodeLine{7 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{8 \textcolor{comment}{ * THE Theora SOURCE CODE IS COPYRIGHT (C) 2002-\/2009                *}}
+\DoxyCodeLine{9 \textcolor{comment}{ * by the Xiph.Org Foundation https://www.xiph.org/                 *}}
+\DoxyCodeLine{10 \textcolor{comment}{ *                                                                  *}}
+\DoxyCodeLine{11 \textcolor{comment}{ ********************************************************************}}
+\DoxyCodeLine{12 \textcolor{comment}{}}
+\DoxyCodeLine{13 \textcolor{comment}{  function:}}
+\DoxyCodeLine{14 \textcolor{comment}{}}
+\DoxyCodeLine{15 \textcolor{comment}{ ********************************************************************/}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{64 \textcolor{preprocessor}{\#if !defined(OGG\_THEORA\_CODEC\_HEADER)}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{\# define OGG\_THEORA\_CODEC\_HEADER (1)}}
+\DoxyCodeLine{66 \textcolor{preprocessor}{\# include <ogg/ogg.h>}}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \textcolor{preprocessor}{\#if defined(\_\_cplusplus)}}
+\DoxyCodeLine{69 \textcolor{keyword}{extern} \textcolor{stringliteral}{"{}C"{}} \{}
+\DoxyCodeLine{70 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 }
+\DoxyCodeLine{77 \textcolor{preprocessor}{\#define TH\_EFAULT     (-\/1)}}
+\DoxyCodeLine{79 \textcolor{preprocessor}{\#define TH\_EINVAL     (-\/10)}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{\#define TH\_EBADHEADER (-\/20)}}
+\DoxyCodeLine{83 \textcolor{preprocessor}{\#define TH\_ENOTFORMAT (-\/21)}}
+\DoxyCodeLine{85 \textcolor{preprocessor}{\#define TH\_EVERSION   (-\/22)}}
+\DoxyCodeLine{87 \textcolor{preprocessor}{\#define TH\_EIMPL      (-\/23)}}
+\DoxyCodeLine{89 \textcolor{preprocessor}{\#define TH\_EBADPACKET (-\/24)}}
+\DoxyCodeLine{93 \textcolor{preprocessor}{\#define TH\_DUPFRAME   (1)}}
+\DoxyCodeLine{100 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}\{}
+\DoxyCodeLine{103   TH\_CS\_UNSPECIFIED,}
+\DoxyCodeLine{105   TH\_CS\_ITU\_REC\_470M,}
+\DoxyCodeLine{107   TH\_CS\_ITU\_REC\_470BG,}
+\DoxyCodeLine{109   TH\_CS\_NSPACES}
+\DoxyCodeLine{110 \}th\_colorspace;}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{116 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}\{}
+\DoxyCodeLine{120   TH\_PF\_420,}
+\DoxyCodeLine{122   TH\_PF\_RSVD,}
+\DoxyCodeLine{126   TH\_PF\_422,}
+\DoxyCodeLine{129   TH\_PF\_444,}
+\DoxyCodeLine{131   TH\_PF\_NFORMATS}
+\DoxyCodeLine{132 \}th\_pixel\_fmt;}
+\DoxyCodeLine{133 }
+\DoxyCodeLine{134 }
+\DoxyCodeLine{135 }
+\DoxyCodeLine{144 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{146   \textcolor{keywordtype}{int}            width;}
+\DoxyCodeLine{148   \textcolor{keywordtype}{int}            height;}
+\DoxyCodeLine{150   \textcolor{keywordtype}{int}            stride;}
+\DoxyCodeLine{152   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *data;}
+\DoxyCodeLine{153 \}th\_img\_plane;}
+\DoxyCodeLine{154 }
+\DoxyCodeLine{170 \textcolor{keyword}{typedef} th\_img\_plane th\_ycbcr\_buffer[3];}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{206 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{210   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} version\_major;}
+\DoxyCodeLine{211   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} version\_minor;}
+\DoxyCodeLine{212   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} version\_subminor;}
+\DoxyCodeLine{216   ogg\_uint32\_t  frame\_width;}
+\DoxyCodeLine{219   ogg\_uint32\_t  frame\_height;}
+\DoxyCodeLine{222   ogg\_uint32\_t  pic\_width;}
+\DoxyCodeLine{225   ogg\_uint32\_t  pic\_height;}
+\DoxyCodeLine{229   ogg\_uint32\_t  pic\_x;}
+\DoxyCodeLine{237   ogg\_uint32\_t  pic\_y;}
+\DoxyCodeLine{242   ogg\_uint32\_t  fps\_numerator;}
+\DoxyCodeLine{243   ogg\_uint32\_t  fps\_denominator;}
+\DoxyCodeLine{254   ogg\_uint32\_t  aspect\_numerator;}
+\DoxyCodeLine{255   ogg\_uint32\_t  aspect\_denominator;}
+\DoxyCodeLine{258   th\_colorspace colorspace;}
+\DoxyCodeLine{260   th\_pixel\_fmt  pixel\_fmt;}
+\DoxyCodeLine{264   \textcolor{keywordtype}{int}           target\_bitrate;}
+\DoxyCodeLine{270   \textcolor{comment}{/*Currently this is set so that a qi of 0 corresponds to distortions of 24}}
+\DoxyCodeLine{271 \textcolor{comment}{     times the JND, and each increase by 16 halves that value.}}
+\DoxyCodeLine{272 \textcolor{comment}{    This gives us fine discrimination at low qualities, yet effective rate}}
+\DoxyCodeLine{273 \textcolor{comment}{     control at high qualities.}}
+\DoxyCodeLine{274 \textcolor{comment}{    The qi value 63 is special, however.}}
+\DoxyCodeLine{275 \textcolor{comment}{    For this, the highest quality, we use one half of a JND for our threshold.}}
+\DoxyCodeLine{276 \textcolor{comment}{    Due to the lower bounds placed on allowable quantizers in Theora, we will}}
+\DoxyCodeLine{277 \textcolor{comment}{     not actually be able to achieve quality this good, but this should}}
+\DoxyCodeLine{278 \textcolor{comment}{     provide as close to visually lossless quality as Theora is capable of.}}
+\DoxyCodeLine{279 \textcolor{comment}{    We could lift the quantizer restrictions without breaking VP3.1}}
+\DoxyCodeLine{280 \textcolor{comment}{     compatibility, but this would result in quantized coefficients that are}}
+\DoxyCodeLine{281 \textcolor{comment}{     too large for the current bitstream to be able to store.}}
+\DoxyCodeLine{282 \textcolor{comment}{    We'd have to redesign the token syntax to store these large coefficients,}}
+\DoxyCodeLine{283 \textcolor{comment}{     which would make transcoding complex.*/}}
+\DoxyCodeLine{284   \textcolor{keywordtype}{int}           quality;}
+\DoxyCodeLine{298   \textcolor{keywordtype}{int}           keyframe\_granule\_shift;}
+\DoxyCodeLine{299 \}th\_info;}
+\DoxyCodeLine{300 }
+\DoxyCodeLine{325 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }th\_comment\{}
+\DoxyCodeLine{327   \textcolor{keywordtype}{char} **user\_comments;}
+\DoxyCodeLine{329   \textcolor{keywordtype}{int}   *comment\_lengths;}
+\DoxyCodeLine{331   \textcolor{keywordtype}{int}    comments;}
+\DoxyCodeLine{334   \textcolor{keywordtype}{char}  *vendor;}
+\DoxyCodeLine{335 \}th\_comment;}
+\DoxyCodeLine{336 }
+\DoxyCodeLine{337 }
+\DoxyCodeLine{338 }
+\DoxyCodeLine{340 \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} th\_quant\_base[64];}
+\DoxyCodeLine{341 }
+\DoxyCodeLine{343 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{345   \textcolor{keywordtype}{int}                  nranges;}
+\DoxyCodeLine{348   \textcolor{keyword}{const} \textcolor{keywordtype}{int}           *sizes;}
+\DoxyCodeLine{351   \textcolor{keyword}{const} th\_quant\_base *base\_matrices;}
+\DoxyCodeLine{352 \}th\_quant\_ranges;}
+\DoxyCodeLine{353 }
+\DoxyCodeLine{411 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{413   ogg\_uint16\_t    dc\_scale[64];}
+\DoxyCodeLine{415   ogg\_uint16\_t    ac\_scale[64];}
+\DoxyCodeLine{417   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}   loop\_filter\_limits[64];}
+\DoxyCodeLine{419   th\_quant\_ranges qi\_ranges[2][3];}
+\DoxyCodeLine{420 \}th\_quant\_info;}
+\DoxyCodeLine{421 }
+\DoxyCodeLine{422 }
+\DoxyCodeLine{423 }
+\DoxyCodeLine{425 \textcolor{preprocessor}{\#define TH\_NHUFFMAN\_TABLES (80)}}
+\DoxyCodeLine{427 \textcolor{preprocessor}{\#define TH\_NDCT\_TOKENS     (32)}}
+\DoxyCodeLine{428 }
+\DoxyCodeLine{440 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{443   ogg\_uint32\_t pattern;}
+\DoxyCodeLine{446   \textcolor{keywordtype}{int}          nbits;}
+\DoxyCodeLine{447 \}th\_huff\_code;}
+\DoxyCodeLine{448 }
+\DoxyCodeLine{449 }
+\DoxyCodeLine{450 }
+\DoxyCodeLine{464 \textcolor{keyword}{extern} \textcolor{keyword}{const} \textcolor{keywordtype}{char} *th\_version\_string(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{474 \textcolor{keyword}{extern} ogg\_uint32\_t th\_version\_number(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{484 \textcolor{keyword}{extern} ogg\_int64\_t th\_granule\_frame(\textcolor{keywordtype}{void} *\_encdec,ogg\_int64\_t \_granpos);}
+\DoxyCodeLine{496 \textcolor{keyword}{extern} \textcolor{keywordtype}{double} th\_granule\_time(\textcolor{keywordtype}{void} *\_encdec,ogg\_int64\_t \_granpos);}
+\DoxyCodeLine{506 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} th\_packet\_isheader(ogg\_packet *\_op);}
+\DoxyCodeLine{517 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} th\_packet\_iskeyframe(ogg\_packet *\_op);}
+\DoxyCodeLine{532 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} th\_info\_init(th\_info *\_info);}
+\DoxyCodeLine{537 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} th\_info\_clear(th\_info *\_info);}
+\DoxyCodeLine{538 }
+\DoxyCodeLine{543 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} th\_comment\_init(th\_comment *\_tc);}
+\DoxyCodeLine{553 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} th\_comment\_add(th\_comment *\_tc,\textcolor{keyword}{const} \textcolor{keywordtype}{char} *\_comment);}
+\DoxyCodeLine{564 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} th\_comment\_add\_tag(th\_comment *\_tc,\textcolor{keyword}{const} \textcolor{keywordtype}{char} *\_tag,}
+\DoxyCodeLine{565  \textcolor{keyword}{const} \textcolor{keywordtype}{char} *\_val);}
+\DoxyCodeLine{581 \textcolor{keyword}{extern} \textcolor{keywordtype}{char} *th\_comment\_query(th\_comment *\_tc,\textcolor{keyword}{const} \textcolor{keywordtype}{char} *\_tag,\textcolor{keywordtype}{int} \_count);}
+\DoxyCodeLine{589 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} th\_comment\_query\_count(th\_comment *\_tc,\textcolor{keyword}{const} \textcolor{keywordtype}{char} *\_tag);}
+\DoxyCodeLine{595 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} th\_comment\_clear(th\_comment *\_tc);}
+\DoxyCodeLine{598 }
+\DoxyCodeLine{599 }
+\DoxyCodeLine{600 }
+\DoxyCodeLine{601 \textcolor{preprocessor}{\#if defined(\_\_cplusplus)}}
+\DoxyCodeLine{602 \}}
+\DoxyCodeLine{603 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{604 }
+\DoxyCodeLine{605 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/* OGG\_THEORA\_CODEC\_HEADER */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

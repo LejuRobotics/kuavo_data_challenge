@@ -1,0 +1,141 @@
+\doxysection{yuv\+\_\+buffer Struct Reference}
+\label{structyuv__buffer}\index{yuv\_buffer@{yuv\_buffer}}
+
+
+A YUV buffer for passing uncompressed frames to and from the codec.  
+
+
+
+
+{\ttfamily \#include $<$theora.\+h$>$}
+
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+int \textbf{ y\+\_\+width}
+\begin{DoxyCompactList}\small\item\em Width of the Y\textquotesingle{} luminance plane. \end{DoxyCompactList}\item 
+int \textbf{ y\+\_\+height}
+\begin{DoxyCompactList}\small\item\em Height of the luminance plane. \end{DoxyCompactList}\item 
+int \textbf{ y\+\_\+stride}
+\begin{DoxyCompactList}\small\item\em Offset in bytes between successive rows. \end{DoxyCompactList}\item 
+int \textbf{ uv\+\_\+width}
+\begin{DoxyCompactList}\small\item\em Width of the Cb and Cr chroma planes. \end{DoxyCompactList}\item 
+int \textbf{ uv\+\_\+height}
+\begin{DoxyCompactList}\small\item\em Height of the chroma planes. \end{DoxyCompactList}\item 
+int \textbf{ uv\+\_\+stride}
+\begin{DoxyCompactList}\small\item\em Offset between successive chroma rows. \end{DoxyCompactList}\item 
+unsigned char $\ast$ \textbf{ y}
+\begin{DoxyCompactList}\small\item\em Pointer to start of luminance data. \end{DoxyCompactList}\item 
+unsigned char $\ast$ \textbf{ u}
+\begin{DoxyCompactList}\small\item\em Pointer to start of Cb data. \end{DoxyCompactList}\item 
+unsigned char $\ast$ \textbf{ v}
+\begin{DoxyCompactList}\small\item\em Pointer to start of Cr data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A YUV buffer for passing uncompressed frames to and from the codec. 
+
+This holds a Y\textquotesingle{}Cb\+Cr frame in planar format. The Cb\+Cr planes can be subsampled and have their own separate dimensions and row stride offsets. Note that the strides may be negative in some configurations. For theora the width and height of the largest plane must be a multiple of 16. The actual meaningful picture size and offset are stored in the \doxyref{theora\+\_\+info}{p.}{structtheora__info} structure; frames returned by the decoder may need to be cropped for display.
+
+All samples are 8 bits. Within each plane samples are ordered by row from the top of the frame to the bottom. Within each row samples are ordered from left to right.
+
+During decode, the \doxyref{yuv\+\_\+buffer}{p.}{structyuv__buffer} struct is allocated by the user, but all fields (including luma and chroma pointers) are filled by the library. These pointers address library-\/internal memory and their contents should not be modified.
+
+Conversely, during encode the user allocates the struct and fills out all fields. The user also manages the data addressed by the luma and chroma pointers. See the encoder\+\_\+example.\+c and dump\+\_\+video.\+c example files in theora/examples/ for more information. 
+
+\doxysubsection{Field Documentation}
+\mbox{\label{structyuv__buffer_a8b1857afe3ffac28f259499a57a559e1}} 
+\index{yuv\_buffer@{yuv\_buffer}!u@{u}}
+\index{u@{u}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{u}
+{\footnotesize\ttfamily unsigned char$\ast$ yuv\+\_\+buffer\+::u}
+
+
+
+Pointer to start of Cb data. 
+
+\mbox{\label{structyuv__buffer_a640f1a0b456d3807f9f0538b22f10097}} 
+\index{yuv\_buffer@{yuv\_buffer}!uv\_height@{uv\_height}}
+\index{uv\_height@{uv\_height}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{uv\_height}
+{\footnotesize\ttfamily int yuv\+\_\+buffer\+::uv\+\_\+height}
+
+
+
+Height of the chroma planes. 
+
+\mbox{\label{structyuv__buffer_ab265cc24ffb5650bf52daf223b0debb9}} 
+\index{yuv\_buffer@{yuv\_buffer}!uv\_stride@{uv\_stride}}
+\index{uv\_stride@{uv\_stride}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{uv\_stride}
+{\footnotesize\ttfamily int yuv\+\_\+buffer\+::uv\+\_\+stride}
+
+
+
+Offset between successive chroma rows. 
+
+\mbox{\label{structyuv__buffer_a8c59a57c35af0be519ee47f15e49fe2b}} 
+\index{yuv\_buffer@{yuv\_buffer}!uv\_width@{uv\_width}}
+\index{uv\_width@{uv\_width}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{uv\_width}
+{\footnotesize\ttfamily int yuv\+\_\+buffer\+::uv\+\_\+width}
+
+
+
+Width of the Cb and Cr chroma planes. 
+
+\mbox{\label{structyuv__buffer_aa429491dd112adb0254672c59ef55075}} 
+\index{yuv\_buffer@{yuv\_buffer}!v@{v}}
+\index{v@{v}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{v}
+{\footnotesize\ttfamily unsigned char$\ast$ yuv\+\_\+buffer\+::v}
+
+
+
+Pointer to start of Cr data. 
+
+\mbox{\label{structyuv__buffer_a725727c70eeced6b8c90866973399ac1}} 
+\index{yuv\_buffer@{yuv\_buffer}!y@{y}}
+\index{y@{y}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{y}
+{\footnotesize\ttfamily unsigned char$\ast$ yuv\+\_\+buffer\+::y}
+
+
+
+Pointer to start of luminance data. 
+
+\mbox{\label{structyuv__buffer_a5a8b60e012247e2caffcbbaca99414e0}} 
+\index{yuv\_buffer@{yuv\_buffer}!y\_height@{y\_height}}
+\index{y\_height@{y\_height}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{y\_height}
+{\footnotesize\ttfamily int yuv\+\_\+buffer\+::y\+\_\+height}
+
+
+
+Height of the luminance plane. 
+
+\mbox{\label{structyuv__buffer_a9cdf61834c11b2351640a4a243ad0549}} 
+\index{yuv\_buffer@{yuv\_buffer}!y\_stride@{y\_stride}}
+\index{y\_stride@{y\_stride}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{y\_stride}
+{\footnotesize\ttfamily int yuv\+\_\+buffer\+::y\+\_\+stride}
+
+
+
+Offset in bytes between successive rows. 
+
+\mbox{\label{structyuv__buffer_aaa6c06c071da933231647238418d5fc0}} 
+\index{yuv\_buffer@{yuv\_buffer}!y\_width@{y\_width}}
+\index{y\_width@{y\_width}!yuv\_buffer@{yuv\_buffer}}
+\doxysubsubsection{y\_width}
+{\footnotesize\ttfamily int yuv\+\_\+buffer\+::y\+\_\+width}
+
+
+
+Width of the Y\textquotesingle{} luminance plane. 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\textbf{ theora.\+h}\end{DoxyCompactItemize}
