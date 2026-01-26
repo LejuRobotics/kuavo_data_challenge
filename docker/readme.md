@@ -1,20 +1,20 @@
-# 项目 Docker 打包指南
+# Docker Packaging Guide for Your Project
 
-本指南介绍如何构建包含 **ROS Noetic + Miniforge + 项目 + editable 第三方包** 的 Docker 镜像。
+This guide explains how to build a Docker image that includes ROS Noetic + Miniforge + your project code + editable third-party packages.
 
 ---
 
-## 1️⃣ 设置 Docker 镜像加速（可选）
+## 1️⃣ Configure Docker Registry Mirrors (Optional)
 
-国内访问 Docker Hub 速度慢，可以使用阿里云镜像加速器。
+Accessing Docker Hub from within China can be slow. You may use registry mirrors such as those provided by DaoCloud or other public accelerators.
 
-1. 编辑 Docker 配置文件：
+1. Edit the Docker configuration file:
 
 ```bash
 sudo vim /etc/docker/daemon.json
 ```
 
-2. 替换为以下内容：
+2. Replace its contents with the following:
 
 ```json
 {
@@ -38,7 +38,7 @@ sudo vim /etc/docker/daemon.json
 }
 ```
 
-3. 保存后重启 Docker：
+3. Save the file and restart Docker:
 
 ```bash
 sudo systemctl daemon-reload
@@ -48,124 +48,124 @@ sudo systemctl status docker
 
 ---
 
-## 2️⃣ 使用 Conda Pack 打包环境
+## 2️⃣ Package Your Conda Environment Using conda-pack
 
-1. 安装 conda-pack
+1. Install  conda-pack
 
 ```bash
 conda install -c conda-forge conda-pack
 ```
 
-2. 假设你已有 Conda 环境 `kdc`：
+2. Assume you already have a Conda environment named `kdc`：
 
 ```bash
 conda activate kdc
 ```
 
-3. 打包环境：
+3. Pack the environment:
 
 ```bash
 conda pack -n kdc -o myenv.tar.gz
 ```
 
-⚠️ 注意：
-- 如果环境中有 editable 安装包（`pip install -e`），可以先忽略，稍后在 Dockerfile 中再安装。
-- 示例：
+⚠️ Important Notes:
+- If your environment contains packages installed in editable mode (`pip install -e`), you can choose to ignore them during packing and reinstall them later inside the Dockerfile.
+- Example:
 
 ```bash
 conda pack -n kdc --ignore-editable-packages -o myenv.tar.gz
 ```
 
-4. 将打包好的环境压缩包 myenv.tar.gz 放在项目根目录下
+4. Place the resulting myenv.tar.gz in your project root directory.
 
 ---
 
-## 3️⃣ Dockerfile 构建项目镜像
+## 3️⃣ Build the Project Image with Dockerfile
 
-⚠️ 注意：
-- 请确保你的outputs文件夹里只有一组你要上传测试的模型文件及其配置文件，避免打包得到的 docker 镜像体积过大
+⚠️ Important:
+- Ensure your outputs/ folder contains only one set of model files and their corresponding config files intended for submission. Including unnecessary files will significantly increase the Docker image size.
 
-### 下面提供一个 **Dockerfile的可用示例**：
+### Below is a working **Dockerfile **：
 
-[Dockerfile可用示例](../Dockerfile)
+[Dockerfile example](../Dockerfile)
 
-### 该Dockerfile的主要功能如下所示：
+### Key Features of This Dockerfile:
 
-#### 1. 基础镜像
-- 使用官方 ROS Noetic Ubuntu 20.04 镜像 `ros:noetic-ros-base-focal`。
+#### 1. Base Image
+- Uses the official ROS Noetic image on Ubuntu 20.04: `ros:noetic-ros-base-focal`.
 
-#### 2. 国内加速
-- APT：使用清华源加速 Ubuntu 软件包下载。
-- Conda：配置 Conda channels 为清华镜像。
-- Pip：配置 PyPI 国内镜像。
+#### 2. Domestic Acceleration
+- APT: Configured to use Tsinghua University mirrors.
+- Conda: Channels set to Tsinghua mirrors.
+- Pip: Uses Alibaba Cloud PyPI mirror.
 
-#### 3. 系统工具和 ROS 包
-- 安装常用工具：`curl`, `wget`, `sudo`, `build-essential`, `bzip2` 等。
-- 安装 ROS 包：`ros-noetic-ros-base`, `ros-noetic-cv-bridge`, `ros-noetic-apriltag-ros`（如果你需要别的ros包，可以自行添加）。
+#### 3. System Tools & ROS Packages
+- Installs common utilities: `curl`, `wget`, `sudo`, `build-essential`, `bzip2`, etc。
+- Installs ROS packages: `ros-noetic-ros-base`, `ros-noetic-cv-bridge`, `ros-noetic-apriltag-ros`(You may add other ROS dependencies as needed).
 
 #### 4. Miniforge
-- 安装 Miniforge3 并配置环境变量。
+- Installs Miniforge3 and sets up environment variables.
 
-#### 5. 项目和 Conda 环境
-- 设置工作目录 `/root/kuavo_data_challenge`。
-- 复制项目代码。
-- 解压 Conda Pack 打包的环境 `myenv.tar.gz`。
-- 使用 `conda-unpack` 修复路径。
-- 安装项目和第三方包（editable 模式）。
-- 删除测试目录和冗余缓存，减小镜像体积。
+#### 5. Project Code & Conda Environment
+- Sets working directory to `/root/kuavo_data_challenge`.
+- Copies entire project source code.
+- Extracts the packed Conda environment `myenv.tar.gz`.
+- Runs `conda-unpack` to fix hardcoded paths.
+- Reinstalls the project and third-party packages in editable mode.
+- Cleans up test directories and cache to reduce final image size.
 
-#### 6. 容器环境优化
-- 自动激活 Conda 环境（写入 `.bashrc`）。
-- 设置默认命令为 `bash`。
-- 多阶段构建：只将最终环境和源码 COPY 到 runtime，避免 builder 中的临时文件占用空间，实现镜像压缩。
+#### 6. Container Optimization
+- Automatically activates the Conda environment by appending to `.bashrc`.
+- Sets default command to `bash`.
+- Uses multi-stage build: only the final runtime environment and source code are copied into the final image, excluding builder-stage temporary files—significantly reducing image size.
 
 ---
 
-## 4️⃣ 构建 Docker 镜像并导出为tar文件
+## 4️⃣ Build and Export the Docker Image as a TAR File
 
-将Dockerfile放置于项目根目录下，运行指令：
+Place the Dockerfile in your project root, then run:
 ```bash
 docker build -t kdc_v0 .
 ```
 
-导出：
+Export the image:
 ```bash
 docker save -o kdc_v0.tar kdc_v0:latest
 ```
 
-需将kdc_v0替换成你的镜像名称
+Replace kdc_v0 with your actual image name if different.
 
 ---
 
-## 5️⃣ 运行 Docker 容器
+## 5️⃣ Run the Docker Container
 
-### 下面提供一个运行 Docker 容器的 **shell 脚本可用示例**：
+### Below is a **sample shell script** for running the container:
 
-[shell脚本可用示例](run_with_gpu.sh)
+[shell script example](run_with_gpu.sh)
 
-### 该脚本用于启动或创建 Docker 容器：
+### This script is used to start or create a Docker container:
 
-- **导入镜像**：
-- **检查容器是否存在**：
-  - 存在 → 启动并附加 (`docker start -ai`)
-  - 不存在 → 创建新容器并启动 (`docker run -it --gpus all --net=host ...`)
-- **设置环境变量**：
-  - ROS 网络配置 (`ROS_MASTER_URI`、`ROS_IP`)
-- **支持 GPU 容器**  
+- **Import Image**：
+- **Check if the container exists**：
+  - Exists → Start and Attach (`docker start -ai`)
+  - Does not exist → Create a new container and start it (`docker run -it --gpus all --net=host ...`)
+- **Set environment variable**：
+  - ROS Network Configuration (`ROS_MASTER_URI`、`ROS_IP`)
+- **Supports GPU containers**  
 
 ---
 
-## 6️⃣ 注意事项
+## 6️⃣ Precautions
 
-比赛测试需上传压缩包，压缩包内包含两个文件，一个是kdc_v0.tar(名字可以自行更改)，是docker镜像的压缩包，另一个是运行脚本run_with_gpu.sh(此名不要更改)
+For the competition test, you need to upload a compressed file, which should contain two files: one is kdc_v0.tar (the name can be changed), which is the compressed Docker image, and the other is the execution script run_with_gpu.sh (do not change this name).
 
-必须确保打包好的docker镜像通过以下代码即可运行仿真测试：
+You must ensure that the packaged Docker image can run the simulation test with the following code:
 
 ```bash
-# 启动docker
+# Start docker
 sh run_with_gpu.sh
 
-# 启动仿真自动化测试
-python kuavo_deploy/examples/scripts/script_auto_test.py --task auto_test --config configs/deploy/kuavo_sim_env.yaml
+# Start simulation automated testing
+python kuavo_deploy/src/scripts/script_auto_test.py --task auto_test --config configs/deploy/kuavo_env.yaml
 
 ```
