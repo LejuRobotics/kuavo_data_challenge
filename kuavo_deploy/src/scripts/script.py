@@ -136,7 +136,7 @@ class ArmMove:
             topic_names = ["/control_robot_hand_position","/leju_claw_command","/kuavo_arm_traj"]
         )
 
-        rospy.init_node('kuavo_deploy', anonymous=True)
+        # rospy.init_node('kuavo_deploy', anonymous=True)
         self.env = gym.make(
             self.config.env.env_name,
             max_episode_steps=self.inference_config.max_episode_steps,
@@ -385,7 +385,7 @@ class ArmMove:
         end_angles = np.array(end_angles)/180*np.pi
         self._move_to_joint_angles(end_angles)
         # 执行评估
-        self.run()
+        #self.run()
 
     def back_to_zero(self) -> None:
         """回到零位"""

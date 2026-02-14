@@ -64,15 +64,24 @@ class Config:
                     }][int(self.use_depth)][self.which_arm]
         return cameras
     
+    # sensor_data_raw 格式：前12为腿部，第13为腰部，第14起为左臂、再为右臂
+    ARM_START_INDEX = 13  # 左手臂起始索引（第14个数据，0-based 为 13）
+
     @property
     def slice_robot(self) -> List[Tuple[int, int]]:
-        """Get robot slice based on which arm is being used."""
+        """Get robot slice based on which arm is being used.
+        左臂: [ARM_START_INDEX, ARM_START_INDEX+7)，右臂: [ARM_START_INDEX+7, ARM_START_INDEX+14)。
+        """
+        left_start = self.ARM_START_INDEX
+        left_end = left_start + 7   # 左臂 7 关节
+        right_start = left_end
+        right_end = right_start + 7  # 右臂 7 关节
         if self.which_arm == 'left':
-            return [(12, 19), (19, 19)]
+            return [(left_start, left_end), (right_start, right_start)]
         elif self.which_arm == 'right':
-            return [(12, 12), (19, 26)]
+            return [(left_start, left_start), (right_start, right_end)]
         elif self.which_arm == 'both':
-            return [(12, 19), (19, 26)]
+            return [(left_start, left_end), (right_start, right_end)]
         else:
             raise ValueError(f"Invalid which_arm: {self.which_arm}")
     

@@ -252,7 +252,7 @@ def main():
         print("无效选择")
         return
 
-    config_path = input("请输入自定义配置文件路径: ").strip()
+    config_path = "configs/deploy/kuavo_env.yaml"
     if not Path(config_path).exists():
         print(f"❌ 配置文件不存在: {config_path}")
         sys.exit(1)

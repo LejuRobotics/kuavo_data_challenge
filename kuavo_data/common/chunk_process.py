@@ -73,16 +73,23 @@ class ChunkedRosbagProcessor:
         
         bag.close()
         
-        # 确定主时间线：消息最多的相机
+        # 确定主时间线：消息最多的相机（输出时长 = 主时间线相机帧数 / jump，与其它话题长度无关）
         camera_counts = {k: len(all_timestamps.get(k, [])) for k in self.camera_names}
         if not any(camera_counts.values()):
             raise ValueError("No camera data found in rosbag")
         
+        jump = self.main_timeline_fps // self.train_hz
+        # 诊断：打印每个相机的帧数和对应时长，便于排查“30秒 bag 只转出 10 秒”等问题
+        for cam, count in camera_counts.items():
+            raw_duration = (count - 2 * self.sample_drop) / self.main_timeline_fps if count > 2 * self.sample_drop else 0
+            out_frames = (count - 2 * self.sample_drop) // jump if self.sample_drop > 0 else count // jump
+            out_duration = out_frames / self.train_hz
+            logger.info(f"  Camera {cam}: {count} raw frames (~{raw_duration:.1f}s raw, ~{out_duration:.1f}s at {self.train_hz}Hz after jump={jump})")
+        
         main_timeline = max(camera_counts, key=lambda k: camera_counts[k])
-        logger.info(f"Main timeline: {main_timeline} ({camera_counts[main_timeline]} frames)")
+        logger.info(f"Main timeline: {main_timeline} ({camera_counts[main_timeline]} frames) -> output duration is determined by this camera only.")
         
         # 生成对齐后的主时间戳序列
-        jump = self.main_timeline_fps // self.train_hz
         raw_timestamps = all_timestamps[main_timeline]
 
         if len(raw_timestamps) < 2 * self.sample_drop + 1:
@@ -96,7 +103,8 @@ class ChunkedRosbagProcessor:
         else:
             main_timestamps = raw_timestamps[::jump]
         
-        logger.info(f"Generated {len(main_timestamps)} aligned timestamps "
+        out_duration_sec = len(main_timestamps) / self.train_hz
+        logger.info(f"Generated {len(main_timestamps)} aligned timestamps (~{out_duration_sec:.1f}s at {self.train_hz}Hz) "
                    f"(from {len(raw_timestamps)} raw frames, "
                    f"dropped {self.sample_drop} frames at each end, jump={jump})")
         

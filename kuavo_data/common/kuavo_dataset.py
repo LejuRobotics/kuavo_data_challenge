@@ -280,31 +280,39 @@ class KuavoMsgProcesser:
             msg: The input message containing joint state information.
 
         Returns:
-            dict: A dictionary with processed joint state data. The 'data' field is sliced to include only indices 12 through 25.
+            dict: A dictionary with processed joint state data. The 'data' field is sliced to include only arm indices (13-26: 左臂7+右臂7).
 
         Notes:
-            This function uses KuavoMsgProcesser.process_joint_state to initially process the input message and then extracts the specific range of data for further use.
+            sensor_data_raw 格式：前12为腿部，第13为腰部，第14起为左臂、再为右臂。
         """
+        # 左臂起始索引 13，双臂共 14 个关节 → [13:27]
+        ARM_START_IDX = 13
+        ARM_END_IDX = ARM_START_IDX + 14
         res = KuavoMsgProcesser.process_joint_state(msg)
-        res["data"] = res["data"][12:26]
+        res["data"] = res["data"][ARM_START_IDX:ARM_END_IDX]
         return res
 
     @staticmethod
     def process_joint_cmd_extract_arm(msg):
+        ARM_START_IDX = 13
+        ARM_END_IDX = ARM_START_IDX + 14
         res = KuavoMsgProcesser.process_joint_cmd(msg)
-        res["data"] = res["data"][12:26]
+        res["data"] = res["data"][ARM_START_IDX:ARM_END_IDX]
         return res
 
     @staticmethod
     def process_sensors_data_raw_extract_arm_head(msg):
+        # 从第14个数据（索引13）开始为手臂
+        ARM_START_IDX = 13
         res = KuavoMsgProcesser.process_joint_state(msg)
-        res["data"] = res["data"][12:]
+        res["data"] = res["data"][ARM_START_IDX:]
         return res
 
     @staticmethod
     def process_joint_cmd_extract_arm_head(msg):
+        ARM_START_IDX = 13
         res = KuavoMsgProcesser.process_joint_cmd(msg)
-        res["data"] = res["data"][12:]
+        res["data"] = res["data"][ARM_START_IDX:]
         return res
 
 
