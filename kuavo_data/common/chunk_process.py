@@ -30,7 +30,7 @@ class ChunkedRosbagProcessor:
     """
     
     def __init__(self, msg_processer, topic_process_map: dict, 
-                 camera_names: list, train_hz: int, main_timeline_fps: int, 
+                 camera_names: list, train_hz: int, main_timeline: str, main_timeline_fps: int, 
                  sample_drop: int, only_half_up_body: bool):
         self._msg_processer = msg_processer
         self._topic_process_map = topic_process_map
@@ -39,6 +39,7 @@ class ChunkedRosbagProcessor:
         self.main_timeline_fps = main_timeline_fps
         self.sample_drop = sample_drop
         self.only_half_up_body = only_half_up_body
+        self.main_timeline = main_timeline
     
     def scan_timestamps_only(self, bag_file: str) -> Tuple[str, List[float], Dict[str, List[float]]]:
         """
@@ -70,15 +71,19 @@ class ChunkedRosbagProcessor:
             keys = topic_to_key.get(topic)
             for key in keys:
                 all_timestamps[key].append(t.to_sec())
+                # all_timestamps[key].append(msg.header.stamp.to_sec())
+                # all_timestamps[key].append(msg.header.stamp.to_sec() if hasattr(msg, 'header') and hasattr(msg.header, 'stamp') else t.to_sec())
         
-        bag.close()
+        bag.close()                           
         
         # 确定主时间线：消息最多的相机
         camera_counts = {k: len(all_timestamps.get(k, [])) for k in self.camera_names}
         if not any(camera_counts.values()):
             raise ValueError("No camera data found in rosbag")
-        
-        main_timeline = max(camera_counts, key=lambda k: camera_counts[k])
+        if self.main_timeline is None:
+            main_timeline = max(camera_counts, key=lambda k: camera_counts[k])
+        else:
+            main_timeline = self.main_timeline
         logger.info(f"Main timeline: {main_timeline} ({camera_counts[main_timeline]} frames)")
         
         # 生成对齐后的主时间戳序列
@@ -96,10 +101,27 @@ class ChunkedRosbagProcessor:
         else:
             main_timestamps = raw_timestamps[::jump]
         
+        # 取所有话题中“最早结束”的时间
+        min_end = min(
+            ts_list[-1]
+            for ts_list in all_timestamps.values()
+            if len(ts_list) > 0
+        )
+
+        # 裁剪主时间线，只保留所有话题都还存在数据的时间点
+        before_len = len(main_timestamps)
+        main_timestamps = [t for t in main_timestamps if t < min_end]
+        after_len = len(main_timestamps)
+
+        logger.info(
+            f"Trim main timeline by min_end={min_end:.6f}, "
+            f"frames: {before_len} -> {after_len}"
+        )
+        
         logger.info(f"Generated {len(main_timestamps)} aligned timestamps "
                    f"(from {len(raw_timestamps)} raw frames, "
                    f"dropped {self.sample_drop} frames at each end, jump={jump})")
-        
+
         return main_timeline, main_timestamps, dict(all_timestamps)
     
     def process_in_chunks(
@@ -281,12 +303,16 @@ class ChunkedRosbagProcessor:
                     msg_data = msg_process_fn(msg)
                     msg_data["timestamp"] = t.to_sec()
                     chunk_data[key][t.to_sec()] = msg_data
-                        
+                    # chunk_data[key][msg_data["timestamp"]] = msg_data
+
         except Exception as e:
             logger.warning(f"Time-range filtering failed: {e}, falling back to full scan")
             # 回退到全量扫描+手动过滤
             for topic, msg, t in bag.read_messages(topics=list(topic_to_key.keys())):
                 ts = t.to_sec()
+                # ts = msg.header.stamp.to_sec()
+                # ts = msg.header.stamp.to_sec() if hasattr(msg, 'header') and hasattr(msg.header, 'stamp') else t.to_sec()
+
                 if start_time <= ts <= end_time:
                     key = topic_to_key.get(topic)
                     if key:

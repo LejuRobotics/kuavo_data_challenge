@@ -45,13 +45,14 @@ DEFAULT_JOINT_NAMES = {
 # ================ 数据转换信息定义 ================
 def init_parameters(cfg):
 
-    global DEFAULT_CAMERA_NAMES, TRAIN_HZ, MAIN_TIMELINE_FPS, SAMPLE_DROP, CONTROL_HAND_SIDE
+    global DEFAULT_CAMERA_NAMES, TRAIN_HZ, MAIN_TIMELINE_FPS, SAMPLE_DROP, CONTROL_HAND_SIDE, MAIN_TIMELINE
     global SLICE_ROBOT, SLICE_DEX, SLICE_CLAW
     global IS_BINARY, DELTA_ACTION, RELATIVE_START
     global RESIZE_W, RESIZE_H
     global ONLY_HALF_UP_BODY, USE_LEJU_CLAW, USE_QIANGNAO
     global USE_DEPTH, DEPTH_RANGE
     global TASK_DESCRIPTION
+    global DEX_DOF_NEEDED
 
     
     from .config_dataset import load_config
@@ -62,6 +63,7 @@ def init_parameters(cfg):
     DEPTH_RANGE = config.depth_range
     DEFAULT_CAMERA_NAMES = config.default_camera_names
     TRAIN_HZ = config.train_hz
+    MAIN_TIMELINE = config.main_timeline
     MAIN_TIMELINE_FPS = config.main_timeline_fps
     SAMPLE_DROP = config.sample_drop
     CONTROL_HAND_SIDE = config.which_arm
@@ -69,6 +71,7 @@ def init_parameters(cfg):
     # 根据which_arm自动计算的切片配置
     SLICE_ROBOT = config.slice_robot
     SLICE_DEX = config.dex_slice
+    DEX_DOF_NEEDED = config.dex_dof_needed
     SLICE_CLAW = config.claw_slice
 
     # 处理标志
@@ -531,6 +534,7 @@ class KuavoRosbagReader:
             topic_process_map=self._topic_process_map,
             camera_names=DEFAULT_CAMERA_NAMES,
             train_hz=TRAIN_HZ,
+            main_timeline=MAIN_TIMELINE,
             main_timeline_fps=MAIN_TIMELINE_FPS,
             sample_drop=SAMPLE_DROP,
             only_half_up_body=ONLY_HALF_UP_BODY

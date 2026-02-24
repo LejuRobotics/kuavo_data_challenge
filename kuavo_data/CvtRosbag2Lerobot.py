@@ -87,9 +87,9 @@ def create_empty_dataset_chunked(
 
     state_dim = (len(motors),)
 
+    # state_name = kuavo.DEFAULT_ARM_JOINT_NAMES[:len(kuavo.DEFAULT_ARM_JOINT_NAMES)//2] + ["gripper_l"] + kuavo.DEFAULT_ARM_JOINT_NAMES[len(kuavo.DEFAULT_ARM_JOINT_NAMES)//2:] + ["gripper_r"]
+    state_name = motors
 
-    state_name = kuavo.DEFAULT_ARM_JOINT_NAMES[:len(kuavo.DEFAULT_ARM_JOINT_NAMES)//2] + ["gripper_l"] + kuavo.DEFAULT_ARM_JOINT_NAMES[len(kuavo.DEFAULT_ARM_JOINT_NAMES)//2:] + ["gripper_r"]
-    
     if not kuavo.ONLY_HALF_UP_BODY:
         action_dim = (action_dim[0] + 3 + 1,)  # cmd_pos_world3+断点标志1
         action_name += ["cmd_pos_x", "cmd_pos_y", "cmd_pos_yaw", "ctrl_change_cmd"]
@@ -392,10 +392,6 @@ def populate_dataset_chunked(
                     frame["task"] = task
                     dataset.add_frame(frame)
                 
-                # 保存当前chunk
-                dataset.save_episode()
-                dataset.hf_dataset = dataset.create_hf_dataset()
-                
                 # 清空buffer并释放内存
                 frames_buffer.clear()
                 gc.collect()
@@ -414,10 +410,10 @@ def populate_dataset_chunked(
             if len(frames_buffer) > 0:
                 for frame in frames_buffer:
                     dataset.add_frame(frame, task=task)
-                dataset.save_episode()
-                dataset.hf_dataset = dataset.create_hf_dataset()
-                frames_buffer.clear()
-                gc.collect()
+            dataset.save_episode()
+            dataset.hf_dataset = dataset.create_hf_dataset()
+            frames_buffer.clear()
+            gc.collect()
             
             log_print.info(f"Episode {ep_idx} completed: {frame_count[0]} frames")
             
@@ -569,6 +565,7 @@ def main(cfg: DictConfig):
 
 
 if __name__ == "__main__":
+    np.random.seed(42)
     main()
 
 
