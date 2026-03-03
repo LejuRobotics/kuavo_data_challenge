@@ -33,7 +33,7 @@ class ObsBuffer:
         # env_cfg = config.env
         env_cfg = config
         self.which_arm = env_cfg.which_arm
-
+        self.arm_start_index = env_cfg.arm_start_index
         # === 观测定义 ===
         self.obs_key_map = obs_key_map or env_cfg.obs_key_map or {}
         self.compute_func_map = compute_func_map or {}
@@ -148,7 +148,7 @@ class ObsBuffer:
 
         # FK 计算需要双臂的14个关节（索引12-26）
         # 计算依赖于此数据源的观测（例如 eef_pose）
-        arm_joints = joint[12:26]  # 提取双臂关节
+        arm_joints = joint[self.arm_start_index:self.arm_start_index + 14]  # 提取双臂关节
         self.compute_dependent_obs(key, arm_joints, timestamp)
 
         slice_value = handle.get("params", {}).get("slice", None)  

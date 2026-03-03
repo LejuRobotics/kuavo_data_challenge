@@ -67,6 +67,8 @@ class ConfigEnv:
     limits: LimitsConfig = field(default_factory=LimitsConfig)
     is_binary: bool = False
 
+    arm_start_index: int = 13  # 默认13，表示手臂数据在sensor_data_raw中的起始索引（0-based），如果你的消息格式不同可在这里调整
+
     # -------- Validation ----------
     def validate(self):
         if self.eef_type not in ["rq2f85", "leju_claw", "qiangnao"]:
@@ -85,10 +87,11 @@ class ConfigEnv:
     # -------- Derived properties ----------
     @property
     def joint_q_slice(self):
+        # sensor_data_raw 格式：前12腿部 + 第13腰部 + 第14起为左臂7关节 + 右臂7关节
         return {
-            "left": [[12, 19]],
-            "right": [[19, 26]],
-            "both": [[12, 19], [19, 26]]
+            "left": [[self.arm_start_index, self.arm_start_index + 7]],
+            "right": [[self.arm_start_index + 7, self.arm_start_index + 14]],
+            "both": [[self.arm_start_index, self.arm_start_index + 7], [self.arm_start_index + 7, self.arm_start_index + 14]]
         }[self.which_arm]
 
     @property

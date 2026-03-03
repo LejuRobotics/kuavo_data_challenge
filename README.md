@@ -523,6 +523,8 @@ b. 调用部署代码
 
 - 步骤同3中b部分，修改配置文件 `kuavo_env.yaml`，`env_name`为`Kuavo-Real`，其他如`eef_type`，`obs_key_map`等按需修改，即可在真机上部署测试。
 
+- 如果是4pro机器人，选择配置文件 `kuavo_env_kuavo4pro.yaml`；如果是5代人形，选择配置文件 `kuavo_env_kuavo5.yaml`
+
 - 边侧机推理请见（待更新），上位机orin推理请见：[README_AGX_ORIN.md](README_AGX_ORIN.md)
 
 - 推理运行时的日志在log/kuavo_deploy/kuavo_deploy.log，请查看。
@@ -530,11 +532,10 @@ b. 调用部署代码
 #### 4.1 真机异步推理
 ```bash
 ##### 4pro机器人
-python kuavo_deploy/eval_kuavo_async_no_lock_kuavo4pro.py --device=cuda --fps=10 --task="tiaojiu" --duration=300
+python kuavo_deploy/eval_kuavo_async_no_lock_kuavo4pro.py --kuavo-config-path /your_working_dir/configs/data/KuavoRosbag2Lerobot_kuavo4pro.yaml --device=cuda --fps=10 --task="tiaojiu" --duration=300
 
 ##### 5代人形
-python kuavo_deploy/eval_kuavo_async_no_lock_kuavo5.py --device=cuda --fps=10 --task="pick the fruit" --duration=300
-
+python kuavo_deploy/eval_kuavo_async_no_lock_kuavo5.py --kuavo-config-path /your_working_dir/configs/data/KuavoRosbag2Lerobot_kuavo5.yaml --device=cuda --fps=10 --task="pick fruit" --duration=300
 ```
 
 ### 5. 关于 kuavo_humanoid_sdk：

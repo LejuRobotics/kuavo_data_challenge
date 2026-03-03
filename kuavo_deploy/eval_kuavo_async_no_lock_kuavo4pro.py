@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 from pathlib import Path
 from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
-from kuavo_deploy.config_kuavo4pro import load_kuavo_config
+from kuavo_deploy.config import load_kuavo_config
 from kuavo_deploy.kuavo_env.KuavoRealEnv import KuavoRealEnv
 from kuavo_deploy.src.scripts.script import ArmMove
 from PIL import Image
@@ -369,8 +369,7 @@ def _apply_torch_compile(policy, cfg: ACTAsyncRealDemoConfig):
 
 
 @parser.wrap()
-def demo_cli(cfg: ACTAsyncRealDemoConfig):
-    """Main entry point for ACT async demo on real robot."""
+def demo_cli(cfg: ACTAsyncRealDemoConfig, kuavo_config_path: Optional[str] = None):
 
     # 初始化日志
     init_logging()
@@ -382,7 +381,8 @@ def demo_cli(cfg: ACTAsyncRealDemoConfig):
     shutdown_event = signal_handler.shutdown_event
 
     # 加载 Kuavo 配置（YAML），与 eval_kuavo.py / real_single_test.py 保持一致
-    kuavo_config = load_kuavo_config()
+    # kuavo_config = load_kuavo_config()
+    kuavo_config = load_kuavo_config(kuavo_config_path)
 
     # 创建 Kuavo 实机环境
     env = KuavoRealEnv(kuavo_config)
