@@ -430,9 +430,17 @@ sudo ldconfig
 将 Kuavo 原生 rosbag 数据转换为 Lerobot 框架可用的 parquet 格式：
 
 ```bash
+##### 5代人形
 python kuavo_data/CvtRosbag2Lerobot.py \
   --config-path=../configs/data/ \
-  --config-name=KuavoRosbag2Lerobot.yaml \
+  --config-name=KuavoRosbag2Lerobot_kuavo5.yaml \
+  rosbag.rosbag_dir=/path/to/rosbag \
+  rosbag.lerobot_dir=/path/to/lerobot_data
+
+##### 4代人形
+python kuavo_data/CvtRosbag2Lerobot.py \
+  --config-path=../configs/data/ \
+  --config-name=KuavoRosbag2Lerobot_kuavo4pro.yaml \
   rosbag.rosbag_dir=/path/to/rosbag \
   rosbag.lerobot_dir=/path/to/lerobot_data
 ```
@@ -518,6 +526,16 @@ b. 调用部署代码
 - 边侧机推理请见（待更新），上位机orin推理请见：[README_AGX_ORIN.md](README_AGX_ORIN.md)
 
 - 推理运行时的日志在log/kuavo_deploy/kuavo_deploy.log，请查看。
+
+#### 4.1 真机异步推理
+```bash
+##### 4pro机器人
+python kuavo_deploy/eval_kuavo_async_no_lock_kuavo4pro.py --device=cuda --fps=10 --task="tiaojiu" --duration=300
+
+##### 5代人形
+python kuavo_deploy/eval_kuavo_async_no_lock_kuavo5.py --device=cuda --fps=10 --task="pick the fruit" --duration=300
+
+```
 
 ### 5. 关于 kuavo_humanoid_sdk：
 

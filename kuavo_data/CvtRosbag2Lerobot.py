@@ -537,7 +537,7 @@ def main(cfg: DictConfig):
     half_claw = len(kuavo.DEFAULT_LEJUCLAW_JOINT_NAMES) // 2
     half_dexhand = len(kuavo.DEFAULT_DEXHAND_JOINT_NAMES) // 2
     # 与 config slice_robot 一致：手臂在 sensor_data_raw 中从第14个（索引13）开始
-    UP_START_INDEX = 13
+    UP_START_INDEX = cfg.dataset.arm_start_index
     # if kuavo.ONLY_HALF_UP_BODY:
     if kuavo.USE_LEJU_CLAW:
         DEFAULT_ARM_JOINT_NAMES = kuavo.DEFAULT_ARM_JOINT_NAMES[:half_arm] + kuavo.DEFAULT_LEJUCLAW_JOINT_NAMES[:half_claw] \

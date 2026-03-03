@@ -27,6 +27,10 @@ dataset:
   which_arm: both  # 需要哪一只手臂的关节 + 图像数据，可选: left, right, both，注意图像数据会同时包含头部相机图像
   use_depth: true  # 是否需要深度图像数据，与上面手臂对应的深度图像数据, 此分支act和dp均支持了深度图像
   depth_range: [0, 1500]  # 深度图的裁剪范围，单位：毫米，将用于做归一化
+
+  # sensors_data_raw 格式：前12为腿部，第13为腰部，第14起为左臂、再为右臂
+  # 默认 13（0-based），如果你的消息格式不同可在这里调整
+  arm_start_index: 13
  
   task_description: "Pick and Place" # 任务描述，自定义
 

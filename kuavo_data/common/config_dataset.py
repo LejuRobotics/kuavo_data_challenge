@@ -17,6 +17,11 @@ class Config:
     use_depth: bool # 是否使用深度数据
     depth_range: tuple[int, int]
     dex_dof_needed: int  # 通常为1，表示只需要第一个关节作为开合依据
+
+    # sensor_data_raw indices
+    # sensor_data_raw 格式：前12为腿部，第13为腰部，第14起为左臂、再为右臂
+    # 默认 13：左手臂起始索引（第14个数据，0-based 为 13）
+    arm_start_index: int
     
     # Timeline settings
     train_hz: int
@@ -63,16 +68,13 @@ class Config:
                     "both":['head_cam_h','depth_h','wrist_cam_l','depth_l','wrist_cam_r','depth_r']
                     }][int(self.use_depth)][self.which_arm]
         return cameras
-    
-    # sensor_data_raw 格式：前12为腿部，第13为腰部，第14起为左臂、再为右臂
-    ARM_START_INDEX = 13  # 左手臂起始索引（第14个数据，0-based 为 13）
 
     @property
     def slice_robot(self) -> List[Tuple[int, int]]:
         """Get robot slice based on which arm is being used.
-        左臂: [ARM_START_INDEX, ARM_START_INDEX+7)，右臂: [ARM_START_INDEX+7, ARM_START_INDEX+14)。
+        左臂: [arm_start_index, arm_start_index+7)，右臂: [arm_start_index+7, arm_start_index+14)。
         """
-        left_start = self.ARM_START_INDEX
+        left_start = self.arm_start_index
         left_end = left_start + 7   # 左臂 7 关节
         right_start = left_end
         right_end = right_start + 7  # 右臂 7 关节
@@ -144,6 +146,7 @@ def load_config(cfg) -> Config:
         use_depth=OmegaConf.select(cfg, 'dataset.use_depth', default=False),
         depth_range=OmegaConf.select(cfg, 'dataset.depth_range', default=(0,1000)),
         dex_dof_needed=OmegaConf.select(cfg, 'dataset.dex_dof_needed', default=1),
+        arm_start_index=OmegaConf.select(cfg, 'dataset.arm_start_index', default=13),
         train_hz=OmegaConf.select(cfg, 'dataset.train_hz', default=10),
         main_timeline=OmegaConf.select(cfg, 'dataset.main_timeline', default='head_cam_h'),
         main_timeline_fps=OmegaConf.select(cfg, 'dataset.main_timeline_fps', default=30),

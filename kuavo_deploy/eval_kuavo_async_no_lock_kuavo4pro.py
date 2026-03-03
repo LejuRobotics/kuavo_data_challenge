@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 from pathlib import Path
 from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
-from kuavo_deploy.config import load_kuavo_config
+from kuavo_deploy.config_kuavo4pro import load_kuavo_config
 from kuavo_deploy.kuavo_env.KuavoRealEnv import KuavoRealEnv
 from kuavo_deploy.src.scripts.script import ArmMove
 from PIL import Image
@@ -397,6 +397,11 @@ def demo_cli(cfg: ACTAsyncRealDemoConfig):
     pretrained_path = Path(f"outputs/train/{inf_cfg.task}/{inf_cfg.method}/{inf_cfg.timestamp}/epoch{inf_cfg.epoch}")
     logger.info(f"[MAIN] Loading ACT policy from {pretrained_path}")
     policy = CustomACTPolicyWrapper.from_pretrained(pretrained_path, strict=True)
+
+    policy.temporal_ensemble_coeff = None
+    policy.temporal_ensemble = None
+    policy.n_action_steps = 18
+    
     policy.eval()
     policy.to(device)
     policy.reset()

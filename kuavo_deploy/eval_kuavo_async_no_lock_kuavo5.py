@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 from pathlib import Path
 from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
-from kuavo_deploy.config import load_kuavo_config
+from kuavo_deploy.config_kuavo5 import load_kuavo_config
 from kuavo_deploy.kuavo_env.KuavoRealEnv import KuavoRealEnv
 from kuavo_deploy.src.scripts.script import ArmMove
 from PIL import Image
@@ -126,7 +126,7 @@ class ACTAsyncRealDemoConfig(HubMixin):
     device: str = field(default="cuda", metadata={"help": "Device to run on (cuda, cpu, auto)"})
 
     # Action buffer configuration
-    action_buffer_size: int = 20  # Maximum number of actions in buffer
+    action_buffer_size: int = 18  # Maximum number of actions in buffer
     min_buffer_size: int = 4  # Minimum buffer size before requesting new actions
     obs_update_interval: int = 1  # Update observation every N executed actions (should match action execution frequency)
 
@@ -233,7 +233,7 @@ def get_actions_async(
                 inference_model_time = time.time() - inference_model_start
                 print(f"sleep time: {max(0, 0.03 - inference_model_time)}")
                 time.sleep(max(0, 0.03 - inference_model_time))
-                
+
                 # actions shape: (B, chunk_size, action_dim) or (chunk_size, action_dim)
                 if actions.dim() == 3:
                     actions = actions.squeeze(0)  # Remove batch dimension if present
@@ -253,7 +253,7 @@ def get_actions_async(
                 
                 # Add to buffer: 基于新观测的动作块应该替换旧队列
                 # 这样可以确保执行的动作总是基于最新的观测
-                action_buffer.put(postprocessed_actions[5:25], replace=True)
+                action_buffer.put(postprocessed_actions[3:21], replace=True)
                 inference_step += 1
                 
                 # 计算总时间
@@ -397,6 +397,11 @@ def demo_cli(cfg: ACTAsyncRealDemoConfig):
     pretrained_path = Path(f"outputs/train/{inf_cfg.task}/{inf_cfg.method}/{inf_cfg.timestamp}/epoch{inf_cfg.epoch}")
     logger.info(f"[MAIN] Loading ACT policy from {pretrained_path}")
     policy = CustomACTPolicyWrapper.from_pretrained(pretrained_path, strict=True)
+
+    policy.temporal_ensemble_coeff = None
+    policy.temporal_ensemble = None
+    policy.n_action_steps = 18
+    
     policy.eval()
     policy.to(device)
     policy.reset()

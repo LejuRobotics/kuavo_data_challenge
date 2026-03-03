@@ -10,6 +10,10 @@ import glob
 from collections import defaultdict
 from typing import Callable, Optional
 
+# Default indices for sensors_data_raw slicing.
+# Will be overridden by init_parameters(cfg) if dataset.arm_start_index is provided.
+# ARM_START_INDEX = 13
+
 # ================ 机器人关节信息定义 ================
 
 DEFAULT_LEG_JOINT_NAMES=[
@@ -52,6 +56,7 @@ def init_parameters(cfg):
     global ONLY_HALF_UP_BODY, USE_LEJU_CLAW, USE_QIANGNAO
     global USE_DEPTH, DEPTH_RANGE
     global TASK_DESCRIPTION
+    global ARM_START_INDEX
 
     
     from .config_dataset import load_config
@@ -86,6 +91,9 @@ def init_parameters(cfg):
     USE_QIANGNAO = config.use_qiangnao  # 由eef_type决定
 
     TASK_DESCRIPTION = config.task_description  # 任务描述
+
+    # sensor_data_raw indices
+    ARM_START_INDEX = config.arm_start_index
 
 
 # ================ 数据处理函数定义 ==================
@@ -285,34 +293,34 @@ class KuavoMsgProcesser:
         Notes:
             sensor_data_raw 格式：前12为腿部，第13为腰部，第14起为左臂、再为右臂。
         """
-        # 左臂起始索引 13，双臂共 14 个关节 → [13:27]
-        ARM_START_IDX = 13
-        ARM_END_IDX = ARM_START_IDX + 14
+        # 左臂起始索引 ARM_START_INDEX，双臂共 14 个关节 → [start:start+14]
+        arm_start_idx = ARM_START_INDEX
+        arm_end_idx = arm_start_idx + 14
         res = KuavoMsgProcesser.process_joint_state(msg)
-        res["data"] = res["data"][ARM_START_IDX:ARM_END_IDX]
+        res["data"] = res["data"][arm_start_idx:arm_end_idx]
         return res
 
     @staticmethod
     def process_joint_cmd_extract_arm(msg):
-        ARM_START_IDX = 13
-        ARM_END_IDX = ARM_START_IDX + 14
+        arm_start_idx = ARM_START_INDEX
+        arm_end_idx = arm_start_idx + 14
         res = KuavoMsgProcesser.process_joint_cmd(msg)
-        res["data"] = res["data"][ARM_START_IDX:ARM_END_IDX]
+        res["data"] = res["data"][arm_start_idx:arm_end_idx]
         return res
 
     @staticmethod
     def process_sensors_data_raw_extract_arm_head(msg):
         # 从第14个数据（索引13）开始为手臂
-        ARM_START_IDX = 13
+        arm_start_idx = ARM_START_INDEX
         res = KuavoMsgProcesser.process_joint_state(msg)
-        res["data"] = res["data"][ARM_START_IDX:]
+        res["data"] = res["data"][arm_start_idx:]
         return res
 
     @staticmethod
     def process_joint_cmd_extract_arm_head(msg):
-        ARM_START_IDX = 13
+        arm_start_idx = ARM_START_INDEX
         res = KuavoMsgProcesser.process_joint_cmd(msg)
-        res["data"] = res["data"][ARM_START_IDX:]
+        res["data"] = res["data"][arm_start_idx:]
         return res
 
 
