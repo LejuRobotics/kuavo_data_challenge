@@ -538,6 +538,13 @@ conda activate kdc_dev
 # 或
 source kdc_dev/bin/activate
 pip install kuavo-humanoid-sdk==xxx #安装对应版本的sdk，目前pip安装支持下位机版本 1.2.2 对应 kuavo-humanoid-sdk==1.2.2，1.3.1 对应 kuavo-humanoid-sdk==1.3.1b98
+
+```
+⚠️ 目前sdk1.3.3版本真机推理会遇到错误码-11即段错误的问题，请安装sdk后卸载pip安装的pyarrow，换成用conda安装!!!
+
+```bash
+pip uninstall pyarrow
+conda install pyarrow
 ```
 
 
