@@ -23,9 +23,10 @@ dataset:
   only_arm: true  # 默认true, 是否只使用手臂数据, 选择true会自动屏蔽足关节数据，false会支持下肢的即本体所处位置及旋转x,y，yaw的数据
   #!!!!!!!!!task4请设置为false,task4请设置为false,task4请设置为false!!!!!!!!!!!!!!
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  eef_type: rq2f85 # 末端执行器类型，仿真选择：rq2f85, 真机可选：leju_claw,（夹爪） qiangnao，（灵巧手）
-  which_arm: both  # 需要哪一只手臂的关节 + 图像数据，可选: left, right, both，注意图像数据会同时包含头部相机图像
-  use_depth: true  # 是否需要深度图像数据，与上面手臂对应的深度图像数据, 此分支act和dp均支持了深度图像
+  platform_type: "4pro"  # 硬件平台类型，可选: "4pro" 或 "5w"，默认使用 configs/platform/platform_config.yaml 中的 default 值
+  eef_type: leju_claw # 末端执行器类型，仿真选择：rq2f85, 真机可选：leju_claw,（夹爪） qiangnao，（灵巧手）
+  which_arm: right  # 需要哪一只手臂的关节 + 图像数据，可选: left, right, both，注意图像数据会同时包含头部相机图像
+  use_depth: False  # 是否需要深度图像数据，与上面手臂对应的深度图像数据, 此分支act和dp均支持了深度图像
   depth_range: [0, 1500]  # 深度图的裁剪范围，单位：毫米，将用于做归一化
  
   task_description: "Pick and Place" # 任务描述，自定义
@@ -47,7 +48,7 @@ dataset:
 
 
   resize:
-    width: 640  # 图像缩放宽度，注意请先查看（推荐浏览器foxglove工具）rosbag中图像的原始尺寸，避免放大或缩小带来模糊或拉伸形变等问题
+    width: 848  # 图像缩放宽度，注意请先查看（推荐浏览器foxglove工具）rosbag中图像的原始尺寸，避免放大或缩小带来模糊或拉伸形变等问题
     height: 480  # 图像缩放高度，注意请先查看（推荐浏览器foxglove工具）rosbag中图像的原始尺寸，避免放大或缩小带来模糊或拉伸形变等问题
 
 

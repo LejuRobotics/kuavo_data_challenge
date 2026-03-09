@@ -1,0 +1,28 @@
+# 硬件平台配置
+# 定义不同硬件平台（4Pro、5W）的关节索引范围
+
+# 默认硬件类型
+default: "4pro"
+
+# 硬件平台定义
+platforms:
+  "4pro":
+    name: "Kuavo 4Pro"
+    arm_joint_start: 12
+    arm_joint_end: 26
+    arm_head_start: 12
+    description: "4Pro: 手臂关节索引范围 [12:26] (14个关节，左右各7个)"
+  
+  "5w":
+    name: "Kuavo 5W"
+    arm_joint_start: 4
+    arm_joint_end: 18
+    arm_head_start: 4
+    description: "5W: 手臂关节索引范围 [4:18] (14个关节，左右各7个)"
+  
+  "5":
+    name: "Kuavo 5"
+    arm_joint_start: 13
+    arm_joint_end: 27
+    arm_head_start: 13
+    description: "5: 手臂关节索引范围 [13:27] (14个关节，左右各7个)"

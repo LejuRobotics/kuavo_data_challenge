@@ -79,7 +79,7 @@ class ChunkedRosbagProcessor:
         # 确定主时间线：消息最多的相机
         camera_counts = {k: len(all_timestamps.get(k, [])) for k in self.camera_names}
         if not any(camera_counts.values()):
-            raise ValueError("No camera data found in rosbag")
+            raise ValueError("No camera data found in rosbag, please check your camera topics or bag file.")
         if self.main_timeline is None:
             main_timeline = max(camera_counts, key=lambda k: camera_counts[k])
         else:
@@ -101,8 +101,7 @@ class ChunkedRosbagProcessor:
         else:
             main_timestamps = raw_timestamps[::jump]
         
-        # 取所有话题中“最早结束”的时间
-        min_end = min(
+        max_end = max(
             ts_list[-1]
             for ts_list in all_timestamps.values()
             if len(ts_list) > 0
@@ -110,18 +109,18 @@ class ChunkedRosbagProcessor:
 
         # 裁剪主时间线，只保留所有话题都还存在数据的时间点
         before_len = len(main_timestamps)
-        main_timestamps = [t for t in main_timestamps if t < min_end]
+        main_timestamps = [t for t in main_timestamps if t < max_end]
         after_len = len(main_timestamps)
 
         logger.info(
-            f"Trim main timeline by min_end={min_end:.6f}, "
+            f"Trim main timeline by max_end={max_end:.6f}, "
             f"frames: {before_len} -> {after_len}"
         )
         
         logger.info(f"Generated {len(main_timestamps)} aligned timestamps "
                    f"(from {len(raw_timestamps)} raw frames, "
                    f"dropped {self.sample_drop} frames at each end, jump={jump})")
-
+        logger.info(f"Main timeline time range: [{main_timestamps[0]:.3f}, {main_timestamps[-1]:.3f}]")
         return main_timeline, main_timestamps, dict(all_timestamps)
     
     def process_in_chunks(
@@ -155,6 +154,35 @@ class ChunkedRosbagProcessor:
         """
         bag = self._load_bag(bag_file)
         
+        # 1. 识别夹爪相关的 topic keys (带有 action 且包含 claw/qiangnao/rqf85/gripper 等字眼)
+        gripper_keys = []
+        for k in self._topic_process_map.keys():
+            k_lower = k.lower()
+            if 'action' in k_lower and any(kw in k_lower for kw in ['claw', 'qiangnao', 'rq2f85', 'gripper']):
+                gripper_keys.append(k)
+                
+        # 2. 维护一个跨 chunk 的状态，主要针对夹爪保持先前状态
+        last_known_state = {}
+        
+        # 3. 如果开始就没有夹爪数据，需要用 00 替代。
+        # 这里预先从 bag 中抽读一条以获取正确的 shape 填充 0，保证一开始就有合法的初始状态。
+        if gripper_keys:
+            logger.info(f"Prefetching initial shapes for gripper topics: {gripper_keys}")
+            for key in gripper_keys:
+                topic = self._topic_process_map[key]["topic"]
+                try:
+                    for _, msg, t in bag.read_messages(topics=[topic]):
+                        msg_process_fn = self._topic_process_map[key]["msg_process_fn"]
+                        msg_data = msg_process_fn(msg)
+                        if "data" in msg_data:
+                            # 拷贝格式并将 data 用全 0 初始化
+                            last_known_state[key] = msg_data.copy()
+                            last_known_state[key]["data"] = np.zeros_like(msg_data["data"])
+                            last_known_state[key]["timestamp"] = 0.0
+                        break  # 只读第一条用于获取shape
+                except Exception as e:
+                    logger.warning(f"Failed to prefetch initial state for {key}: {e}")
+
         # 为每个话题构建时间戳索引（用于快速查找最近帧）
         timestamp_arrays = {k: np.array(v) for k, v in all_timestamps.items()}
         
@@ -201,7 +229,9 @@ class ChunkedRosbagProcessor:
                     chunk_data=chunk_data,
                     timestamp_arrays=timestamp_arrays,
                     alignment_indices=alignment_indices,
-                    arm_traj_gaps=arm_traj_gaps
+                    arm_traj_gaps=arm_traj_gaps,
+                    last_known_state=last_known_state,   # 传入状态缓存
+                    gripper_keys=gripper_keys            # 传入识别的夹爪key集合
                 )
                 
                 frame_callback(aligned_frame, global_idx)
@@ -329,7 +359,9 @@ class ChunkedRosbagProcessor:
         chunk_data: Dict[str, Dict[float, dict]],
         timestamp_arrays: Dict[str, np.ndarray],
         alignment_indices: Dict[str, List[int]],
-        arm_traj_gaps: List[Tuple[float, float]]
+        arm_traj_gaps: List[Tuple[float, float]],
+        last_known_state: Dict[str, dict],
+        gripper_keys: List[str]
     ) -> dict:
         """
         对齐单帧数据
@@ -337,7 +369,9 @@ class ChunkedRosbagProcessor:
         aligned_frame = {"timestamp": main_stamp}
         
         for key in self._topic_process_map.keys():
-            # 特殊处理kuavo_arm_traj的间隙
+            is_gripper = key in gripper_keys
+            
+            # ================= 1. 特殊处理kuavo_arm_traj的间隙 =================
             if key == "action.kuavo_arm_traj" and arm_traj_gaps:
                 in_gap = any(gap_start < main_stamp < gap_end 
                             for gap_start, gap_end in arm_traj_gaps)
@@ -350,22 +384,54 @@ class ChunkedRosbagProcessor:
                             "data": np.full(data_dim, 999.0, dtype=np.float32),
                             "timestamp": main_stamp
                         }
+                    else:
+                        aligned_frame[key] = None
                     continue
             
+            # 从timestamp_arrays获取对应的时间戳异常处理
+            if key not in timestamp_arrays or len(timestamp_arrays[key]) == 0:
+                if is_gripper and key in last_known_state:
+                    aligned_frame[key] = last_known_state[key].copy()
+                    aligned_frame[key]["timestamp"] = main_stamp
+                else:
+                    aligned_frame[key] = None
+                continue
+
+            first_ts = timestamp_arrays[key][0]
+            
+            # ================= 2. 处理早期尚无数据的情况 =================
+            # 逻辑对齐：如果当前主时间戳小于该话题的第一帧时间戳，说明该话题此时还没有数据
+            if main_stamp < first_ts:
+                # 针对夹爪的特定策略：用全0补全 (在 prefetch 阶段已经设为了全0)
+                if is_gripper and key in last_known_state:
+                    aligned_frame[key] = last_known_state[key].copy()
+                    aligned_frame[key]["timestamp"] = main_stamp
+                    continue
+                # else:
+                #     sample_data = next(iter(chunk_data.get(key, {}).values()), None)
+                #     if sample_data and "data" in sample_data and "action." in key and "kuavo_arm_traj" not in key:
+                #         logger.warning(f"Topic {key} has no data for timestamp {main_stamp}, filling with zeros. frame idx: {global_idx}")
+                #         aligned_frame[key] = {
+                #             "data": np.zeros_like(sample_data["data"]),
+                #             "timestamp": main_stamp
+                #         }
+                #     else:
+                #         aligned_frame[key] = None
+                # continue
+
+            # ================= 3. 数据正常匹配处理 =================
             # 获取预计算的索引
             if key not in alignment_indices or global_idx >= len(alignment_indices[key]):
-                aligned_frame[key] = None
+                if is_gripper and key in last_known_state:
+                    aligned_frame[key] = last_known_state[key].copy()
+                    aligned_frame[key]["timestamp"] = main_stamp
+                else:
+                    aligned_frame[key] = None
                 continue
-            
+
             closest_idx = alignment_indices[key][global_idx]
-            
-            # 从timestamp_arrays获取对应的时间戳
-            if key not in timestamp_arrays or len(timestamp_arrays[key]) == 0:
-                aligned_frame[key] = None
-                continue
-            
             target_ts = timestamp_arrays[key][closest_idx]
-            
+               
             # 从chunk_data中查找数据
             if key in chunk_data:
                 # 查找最接近target_ts的数据
@@ -373,11 +439,22 @@ class ChunkedRosbagProcessor:
                 if ts_list:
                     closest_chunk_ts = min(ts_list, key=lambda x: abs(x - target_ts))
                     aligned_frame[key] = chunk_data[key][closest_chunk_ts]
-                else:
                     
+                    # 夹爪在获取到了新数据时，更新到 last_known_state 作为后续备份
+                    if is_gripper:
+                        last_known_state[key] = aligned_frame[key]
+                else:
                     aligned_frame[key] = None
             else:
                 aligned_frame[key] = None
+                
+            # ================= 4. 针对夹爪CMD补齐的最终退路 =================
+            # 经过上面的逻辑如果没有从 chunk_data 中拿到夹爪数据 (比如夹爪数据在此时段内不发送)
+            # 退化利用我们缓存的跨 chunk 的先前状态去替代，保证机械臂在移动时，夹爪不被裁切丢失。
+            if is_gripper and aligned_frame[key] is None:
+                if key in last_known_state:
+                    aligned_frame[key] = last_known_state[key].copy()
+                    aligned_frame[key]["timestamp"] = main_stamp
         return aligned_frame
     
     def _load_bag(self, bag_file: str) -> rosbag.Bag:
@@ -392,8 +469,3 @@ class ChunkedRosbagProcessor:
                 return rosbag.Bag(reindexed_file)
             else:
                 return rosbag.Bag(bag_file, 'r', allow_unindexed=True)
-
-
-
-
-

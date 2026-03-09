@@ -21,8 +21,8 @@ from lerobot.datasets.sampler import EpisodeAwareSampler
 from lerobot.datasets.utils import dataset_to_policy_features
 from lerobot.utils.random_utils import set_seed
 from lerobot.policies.factory import make_pre_post_processors
-from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
-from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
+
+from lerobot.policies.groot.processor_groot import GrootPackInputsStep
 from kuavo_train.wrapper.dataset.LeRobotDatasetWrapper import CustomLeRobotDataset
 from kuavo_train.utils.augmenter import crop_image, resize_image, DeterministicAugmenterColor
 from kuavo_train.utils.utils import save_rng_state, load_rng_state
@@ -103,12 +103,35 @@ def build_optimizer_and_scheduler(policy, cfg, total_frames):
     # or you can set your optimizer and lr_scheduler here and replace it.
     return optimizer, lr_scheduler
 
+# def build_policy(name, policy_cfg):
+#     policy = {
+#         "diffusion": CustomDiffusionPolicyWrapper,
+#         "act": CustomACTPolicyWrapper,
+#         "pi0": CustomPI0PolicyWrapper,
+#         "pi05": CustomPI05PolicyWrapper,
+#         "gr00t_n1d5": CustomGr00tN1d5PolicyWrapper,
+#     }[name](policy_cfg)
+#     return policy
+
 def build_policy(name, policy_cfg):
-    policy = {
-        "diffusion": CustomDiffusionPolicyWrapper,
-        "act": CustomACTPolicyWrapper,
-    }[name](policy_cfg)
-    return policy
+    # 为了支持xvla groot等模型，将之前的字典加载方式改为工厂模式动态加载
+    policy_modules = {
+        "diffusion": ("kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper", "CustomDiffusionPolicyWrapper"),
+        "act": ("kuavo_train.wrapper.policy.act.ACTPolicyWrapper", "CustomACTPolicyWrapper"),
+        "gr00t_n1d5": ("kuavo_train.wrapper.policy.gr00t_n1d5.Gr00tN1d5PolicyWrapper", "CustomGr00tN1d5PolicyWrapper"),
+        "pi0": ("kuavo_train.wrapper.policy.pi0.PI0PolicyWrapper", "CustomPI0PolicyWrapper"),
+        "pi05": ("kuavo_train.wrapper.policy.pi05.PI05PolicyWrapper", "CustomPI05PolicyWrapper"),
+    }
+
+    if name not in policy_modules:
+        raise ValueError(f"Unknown policy name: {name}. Available: {list(policy_modules.keys())}")
+
+    module_path, class_name = policy_modules[name]
+    # 动态导入模块
+    import importlib
+    module = importlib.import_module(module_path)
+    policy_class = getattr(module, class_name)
+    return policy_class(policy_cfg)
 
 def build_policy_config(cfg, input_features, output_features):
     def _normalize_feature_dict(d: Any) -> dict[str, PolicyFeature]:
@@ -188,7 +211,7 @@ def insert_before_normalizer(pipeline, new_step):
     If no NormalizerProcessorStep is found, append at the end.
     """
     for i, step in enumerate(pipeline.steps):
-        if isinstance(step, NormalizerProcessorStep):
+        if isinstance(step, NormalizerProcessorStep) or isinstance(step, GrootPackInputsStep):
             pipeline.steps.insert(i, new_step)
             print(f"Inserted {new_step.__class__.__name__} before NormalizerProcessorStep", {i})
             return new_step

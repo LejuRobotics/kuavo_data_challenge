@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List, Tuple
 import os
 from omegaconf import OmegaConf
+from kuavo_data.common.config_platform import get_arm_joint_slice, DEFAULT_PLATFORM
 
 @dataclass
 class ResizeConfig:
@@ -17,6 +18,7 @@ class Config:
     use_depth: bool # 是否使用深度数据
     depth_range: tuple[int, int]
     dex_dof_needed: int  # 通常为1，表示只需要第一个关节作为开合依据
+    platform_type: str # 机器人类型：'4pro' 或 '5w'
     
     # Timeline settings
     train_hz: int
@@ -67,14 +69,19 @@ class Config:
     @property
     def slice_robot(self) -> List[Tuple[int, int]]:
         """Get robot slice based on which arm is being used."""
+        arm_start, arm_end = get_arm_joint_slice(self.platform_type)
+        left_end = arm_start + 7
+        right_start = left_end
+        
         if self.which_arm == 'left':
-            return [(12, 19), (19, 19)]
+            return [(arm_start, left_end), (left_end, left_end)]
         elif self.which_arm == 'right':
-            return [(12, 12), (19, 26)]
+            return [(arm_start, arm_start), (right_start, arm_end)]
         elif self.which_arm == 'both':
-            return [(12, 19), (19, 26)]
+            return [(arm_start, left_end), (right_start, arm_end)]
         else:
             raise ValueError(f"Invalid which_arm: {self.which_arm}")
+    
     
     @property
     def dex_slice(self) -> List[List[int]]:
@@ -144,4 +151,5 @@ def load_config(cfg) -> Config:
         relative_start=OmegaConf.select(cfg, 'dataset.relative_start', default=False),
         resize=resize_config,
         task_description=OmegaConf.select(cfg, 'dataset.task_description', default="Pick and Place Task"),
+        platform_type=OmegaConf.select(cfg, 'dataset.platform_type', default=DEFAULT_PLATFORM),
     )

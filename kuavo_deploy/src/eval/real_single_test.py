@@ -34,10 +34,6 @@ import imageio
 import numpy
 import torch
 from tqdm import tqdm
-
-from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
-from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
-from lerobot.policies.act.modeling_act import ACTPolicy
 from lerobot.utils.random_utils import set_seed
 import datetime
 import time
@@ -90,14 +86,27 @@ def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
         time.sleep(3)  
     
     if policy_type == 'diffusion':
+        from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
         policy = CustomDiffusionPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     elif policy_type == 'act':
+        from kuavo_train.wrapper.policy.act.ACTPolicyWrapper import CustomACTPolicyWrapper
         policy = CustomACTPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     elif policy_type == 'client':
         policy = PolicyClient()
+    elif policy_type == 'gr00t_n1d5':
+        from kuavo_train.wrapper.policy.gr00t_n1d5.Gr00tN1d5PolicyWrapper import CustomGr00tN1d5PolicyWrapper
+        policy = CustomGr00tN1d5PolicyWrapper.from_pretrained(Path(pretrained_path),strict=True),
+    elif policy_type == 'pi0':
+        from kuavo_train.wrapper.policy.pi0.PI0PolicyWrapper import CustomPI0PolicyWrapper
+        policy = CustomPI0PolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
+    elif policy_type == 'pi05':
+        from kuavo_train.wrapper.policy.pi05.PI05PolicyWrapper import CustomPI05PolicyWrapper
+        policy = CustomPI05PolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
     else:
         raise ValueError(f"Unsupported policy type: {policy_type}")
     
+    if isinstance(policy,tuple):
+        policy = policy[0]
     policy.eval()
     policy.to(device)
     policy.reset()

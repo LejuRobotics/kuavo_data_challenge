@@ -9,6 +9,9 @@ import os
 import glob
 from collections import defaultdict
 from typing import Callable, Optional
+from numpy.lib.stride_tricks import sliding_window_view
+from .config_platform import get_arm_joint_slice, get_arm_head_start, DEFAULT_PLATFORM
+
 
 # ================ 机器人关节信息定义 ================
 
@@ -53,6 +56,7 @@ def init_parameters(cfg):
     global USE_DEPTH, DEPTH_RANGE
     global TASK_DESCRIPTION
     global DEX_DOF_NEEDED
+    global PLATFORM_TYPE
 
     
     from .config_dataset import load_config
@@ -67,6 +71,7 @@ def init_parameters(cfg):
     MAIN_TIMELINE_FPS = config.main_timeline_fps
     SAMPLE_DROP = config.sample_drop
     CONTROL_HAND_SIDE = config.which_arm
+    PLATFORM_TYPE = config.platform_type
 
     # 根据which_arm自动计算的切片配置
     SLICE_ROBOT = config.slice_robot
@@ -283,31 +288,36 @@ class KuavoMsgProcesser:
             msg: The input message containing joint state information.
 
         Returns:
-            dict: A dictionary with processed joint state data. The 'data' field is sliced to include only indices 12 through 25.
+            dict: A dictionary with processed joint state data. The 'data' field is sliced to include only arm joint indices.
 
         Notes:
             This function uses KuavoMsgProcesser.process_joint_state to initially process the input message and then extracts the specific range of data for further use.
+            Uses hardware constants to support different hardware types (4Pro/5W).       
         """
         res = KuavoMsgProcesser.process_joint_state(msg)
-        res["data"] = res["data"][12:26]
+        arm_start, arm_end = get_arm_joint_slice(DEFAULT_PLATFORM)
+        res["data"] = res["data"][arm_start:arm_end]
         return res
 
     @staticmethod
     def process_joint_cmd_extract_arm(msg):
         res = KuavoMsgProcesser.process_joint_cmd(msg)
-        res["data"] = res["data"][12:26]
+        arm_start, arm_end = get_arm_joint_slice(DEFAULT_PLATFORM)
+        res["data"] = res["data"][arm_start:arm_end]
         return res
 
     @staticmethod
     def process_sensors_data_raw_extract_arm_head(msg):
         res = KuavoMsgProcesser.process_joint_state(msg)
-        res["data"] = res["data"][12:]
+        arm_head_start = get_arm_head_start(DEFAULT_PLATFORM)
+        res["data"] = res["data"][arm_head_start:]
         return res
 
     @staticmethod
     def process_joint_cmd_extract_arm_head(msg):
         res = KuavoMsgProcesser.process_joint_cmd(msg)
-        res["data"] = res["data"][12:]
+        arm_head_start = get_arm_head_start(DEFAULT_PLATFORM)
+        res["data"] = res["data"][arm_head_start:]
         return res
 
 
@@ -378,17 +388,20 @@ class KuavoRosbagReader:
             #     }
             if 'wrist_cam_l' in camera:
                 self._topic_process_map[f"{camera}"] = {
-                    "topic": "/cam_l/color/image_raw/compressed",   ### ATT: 这里的cam_r是因为在2025年7月8日的rosbag中，cam_r是左手腕相机
+                    "topic": "/cam_l/color/image_raw/compressed",
+                    # "topic": "/left_cam/color/image_raw",
                     "msg_process_fn": self._msg_processer.process_color_image,
                 }
             elif 'wrist_cam_r' in camera:
                 self._topic_process_map[f"{camera}"] = {
                     "topic": "/cam_r/color/image_raw/compressed",
+                    # "topic": "/right_cam/color/image_raw",
                     "msg_process_fn": self._msg_processer.process_color_image,
                 }
             elif 'head_cam_h' in camera:
                 self._topic_process_map[f"{camera}"] = {
                     "topic": "/cam_h/color/image_raw/compressed",
+                    # "topic": "/camera/color/image_raw",
                     "msg_process_fn": self._msg_processer.process_color_image,
             }
             elif 'head_cam_l' in camera:
@@ -480,8 +493,112 @@ class KuavoRosbagReader:
         data_aligned = self.align_frame_data(data)
         
         return data_aligned
-    
-    
+
+
+    def get_valid_start_ts(self, data: dict):
+
+        def not_black(f):
+            d = f.get("data")
+            if not isinstance(d, np.ndarray) or d.size == 0:
+                return False
+            if d.ndim == 3:
+                return np.mean(d) > 5.0
+            return np.any(d)
+
+        first_ts_list = []
+
+        for cam in DEFAULT_CAMERA_NAMES:
+            frames = data.get(cam, [])
+            for f in frames:
+                if not_black(f):
+                    first_ts_list.append(f["timestamp"])
+                    break
+
+        return max(first_ts_list) if first_ts_list else None
+
+    def _drop_idle_frames(
+        self,
+        aligned_data: dict,
+        idle_window: int = 10,
+        idle_eps: float = 1e-5,
+        idle_flag_value: float = 999.0,
+    ):
+        """
+        去掉空闲冗余帧：若连续 idle_window 帧内 action.kuavo_arm_traj 各维度变化均 <= idle_eps，
+        则整段空闲只保留一帧（保留该段第一帧）。含 idle_flag_value(999) 的窗口不视为空闲。
+        """
+        arm_key = "action.kuavo_arm_traj"
+        if arm_key not in aligned_data or len(aligned_data[arm_key]) < idle_window:
+            return aligned_data
+
+        arm_list = aligned_data[arm_key]
+        n = len(arm_list)
+
+        arr = np.asarray([x["data"] for x in arm_list], dtype=np.float32)  # (n, dim)
+
+        # ------------------------------------------------------------
+        # 1. 计算相邻帧是否发生变化
+        # ------------------------------------------------------------
+        diff = np.abs(arr[1:] - arr[:-1])               # (n-1, dim)
+        changed = np.any(diff > idle_eps, axis=1)       # (n-1,)
+
+        # 是否包含 idle_flag
+        has_flag = np.any(arr == idle_flag_value, axis=1)  # (n,)
+
+        # ------------------------------------------------------------
+        # 2. 找“空闲段起点”
+        # ------------------------------------------------------------
+        # idle_window 帧 == idle_window-1 个 diff
+        win = idle_window - 1
+
+        # changed 在窗口内全 False
+        changed_win = sliding_window_view(changed, win)     # (n-idle_window+1, win)
+        stable = np.sum(changed_win, axis=1) == 0
+
+        # idle_window 内不能有 flag
+        flag_win = sliding_window_view(has_flag, idle_window)
+        no_flag = np.sum(flag_win, axis=1) == 0
+
+        idle_start = stable & no_flag   # shape: (n-idle_window+1,)
+
+        # ------------------------------------------------------------
+        # 3. 生成 keep_mask（只保留每段第一帧）
+        # ------------------------------------------------------------
+        keep_mask = np.ones(n, dtype=bool)
+
+        i = 0
+        while i < n:
+            if i <= n - idle_window and idle_start[i]:
+                j = i + idle_window
+                while j < n and not changed[j - 1] and not has_flag[j]:
+                    j += 1
+                keep_mask[i + 1 : j] = False
+                i = j
+            else:
+                i += 1
+
+        keep_indices = np.nonzero(keep_mask)[0]
+        if len(keep_indices) == n:
+            return aligned_data
+
+        # ------------------------------------------------------------
+        # 4. 对齐裁剪其它 key
+        # ------------------------------------------------------------
+        out = defaultdict(list)
+        for key, v in aligned_data.items():
+            if len(v) == n:
+                out[key] = [v[j] for j in keep_indices]
+            else:
+                out[key] = v
+
+        dropped = n - len(keep_indices)
+        print(
+            f"Dropped {dropped} idle frames "
+            f"(arm_traj stable in {idle_window}-frame windows): "
+            f"{n} -> {len(keep_indices)}"
+        )
+        return dict(out)
+
     def process_rosbag_chunked(
         self,
         bag_file: str,
@@ -560,18 +677,16 @@ class KuavoRosbagReader:
             key=lambda cam_k: len(data.get(cam_k, [])),
         )
 
-        jump = MAIN_TIMELINE_FPS // TRAIN_HZ
+        valid_start_ts = self.get_valid_start_ts(data)
 
-        # 注意：当 SAMPLE_DROP 为 0 时，不能使用 [SAMPLE_DROP:-SAMPLE_DROP]，
-        # 因为 [-0] 等价于 [0]，会导致切片为空列表。
-        main_timeline_list = [t['timestamp'] for t in data[main_timeline]]
+        jump = MAIN_TIMELINE_FPS // TRAIN_HZ
         if SAMPLE_DROP > 0:
-            main_img_timestamps = main_timeline_list[SAMPLE_DROP:-SAMPLE_DROP][::jump]
+            main_img_timestamps = [t['timestamp'] for t in data[main_timeline]][SAMPLE_DROP:-SAMPLE_DROP][::jump]
         else:
-            main_img_timestamps = main_timeline_list[::jump]
-        min_end = min([data[k][-1]['timestamp'] for k in data.keys() if len(data[k]) > 0])
-        main_img_timestamps = [t for t in main_img_timestamps if t < min_end]
-        
+            main_img_timestamps = [t['timestamp'] for t in data[main_timeline]][::jump]
+        max_end = max([data[k][-1]['timestamp'] for k in data.keys() if len(data[k]) > 0])
+        main_img_timestamps = [t for t in main_img_timestamps if valid_start_ts <= t < max_end]
+  
         # 特殊处理kuavo_arm_traj话题的时间戳连续性检测（可能有断点，需要999处理）在控制下肢时候
         def detect_timestamp_gaps(timestamps, gap_threshold=0.15 * 10 / TRAIN_HZ): # gap_threshold可调
             """检测时间戳中的间隙，返回间隙位置"""
@@ -618,6 +733,13 @@ class KuavoRosbagReader:
                             "timestamp": stamp
                         })
                         print(f"Created flag data (999) for action.kuavo_arm_traj at timestamp {stamp}")
+                    elif stamp < arm_traj_timestamps[0]:
+                        # 该话题此时还没有数据（一开始没有），用0填充
+                        zero_data = np.zeros(data_dim, dtype=np.float32)
+                        complete_arm_traj_data.append({
+                            "data": zero_data,
+                            "timestamp": stamp
+                        })                    
                     else:
                         # 正常时间戳，使用最近的数据
                         time_array = np.array(arm_traj_timestamps)
@@ -642,11 +764,22 @@ class KuavoRosbagReader:
                 if len(v) > 0:
                     this_obs_time_seq = [this_frame['timestamp'] for this_frame in v]
                     time_array = np.array([t for t in this_obs_time_seq])
-                    idx = np.argmin(np.abs(time_array - stamp_sec))
-                    aligned_data[key].append(v[idx])
+                    first_ts = time_array[0]
+                    if stamp_sec < first_ts:
+                        # 该话题此时还没有数据（一开始没有），用0填充
+                        aligned_data[key].append({
+                            "data": np.zeros_like(v[0]["data"]),
+                            "timestamp": stamp_sec,
+                        })
+                    else:
+                        idx = np.argmin(np.abs(time_array - stamp_sec))
+                        aligned_data[key].append(v[idx])
                 else:
                     aligned_data[key] = []
-        
+
+        # 减少空闲冗余帧：连续多帧 action.kuavo_arm_traj 几乎无变化时只保留一帧
+        aligned_data = self._drop_idle_frames(aligned_data)
+
         # 打印对齐结果（安全地处理空数据情况）
         if len(main_img_timestamps) > 0 and len(aligned_data) > 0:
             # 使用main_timeline作为参考，或者使用aligned_data中的第一个非空键

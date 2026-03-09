@@ -20,18 +20,18 @@ import os
 import gc
 import shutil
 from pathlib import Path
-from typing import Literal
-
 import numpy as np
 import torch
 import tqdm
 import hydra
-from omegaconf import DictConfig
+from omegaconf import DictConfig, ListConfig
+from typing import Literal, Union, List, Tuple
 
 from lerobot.datasets.lerobot_dataset import HF_LEROBOT_HOME as LEROBOT_HOME
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 import dataclasses
 from kuavo_data.common import kuavo_dataset as kuavo
+from kuavo_data.common.config_platform import get_arm_joint_slice, get_arm_head_start, DEFAULT_PLATFORM
 from rich.logging import RichHandler
 import logging
 
@@ -177,6 +177,7 @@ def populate_dataset_chunked(
     task: str,
     episodes: list[int] | None = None,
     chunk_size: int = 100,
+    platform_type: str = DEFAULT_PLATFORM,
 ) -> LeRobotDataset:
     """
     使用分块流式处理填充数据集
@@ -211,7 +212,7 @@ def populate_dataset_chunked(
     def log_memory(prefix: str):
         if process:
             mem_mb = process.memory_info().rss / 1024 / 1024
-            log_print.debug(f"{prefix} Memory: {mem_mb:.2f} MB")
+            log_print.info(f"{prefix} Memory: {mem_mb:.2f} MB")
     
     for ep_idx in tqdm.tqdm(episodes):
         ep_path = bag_files[ep_idx]
@@ -240,6 +241,7 @@ def populate_dataset_chunked(
                 
 
                 if state.size == 0 or action.size == 0:
+                    log_print.warning(f"Episode {ep_idx} Frame {frame_idx}: Missing state/action data")
                     return
 
                 # =========================
@@ -248,9 +250,11 @@ def populate_dataset_chunked(
                 arm_traj     = get_array("action.kuavo_arm_traj", np.float32)
                 arm_traj_alt = get_array("action.kuavo_arm_traj_alt", np.float32)
                 if arm_traj_alt.size == 0 and arm_traj.size == 0:
+                    log_print.warning(f"Episode {ep_idx} Frame {frame_idx}: Missing arm trajectory data")
                     return
-                action[12:26] = arm_traj_alt if arm_traj_alt.size else arm_traj
-                
+                arm_start, arm_end = get_arm_joint_slice(platform_type)
+                action[arm_start:arm_end] = arm_traj_alt if arm_traj_alt.size else arm_traj
+
                 # 接口留用
                 velocity = None
                 effort = None
@@ -258,16 +262,18 @@ def populate_dataset_chunked(
                 # =========================
                 # 3. 手部数据读取
                 # =========================
-                claw_state     = get_array("observation.claw", np.float64)
-                claw_action    = get_array("action.claw", np.float64)
-                qiangnao_state = get_array("observation.qiangnao", np.float64)
-                qiangnao_action= get_array("action.qiangnao", np.float64)
-                rq2f85_state   = get_array("observation.rq2f85", np.float64)
-                rq2f85_action  = get_array("action.rq2f85", np.float64)
+                claw_state     = get_array("observation.claw", np.float32)
+                claw_action    = get_array("action.claw", np.float32)
+                qiangnao_state = get_array("observation.qiangnao", np.float32)
+                qiangnao_action= get_array("action.qiangnao", np.float32)
+                rq2f85_state   = get_array("observation.rq2f85", np.float32)
+                rq2f85_action  = get_array("action.rq2f85", np.float32)
 
                 if claw_state.size == 0 and qiangnao_state.size == 0 and rq2f85_state.size==0:
-                    return 
+                    # log_print.warning(f"Episode {ep_idx} Frame {frame_idx}: Missing eef state data")
+                    return
                 if claw_action.size == 0 and qiangnao_action.size==0 and rq2f85_action.size ==0:
+                    # log_print.warning(f"Episode {ep_idx} Frame {frame_idx}: Missing eef action data")
                     return
                 # =========================
                 # 4. 手部归一化（保持原逻辑）
@@ -385,6 +391,7 @@ def populate_dataset_chunked(
             def on_chunk_done():
                 """每个chunk处理完后的回调：保存并释放内存"""
                 if len(frames_buffer) == 0:
+                    log_memory(f"After saving chunk (total frames: {frame_count[0]})")
                     return
                 
                 # 将所有缓存的帧添加到dataset
@@ -447,6 +454,7 @@ def port_kuavo_rosbag_chunked(
     root: str,
     n: int | None = None,
     chunk_size: int = 100,
+    platform_type: str = "4pro",
 ):
     """
     分块流式转换rosbag到LeRobot格式
@@ -462,6 +470,14 @@ def port_kuavo_rosbag_chunked(
 
     bag_reader = kuavo.KuavoRosbagReader()
     bag_files = bag_reader.list_bag_files(raw_dir)
+    if not bag_files:
+        log_print.error(
+            f"No .bag files found in rosbag_dir(s). Check that paths exist and contain *.bag. "
+            f"Looked in: {raw_dir}"
+        )
+        raise FileNotFoundError(f"No .bag files in: {raw_dir}")
+
+    log_print.info(f"Found {len(bag_files)} bag file(s) in {len(raw_dir)} dir(s): {raw_dir}")
     
     if isinstance(n, int) and n > 0:
         num_available_bags = len(bag_files)
@@ -473,7 +489,7 @@ def port_kuavo_rosbag_chunked(
     
     dataset = create_empty_dataset_chunked(
         repo_id,
-        robot_type="kuavo4pro",
+        robot_type=f"kuavo-{platform_type}",
         mode=mode,
         has_effort=False,
         has_velocity=False,
@@ -487,6 +503,7 @@ def port_kuavo_rosbag_chunked(
         task=task,
         episodes=episodes,
         chunk_size=chunk_size,
+        platform_type=platform_type,
     )
     
     return dataset
@@ -532,7 +549,7 @@ def main(cfg: DictConfig):
     half_arm = len(kuavo.DEFAULT_ARM_JOINT_NAMES) // 2
     half_claw = len(kuavo.DEFAULT_LEJUCLAW_JOINT_NAMES) // 2
     half_dexhand = len(kuavo.DEFAULT_DEXHAND_JOINT_NAMES) // 2
-    UP_START_INDEX = 12
+    UP_START_INDEX = get_arm_head_start(kuavo.PLATFORM_TYPE)
     # if kuavo.ONLY_HALF_UP_BODY:
     if kuavo.USE_LEJU_CLAW:
         DEFAULT_ARM_JOINT_NAMES = kuavo.DEFAULT_ARM_JOINT_NAMES[:half_arm] + kuavo.DEFAULT_LEJUCLAW_JOINT_NAMES[:half_claw] \
@@ -559,6 +576,7 @@ def main(cfg: DictConfig):
         root=lerobot_dir,
         n=n,
         chunk_size=chunk_size,
+        platform_type=kuavo.PLATFORM_TYPE
     )
     
     log_print.info("Conversion completed!")

@@ -1,0 +1,72 @@
+site_name: Kuavo Data Challenge 文档
+site_url: https://wanglishan.github.io/kuavo_data_challenge/
+site_description: Kuavo Data Challenge 官方文档（数据、训练、部署）
+docs_dir: docs
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: 切换到深色模式
+    - scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: 切换到浅色模式
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+nav:
+  - 首页: index.md
+  - 更新与动态: updates.md
+  - 乐聚赛事与开源资源: leju_ecosystem.md
+  - 入门:
+      - 零基础完整学习教程: getting_started/beginner_tutorial.md
+      - 安装指南: getting_started/installation.md
+      - 快速开始: getting_started/quick_start.md
+      - 项目文件构成: getting_started/file_structure.md
+  - 概念:
+      - 架构说明: concepts/architecture.md
+      - 策略概览: concepts/policy_overview.md
+  - 数据集:
+      - LeRobot v4.3: dataset/lerobot_v30.md
+      - Kuavo 仿真任务: dataset/kuavo_sim_tasks.md
+  - 策略:
+      - ACT: policy/act.md
+      - Diffusion: policy/diffusion.md
+      - PI0: policy/pi0.md
+      - PI05: policy/pi05.md
+      - Groot: policy/groot.md
+      - SmolVLA: policy/smolvla.md
+  - 训练:
+      - 训练流水线: training/pipeline.md
+      - 配置说明: training/configs.md
+      - 策略对比: training/comparison.md
+      - 多卡训练: training/multi_gpu.md
+  - 部署:
+      - 仿真自动测试: deployment/sim_auto_test.md
+      - 真机评测: deployment/real_eval.md
+  - 进阶:
+      - RGB-深度融合: advanced/rgb_depth_fusion.md
+      - 深度支持说明: advanced/depth_support.md
+  - 常见问题: faq.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+
+extra_css:
+  - stylesheets/extra.css

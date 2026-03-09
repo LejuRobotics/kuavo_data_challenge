@@ -1,0 +1,177 @@
+hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
+  run:
+    dir: ./outputs/train_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # 单次运行目录
+  sweep:
+    dir: ./outputs/train_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep并行时的根目录
+    subdir: ${hydra:job.override_dirname}
+
+
+task: "sim_task1"  # 自定义任务名称
+method: "pi05_rgb_depth_crossattn"  # 自定义方法名称（方案4：PI05加深度，Cross-Attention）
+timestamp: ${now:%Y%m%d_%H%M%S}  # 自动获取的运行时时间戳
+# 训练时模型参数的保存目录在outputs/train/<task>/<method>/<timestamp>中
+repoid: "lerobot/${task}"  # lerobot新版本需指定这个，仅供参考，设置了即可
+root: /data/wanglishan/data/sim_task2_lerobot/lerobot  # 你的本地转换好的lerobot数据的目录
+
+# 训练相关配置
+training:
+    output_directory: "outputs/train/${task}/${method}"  # 模型参数保存路径
+    seed: 42  # 数据增广、训练模型的随机种子，便于复现
+    max_epoch: 5  # 最大训练轮次，用于控制学习率调整器
+    
+    save_freq_epoch: 1  # 模型参数保存频率，每1个epoch保存一次（每轮训练完保存检查点）
+    log_freq: 1  # 进度条刷新频率，每1个迭代step
+    checkpoint_save_freq_steps: null  # 定期保存检查点频率（每N个step保存一次，null=仅在epoch结束时保存）
+    device: "cuda" # 训练设备（单卡模式，向后兼容）
+    gpu_ids: [1]   # 默认单卡训练，如需多卡请取消注释并指定 GPU 列表
+    accumulation_steps: 1  # 梯度累积步数
+
+    batch_size: 16  # 批次大小，pi05模型较大，建议从16开始，根据GPU显存调整
+    num_workers: 8  # dataloader的num_workers
+    drop_last: False  # 是否丢弃最后一个不完整的batch
+
+    max_training_step: null  # 最大训练步数（null=根据max_epoch自动确定）
+    
+    # resume training，断点续训
+    resume: false
+    resume_timestamp: "run_20251120_164240"  # 若开启，将从outputs/train/<task>/<method>/<resume_timestamp>中加载最后一个epoch参数续训
+    
+    # ========== WandB 训练可视化配置 ==========
+    use_wandb: true  # 是否启用 WandB 可视化
+    wandb:
+        project: "kuavo_pi05"  # WandB 项目名称
+        run_name: "${method}_${timestamp}"  # 运行名称
+        entity: null  # WandB 实体/团队名称（可选）
+        tags:  # 标签列表
+            - "${method}"  # 方法名称（如 pi05_rgb_depth_crossattn）
+            - "${task}"  # 任务名称（如 sim_task1）
+            - "pi05"  # 模型类型标签
+            - "cross_attention"  # 方案4：Cross-Attention深度融合
+
+    # 数据增广相关的配置（仅对RGB图像，深度图像不进行增广）
+    RGB_Augmenter:
+      enable: True
+      max_num_transforms: 1
+      random_order: True
+      tfs:
+        notransform:
+          weight: 3.0
+          type: "Identity"
+          kwargs: {}
+        brightness:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"brightness": [0.5, 1.5]}
+        contrast:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"contrast": [0.5, 1.5]}
+        saturation:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"saturation": [0.5, 1.5]}
+        hue:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"hue": [-0.05, 0.05]}
+
+policy_name: pi05   # 策略类型，使用pi05策略
+
+# ========== 预训练模型配置 ==========
+# 全量微调：从预训练模型开始训练（推荐，可加速收敛）
+pretrained_path: "/home/wanglishan/models/pi05_base"  # 本地预训练 PI05 模型路径（如果可用）
+# pretrained_path: "lerobot/pi05_base"  # 或使用 HuggingFace Hub ID
+# pretrained_path: null  # 设置为 null 或注释掉则从头开始训练
+
+# 策略相关配置
+policy:
+    _target_: kuavo_train.wrapper.policy.pi05.PI05ConfigWrapper.CustomPI05ConfigWrapper  # pi05配置类，使用自定义的PI05ConfigWrapper以支持深度图像
+    
+    # PaliGemma模型变体
+    paligemma_variant: "gemma_2b"  # 选项: "gemma_300m", "gemma_2b"
+    action_expert_variant: "gemma_300m"  # 选项: "gemma_300m", "gemma_2b"
+    dtype: "float32"  # 选项: "bfloat16", "float32" (bfloat16可节省显存但需要GPU支持)
+    
+    # 观测和动作配置
+    n_obs_steps: 1  # 观测步数
+    chunk_size: 50  # 动作块大小（预测的动作步数）
+    n_action_steps: 50  # 执行的动作步数
+    
+    # 状态和动作维度（会自动填充到这些维度）
+    max_state_dim: 32
+    max_action_dim: 32
+    
+    # Flow matching参数
+    num_inference_steps: 10  # 推理时的去噪步数
+    time_sampling_beta_alpha: 1.5
+    time_sampling_beta_beta: 1.0
+    time_sampling_scale: 0.999
+    time_sampling_offset: 0.001
+    min_period: 4e-3
+    max_period: 4.0
+    
+    # 图像分辨率
+    image_resolution: [224, 224]  # PaliGemma要求正方形图像
+    
+    # 空相机数量（用于添加空相机当没有图像特征时）
+    empty_cameras: 0
+    
+    # ========== RGB-Depth融合配置（方案4：Cross-Attention - 双向注意力融合）==========
+    #
+    # 方案四特点：
+    # - 使用 PaliGemma Vision Tower 处理深度图像（与 RGB 共享编码器）
+    # - RGB 和 Depth 特征通过双向 Cross-Attention 交互融合
+    # - PI05 只支持 Cross-Attention 方法
+    # - 参考文档：RGB_DEPTH_FUSION_COMPARISON.md
+    #
+    # 深度图像支持
+    use_depth: true  # 是否使用深度图像
+    depth_features:  # 深度特征键列表，需要与数据集中的深度特征键对应（必须与RGB图像数量匹配）
+      - "observation.depth_h"  # 对应 observation.images.head_cam_h
+      - "observation.depth_l"  # 对应 observation.images.wrist_cam_l
+      - "observation.depth_r"  # 对应 observation.images.wrist_cam_r
+    
+    # 融合方法配置
+    depth_fusion_method: "cross_attention"  # 融合方法: "cross_attention" (方案四：双向注意力融合，PI05只支持此方法)
+    depth_fusion_dim: null  # 融合维度（null=自动，使用LLM维度）
+    
+    # 深度特征提取器配置（方案四不使用独立的 ViT backbone，深度图像通过 PaliGemma Vision Tower 处理）
+    depth_backbone_init_from_vision_tower: false  # 方案四：深度图像通过 PaliGemma Vision Tower 处理，不使用独立的 backbone
+    depth_preprocessing: "minmax"  # 深度预处理方法: "minmax" (Min-Max归一化，推荐), "hha" (HHA编码)
+    depth_scale: 0.0001  # 深度缩放因子（将uint16转换为米），默认0.0001
+    
+    # ========== 归一化配置（PI05使用QUANTILES）==========
+    normalization_mapping:
+      VISUAL:
+        _target_: lerobot.configs.types.NormalizationMode
+        value: IDENTITY  # RGB图像不归一化（PaliGemma内部处理）
+      STATE:
+        _target_: lerobot.configs.types.NormalizationMode
+        value: QUANTILES  # PI05使用分位数归一化
+      ACTION:
+        _target_: lerobot.configs.types.NormalizationMode
+        value: QUANTILES  # PI05使用分位数归一化
+    
+    # ========== 训练优化配置 ==========
+    gradient_checkpointing: true  # 启用梯度检查点以节省显存（强烈推荐）
+    compile_model: false  # 是否使用torch.compile优化（可选，可能不稳定）
+    compile_mode: "max-autotune"  # torch.compile模式
+    device: null  # 设备（null=自动检测）
+    
+    # ========== 优化器配置 ==========
+    optimizer_lr: 2.5e-5  # 学习率
+    optimizer_betas: [0.9, 0.95]  # AdamW beta参数
+    optimizer_eps: 1.0e-8
+    optimizer_weight_decay: 0.01
+    optimizer_grad_clip_norm: 1.0  # 梯度裁剪
+    
+    # ========== 学习率调度器配置 ==========
+    # 注意：训练3轮时，总步数约为 3 * (数据集大小 / batch_size)
+    # 假设数据集约 10000 帧，batch_size=16，则总步数约 1875 步
+    scheduler_warmup_steps: 100  # 预热步数（约占总步数的5-10%，根据实际数据集大小调整）
+    scheduler_decay_steps: 2000  # 衰减步数（应小于或等于总步数，根据实际数据集大小调整）
+    scheduler_decay_lr: 2.5e-6  # 衰减后的学习率
+    
+    # ========== Tokenizer配置 ==========
+    tokenizer_max_length: 200  # PI05使用更长的tokenizer长度
+

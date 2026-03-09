@@ -1,0 +1,22 @@
+/* 文档视觉微调 */
+.md-typeset .admonition {
+  margin: 1.2em 0;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.md-typeset .admonition-title {
+  font-weight: 600;
+}
+.md-typeset h2 {
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, #eee);
+  padding-bottom: 0.3em;
+  margin-top: 1.6em;
+}
+.md-typeset table:not([class]) {
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06);
+}
+.md-typeset table:not([class]) th {
+  background-color: rgba(0,0,0,.03);
+  font-weight: 600;
+}

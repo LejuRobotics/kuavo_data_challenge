@@ -297,7 +297,8 @@ git submodule update --recursive --progress
 # 如果这一步骤由于网络原因下载失败或很慢：请
 # cd third_party
 # git clone https://githubproxy.cc/https://github.com/huggingface/lerobot.git
-# cd ../ # 回到上一级目录
+# git checkout 563f42bd
+# cd ../../ # 回到上一级目录
 
 ```
 
@@ -365,11 +366,7 @@ pip --version # 查看pip对应的版本，看到确认输出为3.10的pip
 ```bash
 source /opt/ros/noetic/setup.bash  # 进入python环境先source好ros自带的python库，建议这行写入~/.bashrc
 
-pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple  # 建议首先换源，能加快下载安装速度
-
-pip install -r requirements_ilcode.txt   # 无需ROS Noetic，但只能使用kuavo_train模仿学习训练代码，kuavo_data（数转）及 kuavo_deploy（部署代码）均依赖ROS
-# 或
-pip install -r requirements_total.txt    # 需确保 ROS Noetic 已安装 (推荐)
+bash setup_env.sh    # 需确保 ROS Noetic 已安装 (推荐)
 ```
 
 安装完打印下检查下lerobot版本：2025年11月20日为0.4.2版本
@@ -486,6 +483,10 @@ accelerate launch --config_file configs/accelerate/accelerate_config.yaml kuavo_
 说明：
 
 * diffusion_config.yaml文件中配置参数设置参考上面《2.0 模仿学习训练》详细参数说明 
+* 对于VLA模型，一般会去hugging-face上下载预训练权重，国内经常下载不了，请先将下面代码写入到.bashrc中：
+```bash
+export HF_ENDPOINT=https://hf-mirror.com
+```
 
 ---
 
@@ -518,6 +519,7 @@ b. 调用部署代码
 - 边侧机推理请见（待更新），上位机orin推理请见：[README_AGX_ORIN.md](README_AGX_ORIN.md)
 
 - 推理运行时的日志在log/kuavo_deploy/kuavo_deploy.log，请查看。
+- VLA推理时需要先将/home/(user-name)/.cache/huggingface/hub/models--nvidia--GR00T-N1.5-3B等类似的预训练权重从训练服务器上放好到推理机的对应位置
 
 ### 5. 关于 kuavo_humanoid_sdk：
 

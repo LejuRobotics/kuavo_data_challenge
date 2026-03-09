@@ -1,0 +1,41 @@
+site_name: Kuavo Data Challenge
+site_description: Official documentation for Kuavo Data Challenge
+docs_dir: docs
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.tabs
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting_started/installation.md
+      - Quick Start: getting_started/quick_start.md
+  - Concepts:
+      - Architecture: concepts/architecture.md
+      - Policy Overview: concepts/policy_overview.md
+  - Dataset:
+      - LeRobot v4.3: dataset/lerobot_v30.md
+      - Kuavo Sim Tasks: dataset/kuavo_sim_tasks.md
+  - Policies:
+      - ACT: policy/act.md
+      - Diffusion: policy/diffusion.md
+      - PI0: policy/pi0.md
+      - PI05: policy/pi05.md
+      - Groot: policy/groot.md
+      - SmolVLA: policy/smolvla.md
+  - Training:
+      - Pipeline: training/pipeline.md
+      - Configs: training/configs.md
+      - Comparison: training/comparison.md
+  - Deployment:
+      - Simulation Auto Test: deployment/sim_auto_test.md
+      - Real Robot Eval: deployment/real_eval.md
+  - Advanced:
+      - RGB-Depth Fusion: advanced/rgb_depth_fusion.md
+      - Depth Support Internals: advanced/depth_support.md

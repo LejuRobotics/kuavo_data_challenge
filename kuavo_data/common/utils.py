@@ -50,3 +50,4 @@ def reindex_rosbag(bag_file)->str:
     except subprocess.CalledProcessError as e:
         print(f"Error reindexing bag file: {e}")
         return None
+    

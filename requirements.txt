@@ -1,0 +1,16 @@
+-e third_party/lerobot
+hydra-core==1.3.2
+pycryptodomex==3.23.0
+gnupg==2.3.1
+rospkg==1.6.1
+rich==14.3.3
+tensorboard==2.20.0
+kornia==0.8.2
+deprecated==1.3.1
+pyaudio==0.2.14
+zmq
+peft==0.18.0
+transformers==4.57.3
+dm-tree==0.1.9
+kuavo_humanoid_sdk==1.3.3
+-e .

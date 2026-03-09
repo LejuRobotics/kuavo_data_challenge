@@ -39,13 +39,11 @@ class CustomACTConfigWrapper(ACTConfig):
         # make custom settings in main config for better save
         if isinstance(self.custom, DictConfig) or isinstance(self.custom, dict):
             for k, v in self.custom.items():
-                if not hasattr(self, k):
-                    # print("from config",k,v)
-                    setattr(self, k, v)
-                else:
-                    raise ValueError(f"Custom setting '{k}: {v}' conflicts with the parent base configuration. Remove it from 'custom' and modify in the parent configuration instead.")
+                if hasattr(self, k):
+                    print(f"\033[93mCustom setting '{k}: {v}' conflicts with the parent base configuration. The custom value will override the base setting.\033[0m")  # Remove it from 'custom' and modify in the parent configuration instead.
+                setattr(self, k, v)
         self._convert_omegaconf_fields()
-    
+
     def _convert_omegaconf_fields(self):
         for f in fields(self):
             val = getattr(self, f.name)
