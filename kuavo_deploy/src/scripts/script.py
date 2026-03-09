@@ -21,8 +21,7 @@ from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.kuavo_env.KuavoBaseRosEnv import KuavoBaseRosEnv
-from configs.deploy.config_inference import load_inference_config
-from configs.deploy.config_kuavo_env import load_kuavo_env_config
+from kuavo_deploy.config import load_kuavo_config, KuavoConfig
 import gymnasium as gym
 
 import numpy as np
@@ -101,18 +100,22 @@ def setup_signal_handlers():
     log_robot.info("  SIGUSR1 (kill -USR1): 暂停/恢复机械臂运动")
     log_robot.info("  SIGUSR2 (kill -USR2): 停止机械臂运动")
 
+def unwrap_env(env):
+    while hasattr(env, "env"):
+        env = env.env
+    return env
+
 class ArmMove:
     """机械臂运动控制类"""
     
-    def __init__(self, config_path: Path):
+    def __init__(self, config: KuavoConfig):
         """
         初始化机械臂控制
         
         Args:
             bag_path: 轨迹文件路径
         """
-        self.config_path = config_path
-
+        self.config = config
         # 设置信号处理器
         self.shutdown_requested = False
         # 设置信号处理器
@@ -125,7 +128,7 @@ class ArmMove:
         log_robot.info(f"   暂停/恢复: kill -USR1 {pid}")
         log_robot.info(f"   停止运动: kill -USR2 {pid}")
 
-        self.inference_config = load_inference_config(config_path)
+        self.inference_config = config.inference
         self.bag_path = self.inference_config.go_bag_path
 
         self.msg_dict_of_list = self._read_topic_messages(
@@ -135,10 +138,11 @@ class ArmMove:
 
         rospy.init_node('kuavo_deploy', anonymous=True)
         self.env = gym.make(
-            self.inference_config.env_name,
+            self.config.env.env_name,
             max_episode_steps=self.inference_config.max_episode_steps,
-            config_path=config_path,
+            config=self.config,
         )
+        self.env = unwrap_env(self.env)
 
 
     def _check_control_signals(self):
@@ -200,9 +204,9 @@ class ArmMove:
         if self.env.which_arm=="both":
             target_positions = msg.data.position
         elif self.env.which_arm=="left":
-            target_positions = np.concatenate([msg.data.position[:self.env.leju_claw_dof_needed],[0]],axis=0)
+            target_positions = np.concatenate([msg.data.position[:1],[0]],axis=0)
         elif self.env.which_arm=="right":
-            target_positions = np.concatenate([[0],msg.data.position[self.env.leju_claw_dof_needed:]],axis=0)
+            target_positions = np.concatenate([[0],msg.data.position[1:]],axis=0)
         else:
             raise ValueError(f"Invalid which_arm: {self.env.which_arm}, must be 'left', 'right', or 'both'")
         self.env.lejuclaw.control(target_positions)
@@ -403,9 +407,9 @@ class ArmMove:
 
     def run(self) -> None:
         """执行运行"""
-        from kuavo_deploy.examples.eval.eval_kuavo import kuavo_eval
-        kuavo_eval(config_path=self.config_path, env=self.env)
-    
+        from kuavo_deploy.src.eval.real_single_test import kuavo_eval
+        kuavo_eval(config=self.config, env=self.env)
+
 def parse_args():
     """解析命令行参数"""
     parser = argparse.ArgumentParser(
@@ -476,9 +480,10 @@ def main():
     log_robot.info(f"使用配置文件: {config_path}")
     log_robot.info(f"执行任务: {args.task}")
     
+    config = load_kuavo_config(config_path)
     # 初始化机械臂
     try:
-        arm = ArmMove(config_path)
+        arm = ArmMove(config)
         log_robot.info("机械臂初始化成功")
     except Exception as e:
         log_robot.error(f"机械臂初始化失败: {e}")

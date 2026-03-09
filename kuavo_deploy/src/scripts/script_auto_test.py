@@ -17,8 +17,7 @@ from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.kuavo_env.KuavoBaseRosEnv import KuavoBaseRosEnv
-from configs.deploy.config_inference import load_inference_config
-from configs.deploy.config_kuavo_env import load_kuavo_env_config
+from kuavo_deploy.config import load_kuavo_config, KuavoConfig
 import gymnasium as gym
 
 import numpy as np
@@ -100,14 +99,14 @@ def setup_signal_handlers():
 class ArmMove:
     """机械臂运动控制类"""
     
-    def __init__(self, config_path: Path):
+    def __init__(self, config: KuavoConfig):
         """
         初始化机械臂控制
         
         Args:
             bag_path: 轨迹文件路径
         """
-        self.config_path = config_path
+        self.config = config
 
         # 设置信号处理器
         self.shutdown_requested = False
@@ -121,7 +120,7 @@ class ArmMove:
         log_robot.info(f"   暂停/恢复: kill -USR1 {pid}")
         log_robot.info(f"   停止运动: kill -USR2 {pid}")
 
-        self.inference_config = load_inference_config(config_path)
+        self.inference_config = config.inference
 
         rospy.init_node('kuavo_deploy', anonymous=True)
 
@@ -145,8 +144,8 @@ class ArmMove:
 
     def auto_test(self) -> None:
         """执行自动测试"""
-        from kuavo_deploy.examples.eval.auto_test.eval_kuavo_autotest import kuavo_eval_autotest
-        kuavo_eval_autotest(config_path=self.config_path)
+        from kuavo_deploy.src.eval.sim_auto_test import kuavo_eval_autotest
+        kuavo_eval_autotest(config=self.config)
     
 def parse_args():
     """解析命令行参数"""
@@ -210,9 +209,10 @@ def main():
     log_robot.info(f"使用配置文件: {config_path}")
     log_robot.info(f"执行任务: {args.task}")
     
+    config = load_kuavo_config(config_path)
     # 初始化机械臂
     try:
-        arm = ArmMove(config_path)
+        arm = ArmMove(config)
         log_robot.info("机械臂初始化成功")
     except Exception as e:
         log_robot.error(f"机械臂初始化失败: {e}")

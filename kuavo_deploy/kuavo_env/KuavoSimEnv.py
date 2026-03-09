@@ -11,6 +11,8 @@ import time
 from kuavo_deploy.kuavo_env.KuavoBaseRosEnv import KuavoBaseRosEnv
 
 class KuavoSimEnv(KuavoBaseRosEnv):
+    def _reset_eef(self):
+        return
 
     def compute_reward(self):
         return 0
