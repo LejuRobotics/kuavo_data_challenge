@@ -13,6 +13,8 @@
 
 ### 本分支为持续开发中的分支！目前支持了：
 
+- gr00t_n1d5、pi0、pi0.5模型支持（gr00t暂不支持深度图的输入）
+- kuavo 夸父4pro、5、5W多种机型支持！
 - ACT / Diffusion policy的深度图像，分别提供了一种RGB、depth的融合方式，详见[ACT](kuavo_train/wrapper/policy/act/ACTModelWrapper.py), [Diffusion](kuavo_train/wrapper/policy/diffusion/DiffusionModelWrapper.py)
 - Accelerate 多卡并行加速！详见[多卡并行加速](#multigpu)
 - lerobot latest! version 0.4.2 ! [lerobot](https://github.com/huggingface/lerobot)
@@ -369,29 +371,9 @@ source /opt/ros/noetic/setup.bash  # 进入python环境先source好ros自带的p
 bash setup_env.sh    # 需确保 ROS Noetic 已安装 (推荐)
 ```
 
-安装完打印下检查下lerobot版本：2025年11月20日为0.4.2版本
+安装完打印下检查下lerobot版本：2026年03月7日为0.4.5版本
 ```bash
 pip show | grep lerobot
-```
-
-若不是最新版 (0.4.2)：
-```bash
-cd third_party/lerobot
-git fetch
-git reset --hard origin/main
-cd ../../
-```
-
-重新pip install -r requirement即可。
-
-如果pip安装完毕但运行训练代码时报ffmpeg或torchcodec的错：
-
-```bash
-conda install ffmpeg==6.1.1
-
-# 或
-
-# pip uninstall torchcodec
 ```
 
 如果想使用torchcodec，又没有conda，环境是用python venv创建的：
@@ -439,6 +421,7 @@ python kuavo_data/CvtRosbag2Lerobot.py \
 * `rosbag.rosbag_dir`：原始 rosbag 数据路径
 * `rosbag.lerobot_dir`：转换后的lerobot-parquet 数据保存路径，通常会在此目录下创建一个名为lerobot的子文件夹
 * `configs/data/KuavoRosbag2Lerobot.yaml`：请查看并根据需要选择启用的相机及是否使用深度图像等
+* `platform_type`: 支持4pro，5，和5w轮臂等，请根据实际选择
 
 ---
 
@@ -483,10 +466,36 @@ accelerate launch --config_file configs/accelerate/accelerate_config.yaml kuavo_
 说明：
 
 * diffusion_config.yaml文件中配置参数设置参考上面《2.0 模仿学习训练》详细参数说明 
-* 对于VLA模型，一般会去hugging-face上下载预训练权重，国内经常下载不了，请先将下面代码写入到.bashrc中：
-```bash
-export HF_ENDPOINT=https://hf-mirror.com
-```
+
+
+
+### 2.2 VLA模型训练：
+* 建议是100G显存的H100服务器训练，否则不易收敛
+* 对于VLA模型，一般启动训练后会去hugging-face上下载预训练权重，国内经常下载不了，请确认已将下面代码写入到.bashrc中：
+  ```bash
+  export HF_ENDPOINT=https://hf-mirror.com
+  ```
+* PI系列的python环境需要单独创建：
+  ```bash
+  conda create -n kdc_pi --clone kdc_dev
+  cd third_party/lerobot
+  pip install -e ".[pi]"  # 需要确保科学上网
+  ```
+* PI系列训练模型时需要下载预训练权重：
+  - 登录hugging-face
+  - 访问 [paligemma-3b-pt-224](https://huggingface.co/google/paligemma-3b-pt-224)，进行许可证认证
+  - 访问个人页面，获得[access token](https://huggingface.co/settings/tokens)
+  - 将access token写入~/.bashrc，写完记得source ~/.bashrc
+  ```bash
+  export HF_TOKEN=xxxx
+  ```
+* 启动训练命令：（与ACT，DP类似）
+  ```bash
+  python kuavo_train/train_policy.py \
+  --config-path=../configs/policy/ \
+  --config-name=gr00t_n1d5_config.yaml
+  ```
+* 低显存时建议开启yaml文件中的accumulation_steps做梯度累计，便于收敛
 
 ---
 
@@ -519,7 +528,7 @@ b. 调用部署代码
 - 边侧机推理请见（待更新），上位机orin推理请见：[README_AGX_ORIN.md](README_AGX_ORIN.md)
 
 - 推理运行时的日志在log/kuavo_deploy/kuavo_deploy.log，请查看。
-- VLA推理时需要先将/home/(user-name)/.cache/huggingface/hub/models--nvidia--GR00T-N1.5-3B等类似的预训练权重从训练服务器上放好到推理机的对应位置
+- ⚠️VLA推理时需要先将/home/(user-name)/.cache/huggingface/hub/models--nvidia--GR00T-N1.5-3B等类似的预训练权重从训练服务器上放好到推理机的对应位置，然后微调的权重与ACT，DP一致放置到outputs/train路径即可
 
 ### 5. 关于 kuavo_humanoid_sdk：
 

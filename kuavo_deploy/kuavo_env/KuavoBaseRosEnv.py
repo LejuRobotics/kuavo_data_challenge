@@ -9,6 +9,7 @@ import time
 import sys
 from kuavo_humanoid_sdk import KuavoSDK, KuavoRobot, KuavoRobotState, DexterousHand
 from kuavo_humanoid_sdk.msg.kuavo_msgs.msg import lejuClawCommand
+from kuavo_humanoid_sdk.msg.kuavo_msgs.srv import (changeArmCtrlMode, changeArmCtrlModeRequest)
 from kuavo_deploy.utils.logging_utils import setup_logger
 from kuavo_deploy.config import KuavoConfig
 from kuavo_deploy.utils.ros_manager import ROSManager
@@ -17,6 +18,7 @@ import torch
 from torchvision.transforms.functional import to_tensor
 from kuavo_deploy.utils.obs_buffer import ObsBuffer
 from kuavo_deploy.utils.signal_controller import ControlSignalManager
+from kuavo_deploy.utils.lowpass_filter import LowPassFilter
 
 
 log_robot = setup_logger("robot")
@@ -51,6 +53,7 @@ class KuavoBaseRosEnv(gym.Env):
         self.only_arm = config_kuavo_env.only_arm
         self.eef_type = config_kuavo_env.eef_type
         self.which_arm = config_kuavo_env.which_arm
+        self.direct_to_wbc = config_kuavo_env.direct_to_wbc
         self.qiangnao_dof_needed = config_kuavo_env.qiangnao_dof_needed
 
         self.is_binary = config_kuavo_env.is_binary
@@ -68,6 +71,10 @@ class KuavoBaseRosEnv(gym.Env):
         self.arm_state_keys = config_kuavo_env.arm_state_keys # observation.state 的key顺序
         self.ratio = config_kuavo_env.ratio
         self.frame_alignment = config_kuavo_env.frame_alignment
+        if self.direct_to_wbc:
+            self.last_predicted_action = None
+            self.is_first_step = True
+            self.low_pass_filter = LowPassFilter(cutoff_hz=1.0, dt=0.01) # dt*hz
 
     def _set_observation_space(self):
         limits = self.limits
@@ -227,14 +234,37 @@ class KuavoBaseRosEnv(gym.Env):
         obs = self.get_obs()
         self.sleep_time = 0
         self.average_sleep_time = 0
+
+        if self.direct_to_wbc:
+            self.last_predicted_action = None
+            self.low_pass_filter.reset()
+            self.is_first_step = True
         return obs, {}
 
     # ==========================================================
     # 子函数 1. 外部控制模式设置
     # ==========================================================
+    def _set_direct_to_wbc(self, control_mode):
+        rospy.wait_for_service('/enable_wbc_arm_trajectory_control', timeout=5)
+        try:
+            change_mode = rospy.ServiceProxy('/enable_wbc_arm_trajectory_control', changeArmCtrlMode)
+            req = changeArmCtrlModeRequest()
+            req.control_mode = control_mode
+            res = change_mode(req)
+            if res.result:
+                rospy.loginfo("wbc轨迹控制模式已更改为 %d", control_mode)
+            else:
+                rospy.logerr("无法将wbc轨迹控制模式更改为 %d", control_mode)
+        except rospy.ServiceException as e:
+            rospy.logerr("服务调用失败: %s", e)
+
+
     def _enter_external_control_mode(self):
         self.robot.set_external_control_arm_mode()
         print("set_external_control_arm_mode", self.robot_state.arm_control_mode())
+        if self.direct_to_wbc:
+            self._set_direct_to_wbc(1)
+
 
     # ==========================================================
     # 子函数 2. 头部复位
@@ -360,11 +390,57 @@ class KuavoBaseRosEnv(gym.Env):
         # === 4. 执行动作 ===
         t2 = time.time()
         self.cur_joint_angles_action = np.concatenate((action[:7], action[8:15]), axis=0)
-        self.exec_action(action)
+        if  not self.direct_to_wbc:
+            self.exec_action(action)
+            self.rate.sleep()
+        else:
+            # ==== 4.1插值下发动作
+            # ================ 第一帧的时候从current state 插值
+            #joint_q
+            
+            if self.is_first_step:
+                self.is_first_step = False
+                num_points = 100
+                dt = 0.01
+                current_q = self.arm_state["joint_q"]
+
+                left_joints, left_eef = action[:7], action[7]
+                right_joints, right_eef = action[8:15], action[15]
+                target_position = np.concatenate((left_joints, right_joints), axis=0)
+                current_q = np.asarray(current_q)
+                # print(f'======= current_q {current_q}')
+                # print(f'========= target_position {target_position}')
+                for i in range(num_points):
+                    alpha = (i + 1) / num_points
+                    inter_arm_action = (1 - alpha) * current_q + alpha * target_position
+                    
+                    self.safe_control_arm(inter_arm_action)
+                    time.sleep(dt)
+                    
+
+            left_joints, left_eef = action[:7], action[7]
+            right_joints, right_eef = action[8:15], action[15]
+
+            left_eef, right_eef = action[7], action[15]
+            if self.last_predicted_action is None:
+                self.last_predicted_action = action
+            action_dt = 0.1
+            interpolated_dt = 0.01
+            num_inter_points = int(action_dt / interpolated_dt)
+            for i in range(num_inter_points):
+                alpha = (i + 1) / num_inter_points
+                inter_arm_action = (1 - alpha) * self.last_predicted_action + alpha * action
+
+                inter_arm_action[7] = left_eef
+                inter_arm_action[15] = right_eef
+
+                self.exec_action(inter_arm_action)
+                time.sleep(interpolated_dt - 0.002)
+
+            self.last_predicted_action = action
 
         # === 5. 延时与观测 ===
         
-        self.rate.sleep()
         self._record_sleep_time(t2)
         t3 = time.time()
         obs = self.get_obs()
@@ -381,40 +457,41 @@ class KuavoBaseRosEnv(gym.Env):
         self.average_sleep_time += self.sleep_time
         log_robot.info(f"rate.sleep time: {self.sleep_time:.3f}s")
 
+    def safe_control_arm(self, target_position):
+        try:
+            self.robot.control_arm_joint_positions(target_position)
+        except RuntimeError as e:
+            # 当机器人处于 command_pose_world 状态（底盘移动）时，无法控制手臂
+            if "must be in stance state" in str(e):
+                log_robot.warning(f"⚠️  无法发送手臂命令：机器人当前状态不允许 (可能正在底盘移动)")
+                log_robot.debug(f"   详细错误: {e}")
+            else:
+                raise
+
     def exec_action(self, action):
         """执行机械臂与末端执行器动作"""
         # if not self.only_arm:
         #     return
 
-        def safe_control_arm(target_position):
-            try:
-                self.robot.control_arm_joint_positions(target_position)
-            except RuntimeError as e:
-                # 当机器人处于 command_pose_world 状态（底盘移动）时，无法控制手臂
-                if "must be in stance state" in str(e):
-                    log_robot.warning(f"⚠️  无法发送手臂命令：机器人当前状态不允许 (可能正在底盘移动)")
-                    log_robot.debug(f"   详细错误: {e}")
-                else:
-                    raise
-
-
+        if self.direct_to_wbc:
+                action = self.low_pass_filter.update(action)
         if self.which_arm == 'both':
             left_joints, left_eef = action[:7], action[7]
             right_joints, right_eef = action[8:15], action[15]
             target_position = np.concatenate((left_joints, right_joints), axis=0)
-            safe_control_arm(target_position)
+            self.safe_control_arm(target_position)
             self._control_eef(left_eef, right_eef)
 
         elif self.which_arm == 'left':
             left_joints, left_eef = action[:7], action[7]
             target_position = np.concatenate((left_joints, self.arm_init[7:14]), axis=0)
-            safe_control_arm(target_position)
+            self.safe_control_arm(target_position)
             self._control_eef(left_eef, 0)
 
         elif self.which_arm == 'right':
             right_joints, right_eef = action[:7], action[7]
             target_position = np.concatenate((self.arm_init[:7], right_joints), axis=0)
-            safe_control_arm(target_position)
+            self.safe_control_arm(target_position)
             self._control_eef(0, right_eef)
         else:
             raise KeyError(f"Unsupported which_arm: {self.which_arm}")

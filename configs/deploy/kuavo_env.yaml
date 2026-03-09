@@ -14,18 +14,20 @@ hydra:  # Hydra 配置文件保存目录，仅供参数检查使用
 # env config，仿真器运行配置文件
 # =====================================================
 env:
-  env_name: Kuavo-Sim  # kuavo环境名称，仿真Kuavo-Sim，真机Kuavo-Real
+  env_name: Kuavo-Real  # kuavo环境名称，仿真Kuavo-Sim，真机Kuavo-Real
   control_mode: joint # joint 或 eef （正在开发中）
-  eef_type: rq2f85  # 末端执行器类型: 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
+  eef_type: leju_claw  # 末端执行器类型: 仿真选择：rq2f85, 真机可选：leju_claw, qiangnao
+  platform_type: "4pro"  # 硬件平台类型，可选: "4pro", "5w" 或 "5"，默认使用 configs/platform/platform_config.yaml 中的 default 值，比赛默认4pro
   which_arm: both  # 需要哪一只手臂的数据，可选: left, right, both，注意这会同时选择对应手臂的相机，已默认包含头部相机
-  head_init: [0,0.209]  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, 真机可根据需要调整，一般为null！！！
+  head_init: null  # 机器人头部初始位置，仿真请默认使用这个值，保持观测统一, 真机可根据需要调整，一般为null！！！
   ros_rate: 10  # 推理控制频率，单位Hz
+  direct_to_wbc: false  # 是否直接将动作发送到WBC，默认不使用，真机增量式VR数采的可以使用
 
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   only_arm: true  # 默认true, 是否只使用手臂数据, 选择true会自动屏蔽足关节数据
   #!!!!!!!!!task4请设置为false,task4请设置为false,task4请设置为false!!!!!!!!!!!!!!
 
-  image_size: &IMGSIZE [640, 480]  # 图像大小：宽，高
+  image_size: &IMGSIZE [848, 480]  # 图像大小：宽，高
   depth_range: &DEPTHRANGE [0, 1500]  # 深度图范围设置，单位mm，default=[0,1500]
   obs_key_map:  # 话题、消息类型、频率、图像尺寸、深度裁剪等配置，深度图范围设置，单位mm，default=[0,1500]，请注意需要与训练保持一致！
     head_cam_h: ["/cam_h/color/image_raw/compressed", "CompressedImage", 30, *IMGSIZE]  # 头部RGB相机话题，必选

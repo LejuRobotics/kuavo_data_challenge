@@ -88,6 +88,14 @@ class ChunkedRosbagProcessor:
         
         # 生成对齐后的主时间戳序列
         jump = self.main_timeline_fps // self.train_hz
+
+        # 诊断：打印每个相机的帧数和对应时长，便于排查“30秒 bag 只转出 10 秒”等问题
+        for cam, count in camera_counts.items():
+            raw_duration = (count - 2 * self.sample_drop) / self.main_timeline_fps if count > 2 * self.sample_drop else 0
+            out_frames = (count - 2 * self.sample_drop) // jump if self.sample_drop > 0 else count // jump
+            out_duration = out_frames / self.train_hz
+            logger.info(f"  Camera {cam}: {count} raw frames (~{raw_duration:.1f}s raw, ~{out_duration:.1f}s at {self.train_hz}Hz after jump={jump})")
+
         raw_timestamps = all_timestamps[main_timeline]
 
         if len(raw_timestamps) < 2 * self.sample_drop + 1:
@@ -100,6 +108,8 @@ class ChunkedRosbagProcessor:
             main_timestamps = raw_timestamps[self.sample_drop:-self.sample_drop][::jump]
         else:
             main_timestamps = raw_timestamps[::jump]
+
+        out_duration_sec = len(main_timestamps) / self.train_hz
         
         max_end = max(
             ts_list[-1]
@@ -117,7 +127,7 @@ class ChunkedRosbagProcessor:
             f"frames: {before_len} -> {after_len}"
         )
         
-        logger.info(f"Generated {len(main_timestamps)} aligned timestamps "
+        logger.info(f"Generated {len(main_timestamps)} aligned timestamps (~{out_duration_sec:.1f}s at {self.train_hz}Hz) "
                    f"(from {len(raw_timestamps)} raw frames, "
                    f"dropped {self.sample_drop} frames at each end, jump={jump})")
         logger.info(f"Main timeline time range: [{main_timestamps[0]:.3f}, {main_timestamps[-1]:.3f}]")

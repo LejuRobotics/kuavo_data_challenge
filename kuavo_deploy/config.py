@@ -12,7 +12,7 @@ from dataclasses import dataclass, field, asdict
 from typing import List, Optional, Tuple, Any, Dict
 import os
 import yaml
-
+from kuavo_data.common.config_platform import get_arm_joint_slice
 
 @dataclass
 class Range:
@@ -47,12 +47,14 @@ class ConfigEnv:
     real: bool = False
     only_arm: bool = True
     eef_type: str = "rq2f85"
+    platform_type: str = "4pro"
     control_mode: str = "joint"
     which_arm: str = "both"
     head_init: Optional[List[float]] = field(default_factory=lambda: [0.0, 0.0])
     use_delta: bool = False
     delta_type: str = "Tsub"  # "Tsub","Tinv","RPY"
     ros_rate: int = 10
+    direct_to_wbc: bool = False  # 是否直接将动作发送到WBC
     image_size: List[int] = field(default_factory=lambda: [640, 480])
     depth_range: List[int] = field(default_factory=lambda: [0, 1500])
     obs_key_map: Dict[str, List[Any]] = field(default_factory=dict)
@@ -71,6 +73,8 @@ class ConfigEnv:
     def validate(self):
         if self.eef_type not in ["rq2f85", "leju_claw", "qiangnao"]:
             raise ValueError(f"Invalid eef_type: {self.eef_type}. Valid: rq2f85, leju_claw, qiangnao")
+        if self.platform_type not in ["4pro", "5w", "5"]:
+            raise ValueError(f"Invalid platform_type: {self.platform_type}. Valid: 4pro, 5w, 5")
         if self.which_arm not in ["left", "right", "both"]:
             raise ValueError(f"Invalid which_arm: {self.which_arm}. Valid: left, right, both")
         if not isinstance(self.image_size, list) or len(self.image_size) != 2:
@@ -85,10 +89,14 @@ class ConfigEnv:
     # -------- Derived properties ----------
     @property
     def joint_q_slice(self):
+        
+        arm_start, arm_end = get_arm_joint_slice(self.platform_type)
+        left_end = arm_start + 7
+        right_start = left_end
         return {
-            "left": [[12, 19]],
-            "right": [[19, 26]],
-            "both": [[12, 19], [19, 26]]
+            "left": [[arm_start, left_end]],
+            "right": [[right_start, arm_end]],
+            "both": [[arm_start, left_end], [right_start, arm_end]]
         }[self.which_arm]
 
     @property
