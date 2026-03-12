@@ -165,6 +165,7 @@ class ConfigInference:
     def validate(self):
         if self.policy_type not in ["diffusion", "act"]:
             # 若将来支持更多策略，请在此扩展
+            # Expansion room for future support for other policies
             raise ValueError(f"Unsupported policy_type '{self.policy_type}'")
         if self.device not in ["cuda", "cpu"]:
             raise ValueError("device must be 'cuda' or 'cpu'")

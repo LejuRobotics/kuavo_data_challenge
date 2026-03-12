@@ -42,13 +42,13 @@ class CrossModalAttentionFusion(nn.Module):
         fused_rgb_list, fused_depth_list = [], []
 
         for rgb_tokens, depth_tokens in zip(rgb_tokens_list, depth_tokens_list):
-            # 以 RGB 为 Query，Depth 为 Key/Value
+            # RGB as Query, Depth as Key/Value
             rgb_q = rgb_tokens
             depth_kv = depth_tokens
             rgb_out, _ = self.rgb_to_depth_attn(query=rgb_q, key=depth_kv, value=depth_kv)
-            rgb_out = self.norm_rgb(rgb_out + rgb_tokens)   # 残差 + 归一化
+            rgb_out = self.norm_rgb(rgb_out + rgb_tokens)   # Residual + Normalisation
 
-            # 以 Depth 为 Query，RGB 为 Key/Value
+            # RGB as Query, Depth as Key/Value
             depth_q = depth_tokens
             rgb_kv = rgb_tokens
             depth_out, _ = self.depth_to_rgb_attn(query=depth_q, key=rgb_kv, value=rgb_kv)
@@ -256,7 +256,7 @@ class CustomACTModelWrapper(ACT):
                 encoder_in_tokens_campre, encoder_in_tokens_depthpre
             )
             for rgb_feat, depth_feat in zip(fused_rgb_list, fused_depth_list):
-                # 融合后的特征通过线性层进行降维
+                # The fused features are then dimensionality reduced using a linear layer
                 fused_feat = torch.cat([rgb_feat, depth_feat], dim=-1)  # (H*W, B, 2C)
                 fused_feat = self.cross_modal_fusion_proj(fused_feat)  # (H*W, B, C)
                 encoder_in_tokens.extend(list(fused_feat))

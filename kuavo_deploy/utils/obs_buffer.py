@@ -29,20 +29,20 @@ class ObsBuffer:
     ) -> None:
         self.control_signal_manager = ControlSignalManager()
         self.ros_manager = ROSManager()
-        # === 从 KuavoConfig 中提取环境配置 ===
+        # === 从 KuavoConfig 中提取环境配置 Extract Configuration===
         # env_cfg = config.env
         env_cfg = config
         self.which_arm = env_cfg.which_arm
 
-        # === 观测定义 ===
+        # === 观测定义 Observation Defn ===
         self.obs_key_map = obs_key_map or env_cfg.obs_key_map or {}
         self.compute_func_map = compute_func_map or {}
 
-        # === 区分订阅型与计算型观测 ===
+        # === 区分订阅型与计算型观测 Differentiate Observation Types===
         self.subscribe_keys = {k: v for k, v in self.obs_key_map.items() if v.get("type") != "computed"}
         self.computed_keys  = {k: v for k, v in self.obs_key_map.items() if v.get("type") == "computed"}
 
-        # === 反向依赖索引 ===
+        # === 反向依赖索引 Reverse Indicing Dependencies ===
         self.source_to_computed = {}
         for comp_key, comp_info in self.computed_keys.items():
             src = comp_info.get("source")
@@ -50,14 +50,14 @@ class ObsBuffer:
                 self.source_to_computed.setdefault(src, []).append(comp_key)
                 log_robot.info(f"Registered computed obs '{comp_key}' depends on '{src}'")
 
-        # === 初始化观测缓存 ===
+        # === 初始化观测缓存 Init Observation Buffer ===
         self.obs_buffer_size = {k: v["frequency"] for k, v in self.obs_key_map.items()}
         self.obs_buffer_data = {
             k: {"data": deque(maxlen=v["frequency"]), "timestamp": deque(maxlen=v["frequency"])}
             for k, v in self.obs_key_map.items()
         }
 
-        # === ROS topic 对应表 ===
+        # === ROS topic 对应表 Reference List ===
         self.callback_key_map = {
             '/cam_h/color/image_raw/compressed': self.rgb_callback,
             '/cam_l/color/image_raw/compressed': self.rgb_callback,
@@ -72,7 +72,7 @@ class ObsBuffer:
         }
         self.setup_subscribers()
 
-    # ===== ROS订阅 =====
+    # ===== ROS订阅 Subscription =====
     def create_callback(self, callback, topic_key, handle):
         return lambda msg: callback(msg, topic_key, handle)
 
@@ -98,21 +98,20 @@ class ObsBuffer:
             )
             log_robot.info(f"Subscribed to {topic_name} for key '{topic_key}'")
 
-    # ===== 数据预处理 =====
+    # ===== 数据预处理 Data Preprocessing =====
     def img_preprocess(self, image):
         """图像预处理"""
         return to_tensor(image).unsqueeze(0)
 
     def depth_preprocess(self, depth, depth_range=[0, 1500]):
         """深度图像预处理"""
-        depth_float32 = depth.astype(np.float32)
-        depth_float32 = torch.tensor(depth_float32, dtype=torch.float32).clamp(*depth_range).unsqueeze(0)
-        max_depth = depth_float32.max()
-        min_depth = depth_float32.min()
-        depth_normalized = (depth_float32 - min_depth) / (max_depth - min_depth + 1e-9)
+        depth_uint16 = torch.tensor(depth, dtype=torch.float32).clamp(*depth_range).unsqueeze(0)
+        max_depth = depth_uint16.max()
+        min_depth = depth_uint16.min()
+        depth_normalized = (depth_uint16 - min_depth) / (max_depth - min_depth + 1e-9)
         return depth_normalized
 
-    # ===== Callback 函数群 =====
+    # ===== Callback 函数群 Functions =====
     def rgb_callback(self, msg: CompressedImage, key: str, handle: dict):
         img_arr = np.frombuffer(msg.data, dtype=np.uint8)
         cv_img = cv2.imdecode(img_arr, cv2.IMREAD_COLOR)
@@ -180,7 +179,7 @@ class ObsBuffer:
         # joint = torch.tensor(joint, dtype=torch.float32, device=self.device)
         self._append_data(key, joint, msg.header.stamp.to_sec())
 
-    # ===== 公共方法 =====
+    # ===== 公共方法 Public Methods =====
     def _append_data(self, key, data, timestamp):
         self.obs_buffer_data[key]["data"].append(data)
         self.obs_buffer_data[key]["timestamp"].append(timestamp)
@@ -211,7 +210,7 @@ class ObsBuffer:
 
         while not self.obs_buffer_is_ready():
             if not self.control_signal_manager.check_control_signals():
-                log_robot.info("🛑 停止信号已接收，退出")
+                log_robot.info("🛑 Stop signal detected, exiting")
                 sys.exit(1)
 
             now = time.time()

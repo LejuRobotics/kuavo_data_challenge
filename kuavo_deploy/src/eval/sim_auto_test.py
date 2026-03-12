@@ -94,9 +94,9 @@ pause_sub = rospy.Subscriber('/kuavo/pause_state', Bool, pause_callback, queue_s
 stop_sub = rospy.Subscriber('/kuavo/stop_state', Bool, stop_callback, queue_size=10)
 
 def safe_reset_service(reset_service) -> None:
-    """安全重置服务"""
+    """安全重置服务 Safe resetting service"""
     try:
-        # 调用重置服务
+        # 调用重置服务 Reset
         response = reset_service(TriggerRequest())
         if response.success:
             log_robot.info(f"Reset service successful: {response.message}")
@@ -106,21 +106,21 @@ def safe_reset_service(reset_service) -> None:
         log_robot.error(f"Reset service exception: {e}")
 
 def check_control_signals():
-    """检查控制信号"""
-    # 检查暂停状态
+    """检查控制信号 Check control signal"""
+    # 检查暂停状态 Pause state
     while pause_flag.is_set():
-        log_robot.info("🔄 机械臂运动已暂停")
+        log_robot.info("🔄 Robot arm motion paused")
         time.sleep(0.1)
         if stop_flag.is_set():
-            log_robot.info("🛑 机械臂运动被停止")
+            log_robot.info("🛑 Robot arm motion stopped")
             return False
     
-    # 检查是否需要停止
+    # 检查是否需要停止 Whether it needs to be stopped
     if stop_flag.is_set():
-        log_robot.info("🛑 收到停止信号，退出机械臂运动")
+        log_robot.info("🛑 Stop signal detected, exiting robot arm motion")
         return False
         
-    return True  # 正常继续
+    return True  # 正常继续 Continue
 
 
     
@@ -160,7 +160,7 @@ def setup_policy(pretrained_path, policy_type, device=torch.device("cuda")):
     return policy
 
 def run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory):
-    """运行单个episode"""
+    """运行单个episode Running a single episode"""
     cfg = config.inference
     seed = cfg.seed
     task = cfg.task
@@ -218,7 +218,7 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     while not done:
         # --- Pause support: block here if pause_flag is set ---
         if not check_control_signals():
-            log_robot.info("🛑 收到停止信号，退出机械臂运动")
+            log_robot.info("🛑 Stop signal detected, exiting robot arm motion")
             return 0
         
         start_time = time.time()
@@ -295,11 +295,11 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
     gc.collect()
     torch.cuda.empty_cache()
     
-    return 1 if success else 0  # 返回是否成功
+    return 1 if success else 0
 
 
 def kuavo_eval_autotest(config: KuavoConfig):
-    """执行自动测试"""
+    """执行自动测试 Auto testing script"""
     cfg = config.inference
     task = cfg.task
     method = cfg.method
@@ -338,7 +338,7 @@ def kuavo_eval_autotest(config: KuavoConfig):
     while not init_evt.is_set():
         log_robot.info("Waiting for first env init...")
         if not check_control_signals():
-            log_robot.info("🛑 收到停止信号，退出机械臂运动")
+            log_robot.info("🛑 Stop signal detected, exiting robot arm motion")
             return
         time.sleep(1)
         wait_times -= 1
@@ -353,17 +353,17 @@ def kuavo_eval_autotest(config: KuavoConfig):
         while not init_evt.is_set():
             log_robot.info("Waiting for env init...")
             if not check_control_signals():
-                log_robot.info("🛑 收到停止信号，退出机械臂运动")
+                log_robot.info("🛑 Stop signal detected, exiting robot arm motion")
                 return
             time.sleep(1)
         try:
             result = run_single_episode(config, policy, preprocessor, postprocessor, episode, output_directory)
             log_robot.info(f"Episode {episode+1} completed with return code: {result}")
             
-            # 重置policy状态，清理缓存
+            # 重置policy状态，清理缓存 Reset policy, clear cache
             policy.reset()
             
-            # 强制垃圾回收和GPU缓存清理
+            # 强制垃圾回收和GPU缓存清理 Force garbage collection and GPU cache cleaning
             gc.collect()
             torch.cuda.empty_cache()
             
@@ -375,12 +375,12 @@ def kuavo_eval_autotest(config: KuavoConfig):
             init_evt.clear()
             success_evt.clear()
             
-            # 异常情况下也要清理内存
+            # 异常情况下也要清理内存 Garbage collection even under an exception
             gc.collect()
             torch.cuda.empty_cache()
             break
 
-        # 记录episode结果
+        # 记录episode结果 Record episode result
         episode_end_time = datetime.datetime.now().isoformat()
         is_success = result == 1
         if is_success:

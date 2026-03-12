@@ -6,7 +6,7 @@ from typing import Dict, Optional
 from termcolor import colored
 
 class ColoredFormatter(logging.Formatter):
-    """自定义彩色日志格式化器"""
+    """自定义彩色日志格式化器 Customised colour log formatter"""
     
     # 默认样式配置
     DEFAULT_STYLE_CONFIG = {
@@ -39,18 +39,18 @@ class ColoredFormatter(logging.Formatter):
     def __init__(self, fmt: str, style_config: Dict = None):
         super().__init__(fmt)
         self.style_config = style_config or self.DEFAULT_STYLE_CONFIG
-        self.is_console = False  # 默认为文件输出
+        self.is_console = False  # 默认为文件输出 File output by default
 
     def format(self, record):
-        # 保存原始消息，因为我们会修改record.msg
+        # 保存原始消息，因为我们会修改record.msg Cache original message, as it will be modified later on
         original_msg = record.msg
         
-        # 获取对应模块的配置
+        # 获取对应模块的配置 Fetch corresponding module configuration
         source_config = self.style_config.get(record.name, {})
         source_tag = source_config.get('tag', f'📝 {record.name.upper()}')
         style = source_config.get(record.levelname, {'color': 'white', 'attrs': []})
         
-        # 构建位置信息 (文件名:行号) - 参考ks_download.py的方法
+        # 构建位置信息 (文件名:行号) - 参考ks_download.py的方法 Construct location info
         location_info = ""
         if hasattr(record, 'pathname') and hasattr(record, 'lineno'):
             fnameline = f"{record.pathname}:{record.lineno}"
@@ -58,9 +58,9 @@ class ColoredFormatter(logging.Formatter):
             # location_info = f" {fnameline[-20:]:>20}"
             location_info = f" {fnameline}"
         
-        # 构建消息
+        # 构建消息 Construct messages
         if hasattr(self, 'is_console') and self.is_console:
-            # 控制台输出添加颜色
+            # 控制台输出添加颜色 Colour on console output
             colored_message = colored(
                 f"{record.levelname}: {original_msg}",
                 color=style['color'],
@@ -69,12 +69,12 @@ class ColoredFormatter(logging.Formatter):
             )
             record.msg = f"{source_tag} | {colored_message} |{location_info} "
         else:
-            # 文件输出不添加颜色
+            # 文件输出不添加颜色 No colour for file output
             record.msg = f"{source_tag} | {record.levelname}: {original_msg} | {location_info} "
-        # 格式化消息
+        # 格式化消息 Formatted message
         formatted_message = super().format(record)
         
-        # 恢复原始消息
+        # 恢复原始消息 Restore original message
         record.msg = original_msg
         
         return formatted_message

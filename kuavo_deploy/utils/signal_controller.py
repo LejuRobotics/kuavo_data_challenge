@@ -35,21 +35,21 @@ class ControlSignalManager:
         """检查控制信号"""
         # 检查暂停状态
         while self.pause_flag.is_set():
-            log_robot.info("🔄 机械臂运动已暂停")
+            log_robot.info("🔄 Robot arm motion paused")
             time.sleep(0.1)
             if self.stop_flag.is_set():
-                log_robot.info("🛑 机械臂运动被停止")
+                log_robot.info("🛑 Robot arm motion stopped")
                 return False
         
         # 检查是否需要停止
         if self.stop_flag.is_set():
-            log_robot.info("🛑 收到停止信号，退出机械臂运动")
+            log_robot.info("🛑 Stop signal detected, exiting arm motion")
             return False
             
-        return True  # 正常继续
+        return True  # 正常继续 Continue
     
     def close(self):
-        """释放资源"""
+        """释放资源 Release Resources"""
         self.ros_manager.close()
         self.stop_flag.clear()
         self.pause_flag.clear()

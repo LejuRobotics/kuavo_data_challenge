@@ -80,12 +80,12 @@ class CustomLeRobotDataset(LeRobotDataset):
                 for rgb_cam, depth_cam in zip(image_keys, depth_keys):
                     item[rgb_cam], crop_position, resize_shape = self.image_transforms(item[rgb_cam])
 
-                    # 裁剪 depth
+                    # Crop depth
                     if crop_position is not None:
                         if isinstance(crop_position, (list, tuple)) and len(crop_position) == 4:
                             item[depth_cam] = torchvision.transforms.functional.crop(item[depth_cam], *crop_position)
                         else:
-                            # 如果 crop_position 是 int 或单个值
+                            # If crop_position is an int or single value
                             item[depth_cam] = torchvision.transforms.functional.center_crop(item[depth_cam], crop_position)
 
                     # resize depth

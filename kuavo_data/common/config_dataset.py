@@ -145,3 +145,4 @@ def load_config(cfg) -> Config:
         resize=resize_config,
         task_description=OmegaConf.select(cfg, 'dataset.task_description', default="Pick and Place Task"),
     )
+

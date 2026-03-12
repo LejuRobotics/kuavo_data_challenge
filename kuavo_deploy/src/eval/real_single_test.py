@@ -204,7 +204,7 @@ def main(config: KuavoConfig, env: gym.Env):
                 numpy_action = action.squeeze(0).cpu().numpy()
                 log_model.debug(f"numpy_action: {numpy_action}")
 
-                # 执行动作
+                # 执行动作 Execute action
                 observation, reward, terminated, truncated, info = env.step(numpy_action)
                 observation = preprocessor(observation)
                 exec_time = time.time()
@@ -214,6 +214,7 @@ def main(config: KuavoConfig, env: gym.Env):
                 rewards.append(reward)
 
                 # 相机帧记录，真机请取消，否则会一直堆叠卡死
+                # Camera frame record, must be commented out during real-device testing
 
                 # for k in cam_keys:
                 #     frame_map[k].append(observation[k].squeeze(0).cpu().numpy().transpose(1, 2, 0))
