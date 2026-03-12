@@ -211,6 +211,7 @@ outputs/
 log/
 .vscode/
 .claude/
+.carlos/
 *.pth
 ana.py
 *.gz
