@@ -49,20 +49,29 @@ fi
 
 echo ""
 echo "==================================================="
-echo "👉 第 4 步：安装特定版本的 ffmpeg 和 pyarrow"
+echo "👉 第 4 步：安装特定版本的 ffmpeg 和 pyarrow 以及 pyaudio"
 echo "==================================================="
-conda install ffmpeg=6.1.1
+conda install ffmpeg=6.1.1 -y
 pip uninstall pyarrow -y
 conda install pyarrow -y
+conda install pyaudio -y
 
 echo ""
 echo "==================================================="
 echo "👉 第 5 步: 安装VLA 所需要的flash-attn,请先确认nvcc -V cuda版本大于11.7, 如需升级请访问https://developer.nvidia.com/cuda-12-2-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_loca"
 echo "==================================================="
-wget https://files.pythonhosted.org/packages/3b/b2/8d76c41ad7974ee264754709c22963447f7f8134613fd9ce80984ed0dab7/flash_attn-2.8.3.tar.gz
-tar -zxvf flash_attn-2.8.3.tar.gz
+
+if [ ! -d "flash_attn-2.8.3" ]; then
+    echo "未检测到 flash_attn-2.8.3 文件夹，开始下载并解压..."
+    wget https://files.pythonhosted.org/packages/3b/b2/8d76c41ad7974ee264754709c22963447f7f8134613fd9ce80984ed0dab7/flash_attn-2.8.3.tar.gz
+    tar -zxvf flash_attn-2.8.3.tar.gz
+else
+    echo "文件夹 flash_attn-2.8.3 已存在，跳过下载和解压。"
+fi
+
 cd flash_attn-2.8.3/
-python setup.py install
+# 使用 MAX_JOBS=2 限制编译核心数，防止内存溢出 (OOM)
+MAX_JOBS=2 python setup.py install
 cd ../
 
 
