@@ -220,9 +220,9 @@ sudo docker build -t ubt2004_ros_noetic .
 - 构建完成后进入镜像即可，初次启动容器加载镜像：
 
 ```shell
-sudo docker run -it --name ubuntu_ros_container ubt2004_ros_noetic /bin/bash
+sudo docker run -it --shm-size=16g --name ubuntu_ros_container ubt2004_ros_noetic /bin/bash
 # 或 GPU 启动（推荐）
-sudo docker run -it --gpus all --runtime nvidia --name ubuntu_ros_container ubt2004_ros_noetic /bin/bash
+sudo docker run -it --gpus all --shm-size=16g --runtime nvidia --name ubuntu_ros_container ubt2004_ros_noetic /bin/bash
 # 可选，挂载本地目录路径等
 # sudo docker run -it --gpus all --runtime nvidia --name ubuntu_ros_container -v /path/to/your/code:/root/code ubt2004_ros_noetic /bin/bash
 ```

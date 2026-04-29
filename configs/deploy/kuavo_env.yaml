@@ -88,7 +88,7 @@ env:
 # =====================================================
 inference:
   go_bag_path: /path/to/your/go.bag  # ！！！比赛仿真器中暂时不用！！！，真机推理时需要提供bag包的完整路径，如：到达预抓取姿态等，可直接拷贝一个训练的rosbag控制。
-  policy_type: "act"  # 策略名字，支持diffusion，act等
+  policy_type: "act"  # 策略名字，支持diffusion，act,gr00t_n1d5等
   eval_episodes: 100  # 测试回合数，比赛仿真器默认为100次，用于打分
   seed: 42  # 随机种子，仿真中可用于固定各物体初始状态，便于复现
   start_seed: 42  # 回合开始时的随机种子，仿真中可用于固定各物体初始状态，便于复现  

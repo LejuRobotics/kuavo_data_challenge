@@ -8,7 +8,7 @@
 ```bash
 ssh leju_kuavo@xxx.xxx.xxx.xxx   # 自行确认上位机 IP
 # 密码：leju_kuavo
-````
+```
 
 (b) 使用键鼠与显示器直接连接机器人上位机（后续步骤相同）
 
@@ -16,10 +16,14 @@ ssh leju_kuavo@xxx.xxx.xxx.xxx   # 自行确认上位机 IP
 
 ## 2. 创建工作目录并准备环境
 
+确认固态硬盘挂载路径：
+
+由于上位机（Orin）内部存储空间极小，强烈不推荐将本仓库代码、权重、或者venv/conda环境放在内部存储中（例如 `~/`）！请先确认1TB固态硬盘的挂载目录是不是`/media/data`下（一般出厂设置）！如果不是，请按需调整以下推理脚本路径。
+
 创建工作目录：
 
 ```bash
-cd ~
+cd /media/data
 mkdir kdc_ws
 cd kdc_ws
 ```
@@ -45,7 +49,11 @@ git submodule update --recursive --progress
 # 如果这一步骤由于网络原因下载失败或很慢：请
 # cd third_party
 # git clone https://githubproxy.cc/https://github.com/huggingface/lerobot.git
-# cd ../ # 回到上一级目录
+# cd ..
+
+cd third_party/lerobot
+git checkout 563f42bd
+cd ../../ # 回到上一级目录
 ```
 
 ---
@@ -55,8 +63,8 @@ git submodule update --recursive --progress
 通常上位机已预装 Python 3.10，如未安装请按照附录参考先完成python3.10的安装。
 
 ```bash
-python3.10 -m venv ~/kdc_ws/kdc_env
-source ~/kdc_ws/kdc_env/bin/activate
+python3.10 -m venv /media/data/kdc_ws/kdc_env
+source /media/data/kdc_ws/kdc_env/bin/activate
 
 which pip
 pip list
@@ -65,6 +73,9 @@ pip list
 source /opt/ros/noetic/setup.bash
 
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+# 注意：在此安装lerobot！
+pip install -e third_party/lerobot
+# 安装依赖
 pip install -r requirements_agxorin.txt
 # 如果遇到ROS相关的库的问题：
 pip install -r requirements_agxorin_old.bk
@@ -72,6 +83,7 @@ pip install -r requirements_agxorin_old.bk
 # 如果因pip版本问题导致依赖冲突：
 pip install -r requirements_agxorin.txt --use-deprecated=legacy-resolver
 ```
+后面pip会有抱怨numpy版本以及依赖要求的冲突，只要没有安装失败，就不要理他，继续下一步
 
 ---
 
@@ -80,7 +92,7 @@ pip install -r requirements_agxorin.txt --use-deprecated=legacy-resolver
 将训练产出的完整目录复制到如下路径：
 
 ```
-~/kdc_ws/kuavo_data_challenge/outputs/train/<task>/<method>/<timestamp>/epoch<epoch>
+/media/data/kdc_ws/kuavo_data_challenge/outputs/train/<task>/<method>/<timestamp>/epoch<epoch>
 ```
 
 示例：
@@ -119,6 +131,12 @@ vim configs/deploy/kuavo_env.yaml
 
 请务必**逐项确认配置正确**，否则可能无法正常推理。
 （vim：`ESC` → `:wq!` 保存退出；`:q!` 放弃修改）
+
+如果下述推理脚本上位机上（Orin）运行中出报libgomp.so.1错：
+
+```bash
+export LD_PRELOAD=/lib/aarch64-linux-gnu/libgomp.so.1
+```
 
 开始推理：
 

@@ -1,6 +1,5 @@
 import cv2
 from torchvision.transforms.functional import to_tensor
-from kuavo_data.CvtRosbag2Lerobot import load_raw_episode_data
 from client import PolicyClient
 import numpy as np
 import torch,os,shutil
@@ -9,6 +8,37 @@ from lerobot.policies.factory import make_pre_post_processors
 
 from pathlib import Path
 import kuavo_data.common.kuavo_dataset as kuavo
+
+def load_raw_images_per_camera(bag_data: dict) -> dict:
+    imgs_per_cam = {}
+    for camera in kuavo.DEFAULT_CAMERA_NAMES:
+        if camera in bag_data:
+            imgs_per_cam[camera] = np.array([msg['data'] for msg in bag_data[camera]])
+    return imgs_per_cam
+
+def load_raw_episode_data(ep_path):
+    bag_reader = kuavo.KuavoRosbagReader()
+    bag_data = bag_reader.process_rosbag(ep_path)
+    
+    state = np.array([msg['data'] for msg in bag_data['observation.state']], dtype=np.float32)
+    action = np.array([msg['data'] for msg in bag_data['action']], dtype=np.float32)
+    action_kuavo_arm_traj = np.array([msg['data'] for msg in bag_data.get('action.kuavo_arm_traj', [])], dtype=np.float32)
+    claw_state = np.array([msg['data'] for msg in bag_data.get('observation.claw', [])], dtype=np.float64)
+    claw_action = np.array([msg['data'] for msg in bag_data.get('action.claw', [])], dtype=np.float64)
+    qiangnao_state = np.array([msg['data'] for msg in bag_data.get('observation.qiangnao', [])], dtype=np.float64)
+    qiangnao_action = np.array([msg['data'] for msg in bag_data.get('action.qiangnao', [])], dtype=np.float64)
+    rq2f85_state = np.array([msg['data'] for msg in bag_data.get('observation.rq2f85', [])], dtype=np.float64)
+    rq2f85_action = np.array([msg['data'] for msg in bag_data.get('action.rq2f85', [])], dtype=np.float64)
+    
+    if len(action_kuavo_arm_traj) > 0 and len(action) > 0 and action.shape[1] >= 26:
+        action[:, 12:26] = action_kuavo_arm_traj    
+
+    velocity = None
+    effort = None
+    
+    imgs_per_cam = load_raw_images_per_camera(bag_data)
+    
+    return imgs_per_cam, state, action, velocity, effort ,claw_state ,claw_action,qiangnao_state,qiangnao_action, rq2f85_state, rq2f85_action
 
 def read_and_process_episode_data(ep_path):
     def init_param():
@@ -241,10 +271,20 @@ def hardware_obses_to_policy_obs_dict(obs):
             obs_dict[k] = depth_preprocess(v, device=device, depth_range=[0,1500])
     return obs_dict
 
-def main(ep_path="/home/ubun-new/go_bag/bag_for_handover/A10-A01-206-208-92-71-dex_hand-20250930100830-v1.bag"):
+def main(ep_path="/home/ruichen/下载/A10-A12-H-K-08-TQ_06_01-P4_360-leju_claw-20260309142352-v002.bag"):
+    try:
+        from lerobot.policies.groot.groot_n1 import DEFAULT_VENDOR_EAGLE_PATH
+        from lerobot.policies.groot.processor_groot import DEFAULT_TOKENIZER_ASSETS_REPO
+        from lerobot.utils.constants import HF_LEROBOT_HOME
+        from lerobot.policies.groot.utils import ensure_eagle_cache_ready
+        cache_dir = HF_LEROBOT_HOME / DEFAULT_TOKENIZER_ASSETS_REPO
+        ensure_eagle_cache_ready(DEFAULT_VENDOR_EAGLE_PATH, cache_dir, DEFAULT_TOKENIZER_ASSETS_REPO)
+    except Exception as e:
+        print(f"[GROOT init test] cache check skipped: {e}")
+
     policy_client = PolicyClient()
     frames = read_and_process_episode_data(ep_path) # 加载一条遥操数据，每步为一个字典 包含observation.state, observation.images.head_cam_h, observation.images.wrist_cam_l, observation.images.wrist_cam_r, action
-    preprocessor, postprocessor = make_pre_post_processors(None,"outputs/train/test_handover/state_fuse/run_1008/epochbest")
+    preprocessor, postprocessor = make_pre_post_processors(None,"/media/ruichen/5fe8ed68-6ff6-464f-af10-a89b65c040cf/weights/bm97/groot/run/")
     for i in range(len(frames)):
     	# 将真机的观测处理成字典
         obs_dict = hardware_obses_to_policy_obs_dict(frames[i])
@@ -252,9 +292,12 @@ def main(ep_path="/home/ubun-new/go_bag/bag_for_handover/A10-A01-206-208-92-71-d
 
         obs_dict = preprocessor(obs_dict)
 
-        print("head img",obs_dict.keys())
-        print("head img",obs_dict["observation.images.head_cam_h"].min(), obs_dict["observation.images.head_cam_h"].max())
-        print("head img",obs_dict["observation.depth_h"].min(), obs_dict["observation.depth_h"].max())
+        # print("head img",obs_dict.keys())
+        # GR00T的preprocessor会将图像转换为eagle_pixel_values等，所以原来普通的图像key会消失，如果不存在就不打印
+        if "observation.images.head_cam_h" in obs_dict:
+            print("head img",obs_dict["observation.images.head_cam_h"].min(), obs_dict["observation.images.head_cam_h"].max())
+        if "observation.depth_h" in obs_dict:
+            print("head img",obs_dict["observation.depth_h"].min(), obs_dict["observation.depth_h"].max())
         # raise ValueError()
 
         action_pred = policy_client.select_action(obs_dict) # numpy(26,)维动作，按照kuavo转lerobot的方式 由7维左臂+6维左手+7维右臂+6维右手组成。其中手臂的动作为目标关节角，灵巧手的动作在[0,1]之间、需要乘以100再发给真机

@@ -28,10 +28,10 @@ from lerobot.policies.act.modeling_act import ACTPolicy
 import torch
 import zmq
 import numpy as np
-from configs.deploy.config_inference import load_inference_config
+from kuavo_deploy.config import load_kuavo_config
 import torch
 from kuavo_train.wrapper.policy.diffusion.DiffusionPolicyWrapper import CustomDiffusionPolicyWrapper
-
+from kuavo_train.wrapper.policy.gr00t_n1d5.Gr00tN1d5PolicyWrapper import CustomGr00tN1d5PolicyWrapper
 class TorchSerializer:
     @staticmethod
     def to_bytes(data: dict) -> bytes:
@@ -159,27 +159,33 @@ def hardware_obses_to_policy_obs_dict(obs):
 class Policy():
     def __init__(self):
         # load config
-        config_path = 'configs/deploy/kuavo_real_env.yaml'
-        cfg = load_inference_config(config_path)
+        config_path = 'configs/deploy/kuavo_env.yaml'
+        cfg = load_kuavo_config(config_path)
 
-        use_delta = cfg.use_delta
-        eval_episodes = cfg.eval_episodes
-        seed = cfg.seed
-        start_seed = cfg.start_seed
-        policy_type = cfg.policy_type
-        task = cfg.task
-        method = cfg.method
-        timestamp = cfg.timestamp
-        epoch = cfg.epoch
-        env_name = cfg.env_name
-        depth_range = cfg.depth_range
+        use_delta = cfg.env.use_delta
+        eval_episodes = cfg.inference.eval_episodes
+        seed = cfg.inference.seed
+        start_seed = cfg.inference.start_seed
+        policy_type = cfg.inference.policy_type
+        task = cfg.inference.task
+        method = cfg.inference.method
+        timestamp = cfg.inference.timestamp
+        epoch = cfg.inference.epoch
+        env_name = cfg.env.env_name
+        depth_range = cfg.env.depth_range
 
         pretrained_path = Path(f"outputs/train/{task}/{method}/{timestamp}/epoch{epoch}")
 
         # Select your device
-        device = torch.device(cfg.device)
+        device = torch.device(cfg.inference.device)
         # self.policy = ACTPolicy.from_pretrained(Path(pretrained_path),strict=True)
-        self.policy = CustomDiffusionPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
+        # self.policy = CustomDiffusionPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
+        if policy_type == "gr00t_n1d5":
+            self.policy = CustomGr00tN1d5PolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
+        elif policy_type == "diffusion":
+            self.policy = CustomDiffusionPolicyWrapper.from_pretrained(Path(pretrained_path),strict=True)
+        elif policy_type == "act":
+            self.policy = ACTPolicy.from_pretrained(Path(pretrained_path),strict=True)
         self.policy.eval()
         self.policy.to(device)
         self.policy.reset()
