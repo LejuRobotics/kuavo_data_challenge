@@ -75,6 +75,16 @@ class CustomGr00tN1d5ModelWrapper(nn.Module):
         try:
             ah_cfg_dict = dict(self.model.config.action_head_cfg)
 
+            override_num_target_tokens = getattr(config, "num_target_vision_tokens", None)
+            if override_num_target_tokens is None and isinstance(getattr(config, "custom", None), dict):
+                override_num_target_tokens = config.custom.get("num_target_vision_tokens")
+            if override_num_target_tokens is not None:
+                ah_cfg_dict["num_target_vision_tokens"] = int(override_num_target_tokens)
+                print(
+                    f"[GROOT] Overriding action_head num_target_vision_tokens="
+                    f"{ah_cfg_dict['num_target_vision_tokens']}"
+                )
+
             pretrained_action_dim = ah_cfg_dict.get("action_dim", getattr(self.model, "action_dim", None))
 
             use_multi_action_heads = ah_cfg_dict.get("use_multi_action_heads", True)

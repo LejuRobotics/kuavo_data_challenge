@@ -27,6 +27,7 @@ from typing_extensions import Unpack
 
 import torch
 from torch import Tensor
+from safetensors.torch import load_file as load_safetensors_file
 
 from lerobot.policies.pretrained import PreTrainedPolicy, ActionSelectKwargs
 from lerobot.policies.rtc.modeling_rtc import RTCProcessor
@@ -254,15 +255,11 @@ class CustomGr00tN1d5PolicyWrapper(PreTrainedPolicy):
             )
         
         model_id = str(pretrained_name_or_path)
-        
-        # Create instance
-        instance = cls(config, **kwargs)
-        
-        # Load weights if available
+
+        # Resolve weights path first so we can infer architecture hints from checkpoint.
         if os.path.isdir(model_id):
             print("Loading weights from local directory")
             model_file = os.path.join(model_id, SAFETENSORS_SINGLE_FILE)
-            policy = cls._load_as_safetensor(instance, model_file, config.device, strict)
         else:
             try:
                 model_file = hf_hub_download(
@@ -276,15 +273,39 @@ class CustomGr00tN1d5PolicyWrapper(PreTrainedPolicy):
                     token=token,
                     local_files_only=local_files_only,
                 )
-                policy = cls._load_as_safetensor(instance, model_file, config.device, strict)
             except HfHubHTTPError as e:
                 raise FileNotFoundError(
                     f"{SAFETENSORS_SINGLE_FILE} not found on the HuggingFace Hub in {model_id}"
                 ) from e
+
+        # Infer target vision token count directly from checkpoint to avoid
+        # action_head.future_tokens shape mismatch (e.g. ckpt=64 vs config default=32).
+        num_target_vision_tokens = cls._infer_num_target_vision_tokens_from_checkpoint(model_file)
+        if num_target_vision_tokens is not None:
+            if not isinstance(config.custom, dict):
+                config.custom = {}
+            config.custom["num_target_vision_tokens"] = num_target_vision_tokens
+            setattr(config, "num_target_vision_tokens", num_target_vision_tokens)
+            print(f"[GROOT] Inferred num_target_vision_tokens={num_target_vision_tokens} from checkpoint")
+
+        # Create instance after checkpoint-aware config patching
+        instance = cls(config, **kwargs)
+        policy = cls._load_as_safetensor(instance, model_file, config.device, strict)
         
         policy.to(config.device)
         policy.eval()
         return policy
+
+    @staticmethod
+    def _infer_num_target_vision_tokens_from_checkpoint(model_file: str) -> int | None:
+        try:
+            state_dict = load_safetensors_file(model_file)
+            key = "_groot_model.model.action_head.future_tokens.weight"
+            if key in state_dict and len(state_dict[key].shape) >= 1:
+                return int(state_dict[key].shape[0])
+        except Exception as exc:
+            print(f"[GROOT] Warning: cannot infer future token count from checkpoint: {exc}")
+        return None
     
     # -------------------------
     # Internal helpers
