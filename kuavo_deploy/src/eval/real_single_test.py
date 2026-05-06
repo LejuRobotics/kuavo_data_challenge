@@ -52,6 +52,7 @@ import threading
 
 from kuavo_deploy.config import KuavoConfig
 from kuavo_deploy.utils.logging_utils import setup_logger
+from kuavo_deploy.utils.preprocessor_utils import preprocess_observation_with_metadata
 from kuavo_deploy.kuavo_service.client import PolicyClient
 from lerobot.processor import PolicyAction, PolicyProcessorPipeline
 from lerobot.policies.factory import make_pre_post_processors
@@ -181,7 +182,7 @@ def main(config: KuavoConfig, env: gym.Env):
         # Reset the policy and environments to prepare for rollout
         policy.reset()
         observation, info = env.reset(seed=episode+start_seed)
-        observation = preprocessor(observation)
+        observation = preprocess_observation_with_metadata(preprocessor, observation, task=task)
         # log_file.write(f"~~~~~~~~~~~~~~~~~~preprocess observation ok!~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 
         # Prepare to collect every rewards and all the frames of the episode,
@@ -221,7 +222,7 @@ def main(config: KuavoConfig, env: gym.Env):
 
                 # 执行动作
                 observation, reward, terminated, truncated, info = env.step(numpy_action)
-                observation = preprocessor(observation)
+                observation = preprocess_observation_with_metadata(preprocessor, observation, task=task)
                 exec_time = time.time()
                 log_model.debug(f"exec time: {exec_time - action_infer_time:.3f}s")
                 average_exec_time += exec_time - action_infer_time

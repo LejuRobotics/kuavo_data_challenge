@@ -56,6 +56,7 @@ import traceback
 from geometry_msgs.msg import PoseStamped
 from kuavo_deploy.config import KuavoConfig
 from kuavo_deploy.utils.logging_utils import setup_logger
+from kuavo_deploy.utils.preprocessor_utils import preprocess_observation_with_metadata
 from kuavo_deploy.kuavo_service.client import PolicyClient
 from lerobot.policies.factory import make_pre_post_processors
 log_model = setup_logger("model")
@@ -237,7 +238,7 @@ def run_single_episode(config, policy, preprocessor, postprocessor, episode, out
             return 0
         
         start_time = time.time()
-        observation = preprocessor(observation)
+        observation = preprocess_observation_with_metadata(preprocessor, observation, task=task)
         with torch.inference_mode():
             action = policy.select_action(observation)
         log_model.info(f"Step {step}: predict action {action}")
@@ -425,4 +426,3 @@ def kuavo_eval_autotest(config: KuavoConfig):
     init_service.shutdown()
     pause_sub.unregister()
     stop_sub.unregister()
-

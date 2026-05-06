@@ -5,6 +5,7 @@ import numpy as np
 import torch,os,shutil
 from lerobot.processor import PolicyAction, PolicyProcessorPipeline
 from lerobot.policies.factory import make_pre_post_processors
+from kuavo_deploy.utils.preprocessor_utils import preprocess_observation_with_metadata
 
 from pathlib import Path
 import kuavo_data.common.kuavo_dataset as kuavo
@@ -290,7 +291,7 @@ def main(ep_path="/home/ruichen/下载/A10-A12-H-K-08-TQ_06_01-P4_360-leju_claw-
         obs_dict = hardware_obses_to_policy_obs_dict(frames[i])
         # print("head img",obs_dict["observation.depth_h"].max())
 
-        obs_dict = preprocessor(obs_dict)
+        obs_dict = preprocess_observation_with_metadata(preprocessor, obs_dict, task="")
 
         # print("head img",obs_dict.keys())
         # GR00T的preprocessor会将图像转换为eagle_pixel_values等，所以原来普通的图像key会消失，如果不存在就不打印

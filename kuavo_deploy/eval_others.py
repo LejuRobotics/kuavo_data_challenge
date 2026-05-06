@@ -17,6 +17,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf,ListConfig
 import random
 from lerobot.policies.factory import make_pre_post_processors
+from kuavo_deploy.utils.preprocessor_utils import preprocess_observation_with_metadata
 
 @hydra.main(config_path="../configs/deploy/", config_name="others_env", version_base=None)
 def main(cfg: DictConfig):
@@ -98,7 +99,7 @@ def main(cfg: DictConfig):
                     "observation.state": state,
                     env_obs_select["obs"]: image,
                 }
-                observation = preprocessor(observation)
+                observation = preprocess_observation_with_metadata(preprocessor, observation, task=cfg.task)
                 # print(observation[env_obs_select["obs"]].max(), observation[env_obs_select["obs"]].min())
                 # raise ValueError("Stop here")
                 # Predict the next action with respect to the current observation

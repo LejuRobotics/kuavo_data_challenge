@@ -477,6 +477,7 @@ accelerate launch --config_file configs/accelerate/accelerate_config.yaml kuavo_
 * PI系列的python环境需要单独创建：
   ```bash
   conda create -n kdc_pi --clone kdc_dev
+  conda activate kdc_pi
   cd third_party/lerobot
   pip install -e ".[pi]"  # 需要确保科学上网
   ```

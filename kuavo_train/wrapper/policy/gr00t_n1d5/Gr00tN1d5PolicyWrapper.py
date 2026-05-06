@@ -290,7 +290,23 @@ class CustomGr00tN1d5PolicyWrapper(PreTrainedPolicy):
 
         # Create instance after checkpoint-aware config patching
         instance = cls(config, **kwargs)
-        policy = cls._load_as_safetensor(instance, model_file, config.device, strict)
+        try:
+            policy = cls._load_as_safetensor(instance, model_file, config.device, strict)
+        except RuntimeError as exc:
+            should_retry_non_strict = (
+                strict
+                and not getattr(config, "tune_llm", False)
+                and "embed_tokens.weight" in str(exc)
+            )
+            if not should_retry_non_strict:
+                raise
+
+            print(
+                "[GROOT] Checkpoint is missing frozen language embedding weights. "
+                "Retrying with strict=False because tune_llm=False and the base model "
+                "already provides those parameters."
+            )
+            policy = cls._load_as_safetensor(instance, model_file, config.device, strict=False)
         
         policy.to(config.device)
         policy.eval()

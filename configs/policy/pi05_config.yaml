@@ -124,21 +124,22 @@ policy:
     # - PI05 只支持 Cross-Attention 方法
     # - 参考文档：RGB_DEPTH_FUSION_COMPARISON.md
     #
-    # 深度图像支持
-    use_depth: true  # 是否使用深度图像
-    depth_features:  # 深度特征键列表，需要与数据集中的深度特征键对应（必须与RGB图像数量匹配）
-      - "observation.depth_h"  # 对应 observation.images.head_cam_h
-      - "observation.depth_l"  # 对应 observation.images.wrist_cam_l
-      - "observation.depth_r"  # 对应 observation.images.wrist_cam_r
-    
-    # 融合方法配置
-    depth_fusion_method: "cross_attention"  # 融合方法: "cross_attention" (方案四：双向注意力融合，PI05只支持此方法)
-    depth_fusion_dim: null  # 融合维度（null=自动，使用LLM维度）
-    
-    # 深度特征提取器配置（方案四不使用独立的 ViT backbone，深度图像通过 PaliGemma Vision Tower 处理）
-    depth_backbone_init_from_vision_tower: false  # 方案四：深度图像通过 PaliGemma Vision Tower 处理，不使用独立的 backbone
-    depth_preprocessing: "minmax"  # 深度预处理方法: "minmax" (Min-Max归一化，推荐), "hha" (HHA编码)
-    depth_scale: 0.0001  # 深度缩放因子（将uint16转换为米），默认0.0001
+    custom:
+      # 深度图像支持
+      use_depth: true  # 是否使用深度图像
+      depth_features:  # 深度特征键列表，需要与数据集中的深度特征键对应（必须与RGB图像数量匹配）
+        - "observation.depth_h"  # 对应 observation.images.head_cam_h
+        - "observation.depth_l"  # 对应 observation.images.wrist_cam_l
+        - "observation.depth_r"  # 对应 observation.images.wrist_cam_r
+      
+      # 融合方法配置
+      depth_fusion_method: "cross_attention"  # 融合方法: "cross_attention" (方案四：双向注意力融合，PI05只支持此方法)
+      depth_fusion_dim: null  # 融合维度（null=自动，使用LLM维度）
+      
+      # 深度特征提取器配置（方案四不使用独立的 ViT backbone，深度图像通过 PaliGemma Vision Tower 处理）
+      depth_backbone_init_from_vision_tower: false  # 方案四：深度图像通过 PaliGemma Vision Tower 处理，不使用独立的 backbone
+      depth_preprocessing: "minmax"  # 深度预处理方法: "minmax" (Min-Max归一化，推荐), "hha" (HHA编码)
+      depth_scale: 0.0001  # 深度缩放因子（将uint16转换为米），默认0.0001
     
     # ========== 归一化配置（PI05使用QUANTILES）==========
     normalization_mapping:

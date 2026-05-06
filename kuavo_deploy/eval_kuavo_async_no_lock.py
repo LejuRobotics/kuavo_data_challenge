@@ -35,6 +35,7 @@ import numpy as np
 
 from lerobot.configs import parser
 from lerobot.policies.factory import make_pre_post_processors
+from kuavo_deploy.utils.preprocessor_utils import preprocess_observation_with_metadata
 
 from lerobot.utils.hub import HubMixin
 from lerobot.utils.utils import init_logging
@@ -225,7 +226,7 @@ def get_actions_async(
                 
                 # Preprocess observation
                 preprocess_start = time.time()
-                processed_observation = preprocessor(obs)
+                processed_observation = preprocess_observation_with_metadata(preprocessor, obs, task=task)
                 preprocess_time = time.time() - preprocess_start
                 
                 # Generate action chunk (ACT without RTC)

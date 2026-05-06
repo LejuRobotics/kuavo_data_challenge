@@ -73,7 +73,7 @@ echo "==================================================="
 echo "👉 第 4 步：安装特定版本的 ffmpeg 和 pyarrow 以及 pyaudio"
 echo "==================================================="
 conda install ffmpeg=6.1.1 -y
-pip uninstall pyarrow -y
+# pip uninstall pyarrow -y
 conda install pyarrow -y
 conda install pyaudio -y
 
