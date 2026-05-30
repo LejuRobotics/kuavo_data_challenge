@@ -9,25 +9,6 @@
 - 原始：一次性加载所有数据到内存 → 对齐 → 写入dataset（内存峰值巨大）
 - 新方法：分块读取 → 即时对齐 → 即时写入 → 释放内存（内存占用可控）
 """
-# Copyright (C) 2025-2026 LejuRobotics.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#
-# ---
-#
-# This project includes code from LeRobot (https://github.com/huggingface/lerobot),
-# which is licensed under the Apache License, Version 2.0.
 
 import numpy as np
 import rosbag
@@ -279,6 +260,42 @@ class ChunkedRosbagProcessor:
         logger.info(f"Total frames processed: {total_frames}")
         return total_frames
     
+    # def _precompute_alignment_indices(
+    #     self, 
+    #     main_timestamps: List[float], 
+    #     timestamp_arrays: Dict[str, np.ndarray]
+    # ) -> Dict[str, List[int]]:
+    #     """
+    #     预计算每个主时间戳对应的各话题索引
+    #     使用二分查找，比每帧都查找快很多
+    #     """
+    #     alignment_indices = {}
+        
+    #     for key, ts_array in timestamp_arrays.items():
+    #         if len(ts_array) == 0:
+    #             alignment_indices[key] = []
+    #             continue
+            
+    #         indices = []
+    #         for stamp in main_timestamps:
+    #             # 二分查找最近的时间戳
+    #             idx = bisect.bisect_left(ts_array, stamp)
+    #             if idx == 0:
+    #                 closest_idx = 0
+    #             elif idx == len(ts_array):
+    #                 closest_idx = len(ts_array) - 1
+    #             else:
+    #                 # 选择更接近的
+    #                 if abs(ts_array[idx] - stamp) < abs(ts_array[idx-1] - stamp):
+    #                     closest_idx = idx
+    #                 else:
+    #                     closest_idx = idx - 1
+    #             indices.append(closest_idx)
+            
+    #         alignment_indices[key] = indices
+        
+    #     return alignment_indices
+    
     def _precompute_alignment_indices(
         self, 
         main_timestamps: List[float], 
@@ -286,7 +303,7 @@ class ChunkedRosbagProcessor:
     ) -> Dict[str, List[int]]:
         """
         预计算每个主时间戳对应的各话题索引
-        使用二分查找，比每帧都查找快很多
+        使用零阶保持（Zero-Order Hold），只取过去最近的数据，绝不拿未来的数据
         """
         alignment_indices = {}
         
@@ -297,23 +314,23 @@ class ChunkedRosbagProcessor:
             
             indices = []
             for stamp in main_timestamps:
-                # 二分查找最近的时间戳
-                idx = bisect.bisect_left(ts_array, stamp)
+                # bisect_right 找到的是第一个 *严格大于* stamp 的位置
+                idx = bisect.bisect_right(ts_array, stamp)
+                
                 if idx == 0:
+                    # 说明当前 stamp 比 ts_array 中所有的数据都要早（未来才会来第一帧数据）
+                    # 给 0 没关系，因为你在主处理函数里有 `if main_stamp < first_ts:` 会把它设为 None 或 fallback
                     closest_idx = 0
-                elif idx == len(ts_array):
-                    closest_idx = len(ts_array) - 1
                 else:
-                    # 选择更接近的
-                    if abs(ts_array[idx] - stamp) < abs(ts_array[idx-1] - stamp):
-                        closest_idx = idx
-                    else:
-                        closest_idx = idx - 1
+                    # idx - 1 就是最后一个 *小于等于* stamp 的位置，这正是我们要的“当前或过去的最新状态”
+                    closest_idx = idx - 1
+                    
                 indices.append(closest_idx)
             
             alignment_indices[key] = indices
         
         return alignment_indices
+
     
     def _detect_arm_traj_gaps(self, all_timestamps: Dict[str, List[float]]) -> List[Tuple[float, float]]:
         """检测kuavo_arm_traj的时间戳间隙"""
@@ -466,8 +483,18 @@ class ChunkedRosbagProcessor:
                 # 查找最接近target_ts的数据
                 ts_list = list(chunk_data[key].keys())
                 if ts_list:
-                    closest_chunk_ts = min(ts_list, key=lambda x: abs(x - target_ts))
-                    aligned_frame[key] = chunk_data[key][closest_chunk_ts]
+                    # closest_chunk_ts = min(ts_list, key=lambda x: abs(x - target_ts))
+                    # 找到所有小于等于目标时间戳的数据（只看过去和现在）
+                    past_ts_list = [ts for ts in ts_list if ts <= target_ts]
+                    if past_ts_list:
+                        # 在过去的数据中，找离当前最近的（即最大的）
+                        closest_chunk_ts = max(past_ts_list)
+                        aligned_frame[key] = chunk_data[key][closest_chunk_ts]
+                    else:
+                        # 说明 chunk 里没有比当前时间更早的数据
+                        aligned_frame[key] = None 
+
+                    # aligned_frame[key] = chunk_data[key][closest_chunk_ts]
                     
                     # 夹爪在获取到了新数据时，更新到 last_known_state 作为后续备份
                     if is_gripper:
