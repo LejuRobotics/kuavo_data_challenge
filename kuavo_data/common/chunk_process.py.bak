@@ -496,10 +496,9 @@ class ChunkedRosbagProcessor:
 
                     # aligned_frame[key] = chunk_data[key][closest_chunk_ts]
                     
-                    # 只有成功取得夹爪数据时才更新缓存，避免 None 覆盖预取的
-                    # 初始状态，导致下面的回退逻辑对 None 调用 copy()。
-                    if is_gripper and aligned_frame[key] is not None:
-                        last_known_state[key] = aligned_frame[key].copy()
+                    # 夹爪在获取到了新数据时，更新到 last_known_state 作为后续备份
+                    if is_gripper:
+                        last_known_state[key] = aligned_frame[key]
                 else:
                     aligned_frame[key] = None
             else:
@@ -509,9 +508,9 @@ class ChunkedRosbagProcessor:
             # 经过上面的逻辑如果没有从 chunk_data 中拿到夹爪数据 (比如夹爪数据在此时段内不发送)
             # 退化利用我们缓存的跨 chunk 的先前状态去替代，保证机械臂在移动时，夹爪不被裁切丢失。
             if is_gripper and aligned_frame[key] is None:
-                cached_state = last_known_state.get(key)
-                if cached_state is not None:
-                    aligned_frame[key] = cached_state.copy()
+                if key in last_known_state:
+                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~key: ",key)
+                    aligned_frame[key] = last_known_state[key].copy()
                     aligned_frame[key]["timestamp"] = main_stamp
         return aligned_frame
     
